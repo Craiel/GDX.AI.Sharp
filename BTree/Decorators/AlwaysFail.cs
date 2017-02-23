@@ -9,6 +9,21 @@
     public class AlwaysFail<T> : Decorator<T>
         where T : IBlackboard
     {
+        // -------------------------------------------------------------------
+        // Constructor
+        // -------------------------------------------------------------------
+        public AlwaysFail()
+        {
+        }
+        
+        public AlwaysFail(Task<T> child)
+            : base(child)
+        {
+        }
+
+        // -------------------------------------------------------------------
+        // Public
+        // -------------------------------------------------------------------
         public override void ChildSuccess(Task<T> task)
         {
             this.ChildFail(task);

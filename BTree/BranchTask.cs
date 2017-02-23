@@ -1,6 +1,7 @@
 ﻿namespace GDX.AI.Sharp.BTree
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using Contracts;
 
@@ -18,7 +19,7 @@
         /// <summary>
         /// Create a branch task with no children
         /// </summary>
-        public BranchTask() : this(new List<Task<T>>())
+        protected BranchTask() : this(new Task<T>[0])
         {
         }
 
@@ -26,9 +27,18 @@
         /// Create a branch task with a list of children
         /// </summary>
         /// <param name="children">list of this task's children, can be empty</param>
-        public BranchTask(IList<Task<T>> children)
+        protected BranchTask(IEnumerable<Task<T>> children)
         {
-            this.Children = children;
+            this.Children = children.ToList();
+        }
+
+        /// <summary>
+        /// Create a branch task with a list of children
+        /// </summary>
+        /// <param name="children">parameter list of this task's children, can be empty</param>
+        protected BranchTask(params Task<T>[] children)
+        {
+            this.Children = children.ToList();
         }
 
         // -------------------------------------------------------------------

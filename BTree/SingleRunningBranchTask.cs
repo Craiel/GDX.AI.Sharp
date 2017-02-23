@@ -1,5 +1,6 @@
 ﻿namespace GDX.AI.Sharp.BTree
 {
+    using System.Collections.Generic;
     using System.Linq;
 
     using Contracts;
@@ -7,9 +8,7 @@
     using Exceptions;
 
     using Sharp.Utils;
-
-    using Utils;
-
+    
     /// <summary>
     /// A <see cref="SingleRunningBranchTask{T}"/> task is a branch task that supports only one running child at a time
     /// </summary>
@@ -17,6 +16,35 @@
     public abstract class SingleRunningBranchTask<T> : BranchTask<T>
         where T : IBlackboard
     {
+        // -------------------------------------------------------------------
+        // Constructor
+        // -------------------------------------------------------------------
+
+        /// <summary>
+        /// Create a branch task with no children
+        /// </summary>
+        protected SingleRunningBranchTask()
+        {
+        }
+
+        /// <summary>
+        /// Create a branch task with a list of children
+        /// </summary>
+        /// <param name="children">list of this task's children, can be empty</param>
+        protected SingleRunningBranchTask(IEnumerable<Task<T>> children)
+            : base(children)
+        {
+        }
+
+        /// <summary>
+        /// Create a branch task with a list of children
+        /// </summary>
+        /// <param name="children">parameter list of this task's children, can be empty</param>
+        protected SingleRunningBranchTask(params Task<T>[] children)
+            : base(children)
+        {
+        }
+
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------

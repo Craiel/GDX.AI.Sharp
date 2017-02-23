@@ -12,6 +12,18 @@
         where T : IBlackboard
     {
         // -------------------------------------------------------------------
+        // Constructor
+        // -------------------------------------------------------------------
+        protected LoopDecorator()
+        {
+        }
+
+        protected LoopDecorator(Task<T> child)
+            : base(child)
+        {
+        }
+
+        // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
 
@@ -19,7 +31,7 @@
         /// whether the <see cref="LoopDecorator{T}.Run"/> method must keep looping or not.
         /// true if it must keep looping; false otherwise
         /// </summary>
-        public bool Condition { get; protected set; }
+        public virtual bool Condition { get; protected set; }
 
         public override void Run()
         {
