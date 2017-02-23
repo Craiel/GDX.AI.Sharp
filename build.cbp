@@ -4,6 +4,8 @@
 --#include "$(PROJECT_ROOT)sys/ext_log4net.cbi"
 --#include "$(PROJECT_ROOT)sys/ext_json.cbi"
 
+SetFramework("v3.5")
+
 print "Configuring Build with CrystalBuild version $(CB_VER) ..."
 
 AddSources("$(BUILD_DIR)", "*.cs", true)
