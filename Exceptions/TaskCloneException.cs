@@ -15,5 +15,10 @@
             : base(string.Empty, inner)
         {
         }
+
+        public TaskCloneException(string message, Exception inner = null)
+            : base(message, inner)
+        {
+        }
     }
 }

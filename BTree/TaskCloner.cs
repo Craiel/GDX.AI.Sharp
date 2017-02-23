@@ -1,20 +1,20 @@
-﻿namespace GDX.AI.Sharp.Core
+﻿namespace GDX.AI.Sharp.BTree
 {
     using Contracts;
 
     /// <summary>
     /// Static holder of the Task Cloner settings
     /// </summary>
-    public static class BTTaskCloner
+    public static class TaskCloner
     {
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
 
         /// <summary>
-        /// Gets or sets the clone strategy (if any) that <see cref="BTTask{T}.Clone"/> will use. Defaults to null, meaning that <see cref="BTTask{T}.CopyTo"/> is used instead.
+        /// Gets or sets the clone strategy (if any) that <see cref="Task{T}.Clone"/> will use. Defaults to null, meaning that <see cref="Task{T}.CopyTo"/> is used instead.
         /// In this case, properly overriding this method in each task is developer's responsibility
         /// </summary>
-        public static IBTTaskCloner Current { get; set; }
+        public static ITaskCloner Current { get; set; }
     }
 }

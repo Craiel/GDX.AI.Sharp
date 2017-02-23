@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Core
+﻿namespace GDX.AI.Sharp.BTree
 {
     using System;
     using System.Collections.Generic;
@@ -13,13 +13,13 @@
     /// The behavior tree itself
     /// </summary>
     /// <typeparam name="T">type of the blackboard object that tasks use to read or modify game state</typeparam>
-    public class BehaviorTree<T> : BTTask<T>
+    public class BehaviorTree<T> : Task<T>
         where T : IBlackboard
     {
-        private readonly IList<IBTListener<T>> listeners;
+        private readonly IList<IListener<T>> listeners;
 
         private T blackboard;
-        private BTTask<T> rootTask;
+        private Task<T> rootTask;
 
         // -------------------------------------------------------------------
         // Constructor
@@ -39,7 +39,7 @@
         /// be set before running this behavior tree, see <see cref="AddChildToTask"/> and <see cref="SetBlackboard"/> respectively
         /// </summary>
         /// <param name="rootTask">the root task of this tree. It can be null</param>
-        public BehaviorTree(BTTask<T> rootTask)
+        public BehaviorTree(Task<T> rootTask)
             : this(rootTask, default(T))
         {
         }
@@ -50,9 +50,9 @@
         /// </summary>
         /// <param name="rootTask">the root task of this tree. It can be null</param>
         /// <param name="blackboard">the <see cref="IBlackboard"/>. It can be null</param>
-        public BehaviorTree(BTTask<T> rootTask, T blackboard)
+        public BehaviorTree(Task<T> rootTask, T blackboard)
         {
-            this.listeners = new List<IBTListener<T>>();
+            this.listeners = new List<IListener<T>>();
 
             this.rootTask = rootTask;
             this.blackboard = blackboard;
@@ -90,7 +90,7 @@
             this.blackboard = newBlackboard;
         }
 
-        public override BTTask<T> GetChild(int index)
+        public override Task<T> GetChild(int index)
         {
             if (index == 0 && this.rootTask != null)
             {
@@ -100,17 +100,17 @@
             throw new IndexOutOfRangeException("Index for root has to be 0");
         }
 
-        public override void ChildRunning(BTTask<T> task, BTTask<T> reporter)
+        public override void ChildRunning(Task<T> task, Task<T> reporter)
         {
             this.Running();
         }
 
-        public override void ChildFail(BTTask<T> task)
+        public override void ChildFail(Task<T> task)
         {
             this.Fail();
         }
 
-        public override void ChildSuccess(BTTask<T> task)
+        public override void ChildSuccess(Task<T> task)
         {
             this.Success();
         }
@@ -151,10 +151,10 @@
         }
 
         /// <summary>
-        /// Adds a new listener which will receive events defined in <see cref="IBTListener{T}"/>
+        /// Adds a new listener which will receive events defined in <see cref="IListener{T}"/>
         /// </summary>
         /// <param name="listener">the listener to add</param>
-        public void AddListener(IBTListener<T> listener)
+        public void AddListener(IListener<T> listener)
         {
             this.listeners.Add(listener);
             this.HasListeners = true;
@@ -164,7 +164,7 @@
         /// Removes a listener
         /// </summary>
         /// <param name="listener">the listener to remove</param>
-        public void RemoveListener(IBTListener<T> listener)
+        public void RemoveListener(IListener<T> listener)
         {
             this.listeners.Remove(listener);
             this.HasListeners = this.listeners.Count > 0;
@@ -184,7 +184,7 @@
         /// </summary>
         /// <param name="task">the added task</param>
         /// <param name="index">index the task was added at</param>
-        public void NotifyChildAdded(BTTask<T> task, int index)
+        public void NotifyChildAdded(Task<T> task, int index)
         {
             for (var i = 0; i < this.listeners.Count; i++)
             {
@@ -197,7 +197,7 @@
         /// </summary>
         /// <param name="task">task of which the status changed</param>
         /// <param name="previousState">the previous <see cref="BTTaskStatus"/></param>
-        public void NotifyStatusUpdated(BTTask<T> task, BTTaskStatus previousState)
+        public void NotifyStatusUpdated(Task<T> task, BTTaskStatus previousState)
         {
             for (var i = 0; i < this.listeners.Count; i++)
             {
@@ -215,7 +215,7 @@
         /// <param name="child">the root task to add</param>
         /// <returns>the index where the root task has been added (always 0)</returns>
         /// <exception cref="IllegalStateException">if the root task is already set</exception>
-        protected override int AddChildToTask(BTTask<T> child)
+        protected override int AddChildToTask(Task<T> child)
         {
             if (this.rootTask != null)
             {
@@ -226,7 +226,7 @@
             return 0;
         }
 
-        protected override void CopyTo(BTTask<T> clone)
+        protected override void CopyTo(Task<T> clone)
         {
             BehaviorTree<T> target = (BehaviorTree<T>)clone;
             target.rootTask = this.rootTask.Clone();

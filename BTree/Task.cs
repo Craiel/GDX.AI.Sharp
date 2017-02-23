@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Core
+﻿namespace GDX.AI.Sharp.BTree
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -14,7 +14,7 @@
     /// </summary>
     /// <typeparam name="T">type of the blackboard object that tasks use to read or modify game state</typeparam>
     [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:ElementsMustAppearInTheCorrectOrder", Justification = "Reviewed. Suppression is OK here.")]
-    public abstract class BTTask<T>
+    public abstract class Task<T>
         where T : IBlackboard
     {
         // -------------------------------------------------------------------
@@ -29,12 +29,12 @@
         /// <summary>
         /// Gets or sets the parent of this task
         /// </summary>
-        public BTTask<T> Control { get; protected set; }
+        public Task<T> Control { get; protected set; }
 
         /// <summary>
         /// Gets or sets The guard of this task
         /// </summary>
-        public BTTask<T> Guard { get; set; }
+        public Task<T> Guard { get; set; }
 
         /// <summary>
         /// Gets or sets the behavior tree this task belongs to
@@ -69,7 +69,7 @@
         /// <param name="child">the child task which will be added</param>
         /// <returns>the index where the child has been added</returns>
         /// <exception cref="IllegalStateException">if the child cannot be added for whatever reason</exception>
-        public int AddChild(BTTask<T> child)
+        public int AddChild(Task<T> child)
         {
             int index = this.AddChildToTask(child);
 
@@ -86,13 +86,13 @@
         /// </summary>
         /// <param name="index">index of the child</param>
         /// <returns>the child task at the specified index</returns>
-        public abstract BTTask<T> GetChild(int index);
+        public abstract Task<T> GetChild(int index);
 
         /// <summary>
         /// This method will set a task as this task's control (parent)
         /// </summary>
         /// <param name="parent">the parent task</param>
-        public void SetControl(BTTask<T> parent)
+        public void SetControl(Task<T> parent)
         {
             this.Control = parent;
             this.Tree = parent.Tree;
@@ -104,7 +104,7 @@
         /// <param name="control">the parent task</param>
         /// <returns>true if guard evaluation succeeds or there's no guard; false otherwise</returns>
         /// <exception cref="IllegalStateException">if guard evaluation returns any status other than Succeeded or Failed (<see cref="BTTaskStatus"/>)</exception>
-        public bool CheckGuard(BTTask<T> control)
+        public bool CheckGuard(Task<T> control)
         {
             if (this.Guard == null)
             {
@@ -164,19 +164,19 @@
         /// </summary>
         /// <param name="task">the task that needs to run again</param>
         /// <param name="reporter">the task that reports, usually one of this task's children</param>
-        public abstract void ChildRunning(BTTask<T> task, BTTask<T> reporter);
+        public abstract void ChildRunning(Task<T> task, Task<T> reporter);
 
         /// <summary>
         /// This method will be called when one of the children of this task succeeds
         /// </summary>
         /// <param name="task">the task that succeeded</param>
-        public abstract void ChildSuccess(BTTask<T> task);
+        public abstract void ChildSuccess(Task<T> task);
 
         /// <summary>
         /// This method will be called when one of the children of this task fails
         /// </summary>
         /// <param name="task">the task that failed</param>
-        public abstract void ChildFail(BTTask<T> task);
+        public abstract void ChildFail(Task<T> task);
 
         /// <summary>
         /// This method will be called in <see cref="Run"/> to inform control that this task needs to run again
@@ -262,17 +262,17 @@
         }
 
         /// <summary>
-        /// Clones this task to a new one. If you don't specify a clone strategy through <see cref="BTTaskCloner"/> the new task is instantiated via reflection and <see cref="CopyTo"/> is invoked
+        /// Clones this task to a new one. If you don't specify a clone strategy through <see cref="TaskCloner"/> the new task is instantiated via reflection and <see cref="CopyTo"/> is invoked
         /// </summary>
         /// <returns>the cloned task</returns>
         /// <exception cref="TaskCloneException">if the task cannot be successfully cloned</exception>
-        public BTTask<T> Clone()
+        public virtual Task<T> Clone()
         {
-            if (BTTaskCloner.Current != null)
+            if (TaskCloner.Current != null)
             {
                 try
                 {
-                    return BTTaskCloner.Current.CloneTask(this);
+                    return TaskCloner.Current.CloneTask(this);
                 }
                 catch (Exception e)
                 {
@@ -282,7 +282,7 @@
 
             try
             {
-                BTTask<T> clone = (BTTask<T>)Activator.CreateInstance(this.GetType());
+                Task<T> clone = (Task<T>)Activator.CreateInstance(this.GetType());
                 this.CopyTo(clone);
                 clone.Guard = this.Guard?.Clone();
                 return clone;
@@ -303,27 +303,23 @@
         /// <param name="child">the child task which will be added</param>
         /// <returns>the index where the child has been added</returns>
         /// <exception cref="IllegalStateException">if the child cannot be added for whatever reason</exception>
-        protected abstract int AddChildToTask(BTTask<T> child);
+        protected abstract int AddChildToTask(Task<T> child);
 
         /// <summary>
-        /// Copies this task to the given task. This method is invoked by CloneTask only if <see cref="BTTaskCloner"/> is null which is its default value
+        /// Copies this task to the given task. This method is invoked by CloneTask only if <see cref="TaskCloner"/> is null which is its default value
         /// </summary>
         /// <param name="clone">the task to be filled</param>
-        protected abstract void CopyTo(BTTask<T> clone);
-
-        // -------------------------------------------------------------------
-        // Private
-        // -------------------------------------------------------------------
+        protected abstract void CopyTo(Task<T> clone);
 
         /// <summary>
         /// Terminates the running children of this task starting from the specified index up to the end
         /// </summary>
         /// <param name="startIndex"> The start Index. </param>
-        private void CancelRunningChildren(int startIndex)
+        protected virtual void CancelRunningChildren(int startIndex)
         {
             for (var i = startIndex; i < this.ChildCount; i++)
             {
-                BTTask<T> child = this.GetChild(i);
+                Task<T> child = this.GetChild(i);
                 if (child.Status == BTTaskStatus.Running)
                 {
                     child.Cancel();

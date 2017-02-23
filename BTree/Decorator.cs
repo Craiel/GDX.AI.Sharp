@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Core
+﻿namespace GDX.AI.Sharp.BTree
 {
     using System;
 
@@ -11,8 +11,8 @@
     /// <summary>
     /// A <see cref="Decorator{T}"/> is a wrapper that provides custom behavior for its child. The child can be of any kind (branch task, leaf task, or another decorator)
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class Decorator<T> : BTTask<T>
+    /// <typeparam name="T">type of the blackboard object that tasks use to read or modify game state</typeparam>
+    public class Decorator<T> : Task<T>
         where T : IBlackboard
     {
         // -------------------------------------------------------------------
@@ -30,7 +30,7 @@
         /// Creates a decorator that wraps the given task
         /// </summary>
         /// <param name="child">the task that will be wrapped</param>
-        public Decorator(BTTask<T> child)
+        public Decorator(Task<T> child)
         {
             this.Child = child;
         }
@@ -40,7 +40,7 @@
         // -------------------------------------------------------------------
         public override int ChildCount => this.Child == null ? 0 : 1;
 
-        public override BTTask<T> GetChild(int index)
+        public override Task<T> GetChild(int index)
         {
             if (index == 0 && this.Child != null)
             {
@@ -71,17 +71,17 @@
             }
         }
 
-        public override void ChildRunning(BTTask<T> task, BTTask<T> reporter)
+        public override void ChildRunning(Task<T> task, Task<T> reporter)
         {
             this.Running();
         }
 
-        public override void ChildSuccess(BTTask<T> task)
+        public override void ChildSuccess(Task<T> task)
         {
             this.Success();
         }
 
-        public override void ChildFail(BTTask<T> task)
+        public override void ChildFail(Task<T> task)
         {
             this.Fail();
         }
@@ -91,11 +91,11 @@
         // -------------------------------------------------------------------
 
         /// <summary>
-        /// The child task wrapped by this decorator
+        /// Gets the child task wrapped by this decorator
         /// </summary>
-        protected BTTask<T> Child { get; private set; }
+        protected Task<T> Child { get; private set; }
 
-        protected override int AddChildToTask(BTTask<T> child)
+        protected override int AddChildToTask(Task<T> child)
         {
             if (this.Child != null)
             {
@@ -106,7 +106,7 @@
             return 0;
         }
 
-        protected override void CopyTo(BTTask<T> clone)
+        protected override void CopyTo(Task<T> clone)
         {
             if (this.Child != null)
             {

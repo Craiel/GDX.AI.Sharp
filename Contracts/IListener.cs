@@ -1,6 +1,6 @@
 ﻿namespace GDX.AI.Sharp.Contracts
 {
-    using Core;
+    using BTree;
 
     using Enums;
 
@@ -10,7 +10,7 @@
     ///  <see cref="BehaviorTree{T}.AddListener"/> method. When a task event occurs, the corresponding method is invoked.
     /// </summary>
     /// <typeparam name="T">type of the blackboard object that tasks use to read or modify game state</typeparam>
-    public interface IBTListener<T>
+    public interface IListener<T>
         where T : IBlackboard
     {
         /// <summary>
@@ -18,13 +18,13 @@
         /// </summary>
         /// <param name="task">the task whose status has been set</param>
         /// <param name="previousStatus">the task's status before the update</param>
-        void StatusUpdated(BTTask<T> task, BTTaskStatus previousStatus);
+        void StatusUpdated(Task<T> task, BTTaskStatus previousStatus);
 
         /// <summary>
         /// This method is invoked when a child task is added to the children of a parent task
         /// </summary>
         /// <param name="task">the parent task of the newly added child</param>
         /// <param name="index">the index where the child has been added</param>
-        void ChildAdded(BTTask<T> task, int index);
+        void ChildAdded(Task<T> task, int index);
     }
 }

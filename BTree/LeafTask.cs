@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Core
+﻿namespace GDX.AI.Sharp.BTree
 {
     using System;
 
@@ -9,10 +9,10 @@
     using Exceptions;
 
     /// <summary>
-    /// A <see cref="BTLeafTask{T}"/> is a terminal task of a behavior tree, contains action or condition logic, can not have any child
+    /// A <see cref="LeafTask{T}"/> is a terminal task of a behavior tree, contains action or condition logic, can not have any child
     /// </summary>
     /// <typeparam name="T">type of the blackboard object that tasks use to read or modify game state</typeparam>
-    public abstract class BTLeafTask<T> : BTTask<T>
+    public abstract class LeafTask<T> : Task<T>
         where T : IBlackboard
     {
         // -------------------------------------------------------------------
@@ -53,20 +53,20 @@
             }
         }
         
-        public override BTTask<T> GetChild(int index)
+        public override Task<T> GetChild(int index)
         {
             throw new IndexOutOfRangeException("A leaf task can not have any child");
         }
 
-        public override void ChildRunning(BTTask<T> task, BTTask<T> reporter)
+        public override void ChildRunning(Task<T> task, Task<T> reporter)
         {
         }
 
-        public override void ChildSuccess(BTTask<T> task)
+        public override void ChildSuccess(Task<T> task)
         {
         }
 
-        public override void ChildFail(BTTask<T> task)
+        public override void ChildFail(Task<T> task)
         {
         }
 
@@ -81,7 +81,7 @@
         /// <returns>the status of this leaf task</returns>
         protected abstract BTTaskStatus Execute();
 
-        protected override int AddChildToTask(BTTask<T> child)
+        protected override int AddChildToTask(Task<T> child)
         {
             throw new IllegalStateException("A leaf task cannot have any children");
         }

@@ -1,11 +1,11 @@
 ﻿namespace GDX.AI.Sharp.Contracts
 {
-    using Core;
+    using BTree;
 
     /// <summary>
-    /// A <see cref="IBTTaskCloner"/> allows you to use third-party libraries to clone behavior trees. See <see cref="BTTaskCloner.Current"/>
+    /// A <see cref="ITaskCloner"/> allows you to use third-party libraries to clone behavior trees. See <see cref="TaskCloner.Current"/>
     /// </summary>
-    public interface IBTTaskCloner
+    public interface ITaskCloner
     {
         /// <summary>
         /// Makes a deep copy of the given task
@@ -13,6 +13,6 @@
         /// <typeparam name="T">type of the blackboard object</typeparam>
         /// <param name="task">the task to clone</param>
         /// <returns>the cloned task</returns>
-        BTTask<T> CloneTask<T>(BTTask<T> task) where T : IBlackboard;
+        Task<T> CloneTask<T>(Task<T> task) where T : IBlackboard;
     }
 }

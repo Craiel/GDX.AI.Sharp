@@ -1,8 +1,8 @@
-﻿namespace GDX.AI.Sharp.Core
+﻿namespace GDX.AI.Sharp.BTree
 {
     using Contracts;
 
-    public sealed class GuardEvaluator<T> : BTTask<T>
+    public sealed class GuardEvaluator<T> : Task<T>
         where T : IBlackboard
     {
         // -------------------------------------------------------------------
@@ -22,7 +22,7 @@
         // -------------------------------------------------------------------
         public override int ChildCount => 0;
         
-        public override BTTask<T> GetChild(int index)
+        public override Task<T> GetChild(int index)
         {
             return null;
         }
@@ -31,27 +31,27 @@
         {
         }
 
-        public override void ChildSuccess(BTTask<T> task)
+        public override void ChildSuccess(Task<T> task)
         {
         }
 
-        public override void ChildFail(BTTask<T> task)
+        public override void ChildFail(Task<T> task)
         {
         }
 
-        public override void ChildRunning(BTTask<T> task, BTTask<T> reporter)
+        public override void ChildRunning(Task<T> task, Task<T> reporter)
         {
         }
 
         // -------------------------------------------------------------------
         // Protected
         // -------------------------------------------------------------------
-        protected override int AddChildToTask(BTTask<T> child)
+        protected override int AddChildToTask(Task<T> child)
         {
             return 0;
         }
 
-        protected override void CopyTo(BTTask<T> clone)
+        protected override void CopyTo(Task<T> clone)
         {
         }
     }
