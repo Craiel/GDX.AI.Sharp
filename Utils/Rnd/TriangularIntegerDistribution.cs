@@ -4,6 +4,8 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
+    using Contracts;
+
     public class TriangularIntegerDistribution : IntegerDistribution
     {
         // -------------------------------------------------------------------
@@ -44,6 +46,11 @@
             }
 
             return (int)Math.Round(MathUtils.RandomTriangular(this.Low, this.High, this.Mode));
+        }
+
+        public override T Clone<T>()
+        {
+            return (T)(IDistribution)new TriangularIntegerDistribution(this.Low, this.High, this.Mode);
         }
     }
 

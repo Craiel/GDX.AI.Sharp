@@ -4,6 +4,8 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
+    using Contracts;
+
     public sealed class ConstantIntegerDistribution : IntegerDistribution
     {
         public static readonly ConstantIntegerDistribution Zero = new ConstantIntegerDistribution(0);
@@ -26,6 +28,11 @@
         public override int NextInt()
         {
             return this.Value;
+        }
+
+        public override T Clone<T>()
+        {
+            return (T)(IDistribution)new ConstantIntegerDistribution(this.Value);
         }
     }
 

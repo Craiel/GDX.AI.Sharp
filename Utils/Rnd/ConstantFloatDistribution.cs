@@ -4,6 +4,8 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
+    using Contracts;
+
     public sealed class ConstantFloatDistribution : FloatDistribution
     {
         public static readonly ConstantFloatDistribution Zero = new ConstantFloatDistribution(0);
@@ -27,6 +29,11 @@
         public override float NextFloat()
         {
             return this.Value;
+        }
+
+        public override T Clone<T>()
+        {
+            return (T)(IDistribution)new ConstantFloatDistribution(this.Value);
         }
     }
 

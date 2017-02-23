@@ -4,6 +4,8 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
+    using Contracts;
+
     public class TriangularFloatDistribution : FloatDistribution
     {
         // -------------------------------------------------------------------
@@ -44,6 +46,11 @@
             }
 
             return MathUtils.RandomTriangular(this.Low, this.High, this.Mode);
+        }
+
+        public override T Clone<T>()
+        {
+            return (T)(IDistribution)new TriangularFloatDistribution(this.Low, this.High, this.Mode);
         }
     }
 

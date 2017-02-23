@@ -4,6 +4,8 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
+    using Contracts;
+
     public class UniformFloatDistribution : FloatDistribution
     {
         // -------------------------------------------------------------------
@@ -30,6 +32,11 @@
         public override float NextFloat()
         {
             return this.Low + (float)(MathUtils.Rnd.NextDouble() * (this.High - this.Low));
+        }
+
+        public override T Clone<T>()
+        {
+            return (T)(IDistribution)new UniformFloatDistribution(this.Low, this.High);
         }
     }
 

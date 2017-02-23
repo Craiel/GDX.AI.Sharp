@@ -4,6 +4,8 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
+    using Contracts;
+
     public sealed class ConstantLongDistribution : LongDistribution
     {
         public static readonly ConstantLongDistribution Zero = new ConstantLongDistribution(0);
@@ -26,6 +28,11 @@
         public override long NextLong()
         {
             return this.Value;
+        }
+
+        public override T Clone<T>()
+        {
+            return (T)(IDistribution)new ConstantLongDistribution(this.Value);
         }
     }
 

@@ -75,7 +75,7 @@
         protected override void CopyTo(Task<T> clone)
         {
             Wait<T> wait = (Wait<T>)clone;
-            wait.Seconds = this.Seconds;
+            wait.Seconds = this.Seconds.Clone<FloatDistribution>();
         }
     }
 }

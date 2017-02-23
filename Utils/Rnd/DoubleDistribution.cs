@@ -20,5 +20,7 @@
         }
 
         public abstract double NextDouble();
+
+        public abstract T Clone<T>() where T : IDistribution;
     }
 }

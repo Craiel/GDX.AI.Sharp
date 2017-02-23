@@ -4,6 +4,8 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
+    using Contracts;
+
     public class UniformDoubleDistribution : DoubleDistribution
     {
         // -------------------------------------------------------------------
@@ -30,6 +32,11 @@
         public override double NextDouble()
         {
             return this.Low + (MathUtils.Rnd.NextDouble() * (this.High - this.Low));
+        }
+
+        public override T Clone<T>()
+        {
+            return (T)(IDistribution)new UniformDoubleDistribution(this.Low, this.High);
         }
     }
 

@@ -4,6 +4,8 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
+    using Contracts;
+
     public class UniformIntegerDistribution : IntegerDistribution
     {
         // -------------------------------------------------------------------
@@ -30,6 +32,11 @@
         public override int NextInt()
         {
             return MathUtils.Rnd.Next(this.Low, this.High);
+        }
+
+        public override T Clone<T>()
+        {
+            return (T)(IDistribution)new UniformIntegerDistribution(this.Low, this.High);
         }
     }
 

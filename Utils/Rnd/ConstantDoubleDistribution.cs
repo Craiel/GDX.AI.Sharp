@@ -4,6 +4,8 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
+    using Contracts;
+
     public sealed class ConstantDoubleDistribution : DoubleDistribution
     {
         public static readonly ConstantDoubleDistribution Zero = new ConstantDoubleDistribution(0);
@@ -27,6 +29,11 @@
         public override double NextDouble()
         {
             return this.Value;
+        }
+
+        public override T Clone<T>()
+        {
+            return (T)(IDistribution)new ConstantDoubleDistribution(this.Value);
         }
     }
 

@@ -20,5 +20,7 @@
         {
             return this.NextFloat();
         }
+
+        public abstract T Clone<T>() where T : IDistribution;
     }
 }

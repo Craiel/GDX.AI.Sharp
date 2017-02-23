@@ -4,6 +4,8 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
+    using Contracts;
+
     public class GaussianFloatDistribution : FloatDistribution
     {
         public static readonly GaussianFloatDistribution StandardNormal = new GaussianFloatDistribution(0, 1);
@@ -27,6 +29,11 @@
         public override float NextFloat()
         {
             return this.Mean + (float)MathUtils.NextGaussian() * this.StandardDeviation;
+        }
+
+        public override T Clone<T>()
+        {
+            return (T)(IDistribution)new GaussianFloatDistribution(this.Mean, this.StandardDeviation);
         }
     }
 

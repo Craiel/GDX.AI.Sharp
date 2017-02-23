@@ -9,5 +9,7 @@
         float NextFloat();
 
         double NextDouble();
+
+        T Clone<T>() where T : IDistribution;
     }
 }
