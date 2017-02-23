@@ -6,8 +6,8 @@
 
     using Enums;
 
-    using Utils.Rnd;
-
+    using Sharp.Utils.Rnd;
+    
     /// <summary>
     /// <see cref="Wait{T}"/> is a leaf that keeps running for the specified amount of time then succeeds
     /// </summary>

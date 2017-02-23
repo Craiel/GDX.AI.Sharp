@@ -105,7 +105,9 @@
 
         private Task<T> CreateSubtreeRootTask()
         {
-            return BehaviorTreeLibraryManager.Instance.CreateRootTask(this.SubTree);
+            // TODO: continue
+            return null;
+            //return BehaviorTreeLibraryManager.Instance.CreateRootTask(this.SubTree);
         }
     }
 }

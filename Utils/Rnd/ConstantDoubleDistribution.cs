@@ -1,5 +1,9 @@
 ﻿namespace GDX.AI.Sharp.Utils.Rnd
 {
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
+
     public sealed class ConstantDoubleDistribution : DoubleDistribution
     {
         public static readonly ConstantDoubleDistribution Zero = new ConstantDoubleDistribution(0);
@@ -23,6 +27,30 @@
         public override double NextDouble()
         {
             return this.Value;
+        }
+    }
+
+    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Reviewed. Suppression is OK here.")]
+    public sealed class ConstantDoubleDistributionAdapter : DistributionAdapters.DoubleAdapter<ConstantDoubleDistribution>
+    {
+        public ConstantDoubleDistributionAdapter()
+            : base("constant")
+        {
+        }
+
+        protected override ConstantDoubleDistribution ToDistributionTyped(params string[] parameters)
+        {
+            if (parameters.Length != 1)
+            {
+                throw new ArgumentException("Expected 1 parameter");
+            }
+
+            return new ConstantDoubleDistribution(ParseDouble(parameters[0]));
+        }
+
+        protected override string[] ToParametersTyped(ConstantDoubleDistribution distribution)
+        {
+            return new[] { distribution.Value.ToString(CultureInfo.InvariantCulture) };
         }
     }
 }
