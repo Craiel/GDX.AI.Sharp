@@ -14,16 +14,16 @@
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        protected RandomSelector()
+        public RandomSelector()
         {
         }
 
-        protected RandomSelector(IEnumerable<Task<T>> children)
+        public RandomSelector(IEnumerable<Task<T>> children)
             : base(children)
         {
         }
 
-        protected RandomSelector(params Task<T>[] children)
+        public RandomSelector(params Task<T>[] children)
             : base(children)
         {
         }

@@ -15,16 +15,16 @@
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        protected Selector()
+        public Selector()
         {
         }
-        
-        protected Selector(IEnumerable<Task<T>> children)
+
+        public Selector(IEnumerable<Task<T>> children)
             : base(children)
         {
         }
-        
-        protected Selector(params Task<T>[] children)
+
+        public Selector(params Task<T>[] children)
             : base(children)
         {
         }

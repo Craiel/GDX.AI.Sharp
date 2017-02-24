@@ -14,11 +14,11 @@
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        protected UntilFail()
+        public UntilFail()
         {
         }
 
-        protected UntilFail(Task<T> child)
+        public UntilFail(Task<T> child)
             : base(child)
         {
         }

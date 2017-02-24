@@ -28,18 +28,18 @@
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        protected Parallel(ParallelPolicy policy = ParallelPolicy.Sequence) 
+        public Parallel(ParallelPolicy policy = ParallelPolicy.Sequence) 
             : this(policy, new Task<T>[0])
         {
         }
-        
-        protected Parallel(ParallelPolicy policy, IEnumerable<Task<T>> children)
+
+        public Parallel(ParallelPolicy policy, IEnumerable<Task<T>> children)
         {
             this.SetPolicy(policy);
             this.Children = children.ToList();
         }
-        
-        protected Parallel(ParallelPolicy policy, params Task<T>[] children)
+
+        public Parallel(ParallelPolicy policy, params Task<T>[] children)
         {
             this.SetPolicy(policy);
             this.Children = children.ToList();

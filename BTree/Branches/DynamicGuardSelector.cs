@@ -18,16 +18,16 @@
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        protected DynamicGuardSelector() : this(new Task<T>[0])
+        public DynamicGuardSelector() : this(new Task<T>[0])
         {
         }
-        
-        protected DynamicGuardSelector(IEnumerable<Task<T>> children)
+
+        public DynamicGuardSelector(IEnumerable<Task<T>> children)
         {
             this.Children = children.ToList();
         }
-        
-        protected DynamicGuardSelector(params Task<T>[] children)
+
+        public DynamicGuardSelector(params Task<T>[] children)
         {
             this.Children = children.ToList();
         }

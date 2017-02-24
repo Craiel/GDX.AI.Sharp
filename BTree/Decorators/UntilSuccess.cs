@@ -14,11 +14,11 @@
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        protected UntilSuccess()
+        public UntilSuccess()
         {
         }
 
-        protected UntilSuccess(Task<T> child)
+        public UntilSuccess(Task<T> child)
             : base(child)
         {
         }
