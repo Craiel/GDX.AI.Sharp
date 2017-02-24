@@ -118,6 +118,11 @@
             return this.Leaf(new Wait<T>(seconds));
         }
 
+        public BehaviorTreeBuilder<T> Action(ActionDelegate action = null)
+        {
+            return this.Leaf(new Action<T>(action));
+        }
+
         public BehaviorTreeBuilder<T> Decorator(Decorator<T> task)
         {
             if (this.CurrentParent == null)
