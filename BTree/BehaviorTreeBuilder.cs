@@ -132,7 +132,7 @@
 
             this.CurrentParent.AddChild(task);
 
-            if (task.ChildCount < 0)
+            if (task.ChildCount <= 0)
             {
                 // This decorator has no child yet, wait for a fluent set of a leaf node
                 this.CurrentDecorator = task;
@@ -189,17 +189,23 @@
 
         public BehaviorTreeBuilder<T> End()
         {
-            if (this.parentStack.Count <= 0)
+            if (this.parentStack.Count <= 1)
             {
-                throw new BehaviorTreeBuilderException("End() called on empty stack");
+                throw new BehaviorTreeBuilderException("End() called on empty stack or root node");
             }
 
-            this.CurrentParent = this.parentStack.Pop();
+            this.parentStack.Pop();
+            this.CurrentParent = this.parentStack.Peek();
             return this;
         }
 
         public BehaviorTree<T> Build(T blackboard = default(T))
         {
+            if (this.parentStack.Count > 1)
+            {
+                throw new BehaviorTreeBuilderException("Build() called with open parent nodes, you are missing End() calls");
+            }
+
             if (this.CurrentParent == null)
             {
                 throw new BehaviorTreeBuilderException("Build() called on empty tree");
