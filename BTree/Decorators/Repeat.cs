@@ -2,7 +2,7 @@
 {
     using Contracts;
 
-    using Sharp.Utils.Rnd;
+    using Mathematics.Rnd;
 
     /// <summary>
     /// A <see cref="Repeat{T}"/> decorator will repeat the wrapped task a certain number of times, possibly infinite. 

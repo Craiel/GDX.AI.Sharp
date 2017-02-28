@@ -1,9 +1,9 @@
-﻿namespace GDX.AI.Sharp.Utils.Rnd
+﻿namespace GDX.AI.Sharp.Mathematics.Rnd
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    
+
     using Contracts;
 
     using Exceptions;

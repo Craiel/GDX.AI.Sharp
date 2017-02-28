@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Utils.Rnd
+﻿namespace GDX.AI.Sharp.Mathematics.Rnd
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -6,14 +6,16 @@
 
     using Contracts;
 
-    public class GaussianFloatDistribution : FloatDistribution
+    using Mathematics;
+
+    public class GaussianDoubleDistribution : DoubleDistribution
     {
-        public static readonly GaussianFloatDistribution StandardNormal = new GaussianFloatDistribution(0, 1);
+        public static readonly GaussianDoubleDistribution StandardNormal = new GaussianDoubleDistribution(0, 1);
 
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        public GaussianFloatDistribution(float mean, float standardDeviation)
+        public GaussianDoubleDistribution(double mean, double standardDeviation)
         {
             this.Mean = mean;
             this.StandardDeviation = standardDeviation;
@@ -22,40 +24,40 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public float Mean { get; }
+        public double Mean { get; }
 
-        public float StandardDeviation { get; }
+        public double StandardDeviation { get; }
 
-        public override float NextFloat()
+        public override double NextDouble()
         {
-            return this.Mean + (float)MathUtils.NextGaussian() * this.StandardDeviation;
+            return this.Mean + MathUtils.NextGaussian() * this.StandardDeviation;
         }
 
         public override T Clone<T>()
         {
-            return (T)(IDistribution)new GaussianFloatDistribution(this.Mean, this.StandardDeviation);
+            return (T)(IDistribution)new GaussianDoubleDistribution(this.Mean, this.StandardDeviation);
         }
     }
 
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Reviewed. Suppression is OK here.")]
-    public sealed class GaussianFloatDistributionAdapter : DistributionAdapters.FloatAdapter<GaussianFloatDistribution>
+    public sealed class GaussianDoubleDistributionAdapter : DistributionAdapters.DoubleAdapter<GaussianDoubleDistribution>
     {
-        public GaussianFloatDistributionAdapter()
+        public GaussianDoubleDistributionAdapter()
             : base("gaussian")
         {
         }
 
-        protected override GaussianFloatDistribution ToDistributionTyped(params string[] parameters)
+        protected override GaussianDoubleDistribution ToDistributionTyped(params string[] parameters)
         {
             if (parameters.Length != 2)
             {
                 throw new ArgumentException("Expected 2 parameters");
             }
 
-            return new GaussianFloatDistribution(ParseFloat(parameters[0]), ParseFloat(parameters[1]));
+            return new GaussianDoubleDistribution(ParseDouble(parameters[0]), ParseDouble(parameters[1]));
         }
 
-        protected override string[] ToParametersTyped(GaussianFloatDistribution distribution)
+        protected override string[] ToParametersTyped(GaussianDoubleDistribution distribution)
         {
             return new[] { distribution.Mean.ToString(CultureInfo.InvariantCulture), distribution.StandardDeviation.ToString(CultureInfo.InvariantCulture) };
         }

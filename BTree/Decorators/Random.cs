@@ -4,8 +4,8 @@
 
     using Leafs;
 
-    using Sharp.Utils;
-    using Sharp.Utils.Rnd;
+    using Mathematics;
+    using Mathematics.Rnd;
 
     /// <summary>
     /// The <see cref="Random{T}"/> decorator succeeds with the specified probability, regardless of whether the wrapped task fails or succeeds.

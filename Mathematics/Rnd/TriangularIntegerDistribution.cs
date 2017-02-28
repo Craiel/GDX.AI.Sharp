@@ -1,10 +1,12 @@
-﻿namespace GDX.AI.Sharp.Utils.Rnd
+﻿namespace GDX.AI.Sharp.Mathematics.Rnd
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
     using Contracts;
+
+    using Mathematics;
 
     public class TriangularIntegerDistribution : IntegerDistribution
     {

@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Utils
+﻿namespace GDX.AI.Sharp.Mathematics
 {
     using System;
     using System.Diagnostics.CodeAnalysis;

@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Utils.Rnd
+﻿namespace GDX.AI.Sharp.Mathematics.Rnd
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -6,22 +6,24 @@
 
     using Contracts;
 
-    public class TriangularLongDistribution : LongDistribution
+    using Mathematics;
+
+    public class TriangularFloatDistribution : FloatDistribution
     {
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        public TriangularLongDistribution(long high)
+        public TriangularFloatDistribution(float high)
             : this(-high, high)
         {
         }
 
-        public TriangularLongDistribution(long low, long high)
-            : this(low, high, (low + high) * .5)
+        public TriangularFloatDistribution(float low, float high)
+            : this(low, high, (low + high) * .5f)
         {
         }
 
-        public TriangularLongDistribution(long low, long high, double mode)
+        public TriangularFloatDistribution(float low, float high, float mode)
         {
             this.Low = low;
             this.High = high;
@@ -31,61 +33,61 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public long Low { get; }
+        public float Low { get; }
 
-        public long High { get; }
+        public float High { get; }
 
-        public double Mode { get; }
+        public float Mode { get; }
 
-        public override long NextLong()
+        public override float NextFloat()
         {
             if (Math.Abs(-this.Low - this.High) < double.Epsilon && Math.Abs(this.Mode) < double.Epsilon)
             {
                 // Faster
-                return (long)Math.Round(MathUtils.RandomTriangular(this.High));
+                return MathUtils.RandomTriangular(this.High);
             }
 
-            return (long)Math.Round(MathUtils.RandomTriangular(this.Low, this.High, this.Mode));
+            return MathUtils.RandomTriangular(this.Low, this.High, this.Mode);
         }
 
         public override T Clone<T>()
         {
-            return (T)(IDistribution)new TriangularLongDistribution(this.Low, this.High, this.Mode);
+            return (T)(IDistribution)new TriangularFloatDistribution(this.Low, this.High, this.Mode);
         }
     }
 
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Reviewed. Suppression is OK here.")]
-    public sealed class TriangularLongDistributionAdapter : DistributionAdapters.LongAdapter<TriangularLongDistribution>
+    public sealed class TriangularFloatDistributionAdapter : DistributionAdapters.FloatAdapter<TriangularFloatDistribution>
     {
-        public TriangularLongDistributionAdapter()
+        public TriangularFloatDistributionAdapter()
             : base("triangular")
         {
         }
 
-        protected override TriangularLongDistribution ToDistributionTyped(params string[] parameters)
+        protected override TriangularFloatDistribution ToDistributionTyped(params string[] parameters)
         {
             switch (parameters.Length)
             {
                 case 1:
                     {
-                        return new TriangularLongDistribution(ParseLong(parameters[0]));
+                        return new TriangularFloatDistribution(ParseFloat(parameters[0]));
                     }
 
                 case 2:
                     {
-                        return new TriangularLongDistribution(ParseLong(parameters[0]), ParseLong(parameters[1]));
+                        return new TriangularFloatDistribution(ParseFloat(parameters[0]), ParseFloat(parameters[1]));
                     }
 
                 case 3:
                     {
-                        return new TriangularLongDistribution(ParseLong(parameters[0]), ParseLong(parameters[1]), ParseDouble(parameters[2]));
+                        return new TriangularFloatDistribution(ParseFloat(parameters[0]), ParseFloat(parameters[1]), ParseFloat(parameters[2]));
                     }
             }
 
             throw new ArgumentException("Expected 1-3 parameters");
         }
 
-        protected override string[] ToParametersTyped(TriangularLongDistribution distribution)
+        protected override string[] ToParametersTyped(TriangularFloatDistribution distribution)
         {
             return new[] { distribution.Low.ToString(CultureInfo.InvariantCulture), distribution.High.ToString(CultureInfo.InvariantCulture), distribution.Mode.ToString(CultureInfo.InvariantCulture) };
         }
