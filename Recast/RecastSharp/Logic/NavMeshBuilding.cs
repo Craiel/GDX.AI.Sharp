@@ -1,8 +1,8 @@
-﻿namespace RecastTest.Logic
+﻿namespace GDX.AI.Sharp.Recast.RecastSharp.Logic
 {
     using CarbonCore.Utils.Diagnostics;
     using CarbonCore.Utils.IO;
-    
+
     using RecastWrapper;
 
     public static class NavMeshBuilding

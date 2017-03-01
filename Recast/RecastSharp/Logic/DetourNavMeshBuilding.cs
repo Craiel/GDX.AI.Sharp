@@ -1,6 +1,6 @@
-﻿namespace RecastTest.Logic
+﻿namespace GDX.AI.Sharp.Recast.RecastSharp.Logic
 {
-    using RecastTest.Enums;
+    using Enums;
 
     using RecastWrapper;
 

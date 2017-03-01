@@ -2,6 +2,7 @@
 --#include "$(PROJECT_ROOT)sys/common.cbi"
 --#include "$(PROJECT_ROOT)sys/default.cbi"
 --#include "$(PROJECT_ROOT)sys/ext_nunit.cbi"
+--#include "$(PROJECT_ROOT)sys/ext_json.cbi"
 
 print "Configuring Build with CrystalBuild version $(CB_VER) ..."
 
@@ -10,12 +11,11 @@ AddSources("$(BUILD_DIR)", "*.cs", true)
 SetOutputType("Library")
 SetNamespace("GDX.AI.Sharp.Tests")
 
-AddReference("Newtonsoft.Json", ccRoot.."Newtonsoft.Json.dll")
 AddReference("MonoGame.Math", ccRoot.."MonoGame.Math.dll")
 AddReference("CarbonCore.Utils", ccRoot.."CarbonCore.Utils.dll")
 AddReference("CarbonCore.Utils.Edge", "$(PROJECT_ROOT)External/CCRelease/CarbonCore.Utils.Edge.dll")
 
-AddProjectReference("$(PROJECT_ROOT)External/gdxAI.Sharp", "gdxAI.Sharp")
+AddProjectReference("$(PROJECT_ROOT)External/GDX.AI.Sharp", "GDX.AI.Sharp")
 
 return WriteProjectFile()
 

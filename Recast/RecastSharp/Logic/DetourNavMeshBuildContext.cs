@@ -1,4 +1,4 @@
-﻿namespace RecastTest.Logic
+﻿namespace GDX.AI.Sharp.Recast.RecastSharp.Logic
 {
     using RecastWrapper;
 

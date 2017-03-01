@@ -1,4 +1,4 @@
-﻿namespace RecastTest.Enums
+﻿namespace GDX.AI.Sharp.Recast.RecastSharp.Enums
 {
     using System;
 

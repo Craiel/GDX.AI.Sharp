@@ -100,7 +100,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Source\Detour\Include;$(ProjectDir)..\Source\DetourCrowd\Include;$(ProjectDir)..\Source\DetourTileCache\Include;$(ProjectDir)..\Source\Recast\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -136,9 +136,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\DetourCrowd\Include\DetourCrowd.h" />
+    <ClInclude Include="..\Source\DetourCrowd\Include\DetourLocalBoundary.h" />
+    <ClInclude Include="..\Source\DetourCrowd\Include\DetourObstacleAvoidance.h" />
+    <ClInclude Include="..\Source\DetourCrowd\Include\DetourPathCorridor.h" />
+    <ClInclude Include="..\Source\DetourCrowd\Include\DetourPathQueue.h" />
+    <ClInclude Include="..\Source\DetourCrowd\Include\DetourProximityGrid.h" />
+    <ClInclude Include="..\Source\DetourTileCache\Include\DetourTileCache.h" />
+    <ClInclude Include="..\Source\DetourTileCache\Include\DetourTileCacheBuilder.h" />
+    <ClInclude Include="..\Source\Detour\Include\DetourAlloc.h" />
+    <ClInclude Include="..\Source\Detour\Include\DetourAssert.h" />
+    <ClInclude Include="..\Source\Detour\Include\DetourCommon.h" />
+    <ClInclude Include="..\Source\Detour\Include\DetourMath.h" />
+    <ClInclude Include="..\Source\Detour\Include\DetourNavMesh.h" />
+    <ClInclude Include="..\Source\Detour\Include\DetourNavMeshBuilder.h" />
+    <ClInclude Include="..\Source\Detour\Include\DetourNavMeshQuery.h" />
+    <ClInclude Include="..\Source\Detour\Include\DetourNode.h" />
+    <ClInclude Include="..\Source\Detour\Include\DetourStatus.h" />
+    <ClInclude Include="..\Source\Recast\Include\Recast.h" />
+    <ClInclude Include="..\Source\Recast\Include\RecastAlloc.h" />
+    <ClInclude Include="..\Source\Recast\Include\RecastAssert.h" />
     <ClInclude Include="BuildContext.h" />
     <ClInclude Include="DetourWrapper.h" />
     <ClInclude Include="ManagedDtCrowd.h" />
+    <ClInclude Include="ManagedDtCrowdAgent.h" />
+    <ClInclude Include="ManagedDtCrowdAgentParams.h" />
     <ClInclude Include="ManagedDtNavMesh.h" />
     <ClInclude Include="ManagedDtNavMeshCreateParams.h" />
     <ClInclude Include="ManagedDtNavMeshQuery.h" />
@@ -152,38 +174,43 @@
     <ClInclude Include="RecastWrapper.h" />
     <ClInclude Include="ManagedRcConfig.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\DetourCrowd\Source\DetourCrowd.cpp" />
+    <ClCompile Include="..\Source\DetourCrowd\Source\DetourLocalBoundary.cpp" />
+    <ClCompile Include="..\Source\DetourCrowd\Source\DetourObstacleAvoidance.cpp" />
+    <ClCompile Include="..\Source\DetourCrowd\Source\DetourPathCorridor.cpp" />
+    <ClCompile Include="..\Source\DetourCrowd\Source\DetourPathQueue.cpp" />
+    <ClCompile Include="..\Source\DetourCrowd\Source\DetourProximityGrid.cpp" />
+    <ClCompile Include="..\Source\DetourTileCache\Source\DetourTileCache.cpp" />
+    <ClCompile Include="..\Source\DetourTileCache\Source\DetourTileCacheBuilder.cpp" />
+    <ClCompile Include="..\Source\Detour\Source\DetourAlloc.cpp" />
+    <ClCompile Include="..\Source\Detour\Source\DetourAssert.cpp" />
+    <ClCompile Include="..\Source\Detour\Source\DetourCommon.cpp" />
+    <ClCompile Include="..\Source\Detour\Source\DetourNavMesh.cpp" />
+    <ClCompile Include="..\Source\Detour\Source\DetourNavMeshBuilder.cpp" />
+    <ClCompile Include="..\Source\Detour\Source\DetourNavMeshQuery.cpp" />
+    <ClCompile Include="..\Source\Detour\Source\DetourNode.cpp" />
+    <ClCompile Include="..\Source\Recast\Source\Recast.cpp" />
+    <ClCompile Include="..\Source\Recast\Source\RecastAlloc.cpp" />
+    <ClCompile Include="..\Source\Recast\Source\RecastArea.cpp" />
+    <ClCompile Include="..\Source\Recast\Source\RecastAssert.cpp" />
+    <ClCompile Include="..\Source\Recast\Source\RecastContour.cpp" />
+    <ClCompile Include="..\Source\Recast\Source\RecastFilter.cpp" />
+    <ClCompile Include="..\Source\Recast\Source\RecastLayers.cpp" />
+    <ClCompile Include="..\Source\Recast\Source\RecastMesh.cpp" />
+    <ClCompile Include="..\Source\Recast\Source\RecastMeshDetail.cpp" />
+    <ClCompile Include="..\Source\Recast\Source\RecastRasterization.cpp" />
+    <ClCompile Include="..\Source\Recast\Source\RecastRegion.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="BuildLog.cpp" />
     <ClCompile Include="DetourWrapper.cpp" />
     <ClCompile Include="PerfTimer.cpp" />
     <ClCompile Include="RecastWrapper.cpp" />
     <ClCompile Include="ManagedRcConfig.cpp" />
-    <ClCompile Include="Stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Source\Detour.vcxproj">
-      <Project>{18fee2ad-04a0-0d84-ed5a-21d8d99b94d4}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Source\DetourCrowd.vcxproj">
-      <Project>{f7616a66-6317-e35b-ec0b-dd3258c0d95f}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Source\DetourTileCache.vcxproj">
-      <Project>{1ab411d3-863f-7f97-8f50-028cfb5adb97}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Source\Recast.vcxproj">
-      <Project>{a7a881ce-934a-aca4-7c05-c0f8684633f5}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

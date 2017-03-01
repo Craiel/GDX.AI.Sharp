@@ -1,8 +1,8 @@
-﻿namespace RecastTest.Logic
+﻿namespace GDX.AI.Sharp.Recast.RecastSharp.Logic
 {
     using System;
 
-    using GDX.AI.Sharp.Geometry;
+    using Geometry;
 
     using RecastWrapper;
 
