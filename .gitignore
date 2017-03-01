@@ -1,3 +1,5 @@
 Help/
+Debug/
+x64/
 
 *.csproj

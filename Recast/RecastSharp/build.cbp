@@ -1,0 +1,16 @@
+﻿--#include <System>
+--#include "$(PROJECT_ROOT)sys/common.cbi"
+--#include "$(PROJECT_ROOT)sys/default.cbi"
+
+print "Configuring Build with CrystalBuild version $(CB_VER) ..."
+
+AddSources("$(BUILD_DIR)", "*.cs", true)
+
+SetNamespace("GDX.AI.Sharp.Recast.RecastSharp")
+
+AddReference("Newtonsoft.Json", ccRoot.."Newtonsoft.Json.dll")
+AddReference("MonoGame.Math", ccRoot.."MonoGame.Math.dll")
+AddReference("CarbonCore.Utils", ccRoot.."CarbonCore.Utils.dll")
+AddReference("CarbonCore.Utils.Edge", "$(PROJECT_ROOT)External/CCRelease/CarbonCore.Utils.Edge.dll")
+
+return WriteProjectFile()
