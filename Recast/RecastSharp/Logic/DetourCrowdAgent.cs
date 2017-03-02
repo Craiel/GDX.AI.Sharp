@@ -19,7 +19,7 @@
             this.agent = agent;
         }
 
-        public Vector3 Position
+        /*public Vector3 Position
         {
             get
             {
@@ -29,6 +29,6 @@
             }
         }
 
-        public GDX.AI.Sharp.Recast.RecastSharp.Enums.MoveRequestState State => (GDX.AI.Sharp.Recast.RecastSharp.Enums.MoveRequestState)this.agent.TargetState;
+        public GDX.AI.Sharp.Recast.RecastSharp.Enums.MoveRequestState State => (GDX.AI.Sharp.Recast.RecastSharp.Enums.MoveRequestState)this.agent.TargetState;*/
     }
 }

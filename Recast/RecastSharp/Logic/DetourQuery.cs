@@ -36,7 +36,7 @@
                 out randomPointData);
 
             randomPoint = new Vector3(randomPointData[0], randomPointData[1], randomPointData[2]);
-            return DetourWrapper.Instance.dtStatusFailedWrapped(status);
+            return !DetourWrapper.Instance.dtStatusFailedWrapped(status);
         }
 
         public bool FindNearestPoly(Vector3 centerPoint, Vector3 extends, out uint nearestRef, out Vector3 nearestPoint)
@@ -48,9 +48,14 @@
                 this.runtime.Crowd.GetManaged(),
                 out nearestRef,
                 out nearestPointData);
+            if (nearestPointData == null)
+            {
+                nearestPoint = new Vector3(float.MinValue);
+                return false;
+            }
 
             nearestPoint = new Vector3(nearestPointData[0], nearestPointData[1], nearestPointData[2]);
-            return DetourWrapper.Instance.dtStatusFailedWrapped(status);
+            return !DetourWrapper.Instance.dtStatusFailedWrapped(status);
         }
 
         // -------------------------------------------------------------------

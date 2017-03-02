@@ -1,7 +1,7 @@
 #pragma once
 
+#include <Recast.h>
 #include "PerfTimer.h"
-#include "ManagedRcContext.h"
 
 using namespace System;
 
@@ -39,7 +39,7 @@ namespace RecastWrapper {
 		///@}
 	};
 
-	public ref class ManagedBuildContext : ManagedRcContext
+	/*public ref class ManagedBuildContext : ManagedRcContext
 	{
 	public:
 		ManagedBuildContext() : ManagedRcContext(new BuildContext()) {}
@@ -107,5 +107,5 @@ namespace RecastWrapper {
 			if (t < 0) return;
 			ctx.log(RC_LOG_PROGRESS, "%s:\t%.2fms\t(%.1f%%)", name, t / 1000.0f, t*pc);
 		}		
-	};
+	};*/
 }

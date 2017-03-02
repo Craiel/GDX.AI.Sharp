@@ -14,7 +14,6 @@
         public NavMeshBuildContext()
         {
             this.ManagedContext = new ManagedBuildContext();
-            this.Model = new ObjModel();
             this.Config = new ManagedRcConfig();
 
             this.SetDefaultConfig();
@@ -30,8 +29,8 @@
         // Public
         // -------------------------------------------------------------------
         public ManagedBuildContext ManagedContext { get; private set; }
-
-        public ObjModel Model { get; private set; }
+        
+        public ManagedInputGeom InputGeom { get; set; }
 
         public ManagedRcConfig Config { get; private set; }
 
@@ -88,8 +87,8 @@
             this.Config.walkableRadius = (int)Math.Ceiling(agentRadius / cellSize);
             this.Config.maxEdgeLen = (int)(maxEdgeLength / cellSize);
             this.Config.maxSimplificationError = maxEdgeError;
-            this.Config.minRegionArea = (int)Math.Sqrt(minRegionSize);
-            this.Config.mergeRegionArea = (int)Math.Sqrt(mergedRegionSize);
+            this.Config.minRegionArea = minRegionSize * minRegionSize;
+            this.Config.mergeRegionArea = mergedRegionSize * mergedRegionSize;
             this.Config.maxVertsPerPoly = versPerPoly;
             this.Config.detailSampleDist = sampleDistance < 0.9f ? 0 : cellSize * sampleDistance;
             this.Config.detailSampleMaxError = cellHeight * maxSampleError;

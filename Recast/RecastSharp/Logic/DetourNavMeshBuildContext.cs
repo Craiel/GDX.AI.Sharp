@@ -10,6 +10,10 @@
         public DetourNavMeshBuildContext()
         {
             this.Params = new ManagedDtNavMeshCreateParams();
+            
+            this.AgentHeight = 2.0f;
+            this.AgentRadius = 0.6f;
+            this.AgentMaxClimb = 0.9f;
         }
 
         // -------------------------------------------------------------------
@@ -24,5 +28,11 @@
         public ManagedDtNavMeshQuery Query { get; set; }
 
         public byte[] NavMeshData { get; set; }
+
+        public float AgentHeight { get; set; }
+
+        public float AgentRadius { get; set; }
+
+        public float AgentMaxClimb { get; set; }
     }
 }

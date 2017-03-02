@@ -32,6 +32,9 @@ namespace RecastWrapper
 
 		unsigned int FindRandomPointAroundCircle(unsigned int% startRef, array<float>^ centerPosition, float maxRadius, ManagedDtCrowd^ crowd, [Out] unsigned int% randomRef, [Out] array<float>^% randomPoint)
 		{
+			float rn1 = frand();
+			float rn2 = frand();
+
 			dtPolyRef startRefLocal = startRef;
 			dtPolyRef randomRefLocal;
 			float pt[3];
@@ -56,11 +59,14 @@ namespace RecastWrapper
 			float pt[3];
 			const dtQueryFilter* filter = crowd->GetUnmanaged()->getFilter(0);
 			dtStatus status = unmanaged->findNearestPoly(center_start, extends_start, filter, &refLocal, pt);
-			nearestRef = refLocal;
-			nearestPoint = gcnew array<float>(3);
-			nearestPoint[0] = pt[0];
-			nearestPoint[1] = pt[1];
-			nearestPoint[2] = pt[2];
+			if (refLocal != 0) {
+				nearestRef = refLocal;
+				nearestPoint = gcnew array<float>(3);
+				nearestPoint[0] = pt[0];
+				nearestPoint[1] = pt[1];
+				nearestPoint[2] = pt[2];
+			}
+
 			return status;
 		}
 

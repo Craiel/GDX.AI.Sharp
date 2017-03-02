@@ -1,17 +1,12 @@
 #pragma once
 
+#include "ManagedInputGeom.h"
 #include "Singleton.h"
-#include "ManagedRcCompactHeightfield.h"
-#include "ManagedRcHeightfield.h"
-#include "ManagedRcContext.h"
-#include "ManagedRcContourSet.h"
-#include "ManagedRcPolyMesh.h"
-#include "ManagedRcPolyMeshDetail.h"
 #include <Recast.h>
 
 using namespace System::Runtime::InteropServices;
 
-namespace RecastWrapper
+/*namespace RecastWrapper
 {
 	public enum class PartitionType
 	{
@@ -29,6 +24,7 @@ namespace RecastWrapper
 
 	public:
 		static property RecastWrapper^ Instance { RecastWrapper^ get() { return %m_instance; } }
+		static property int RC_WALKABLE_AREA_W { int get() { return RC_WALKABLE_AREA; }}
 
 	public:
 		void rcCalcGridSizeWrapped(array<float>^ bmin, array<float>^ bmax, float cs, [Out] int% width, [Out] int% height)
@@ -48,6 +44,22 @@ namespace RecastWrapper
 			return gcnew ManagedRcHeightfield(field);
 		}
 
+		void rcMarkWalkableTrianglesWrapped(ManagedRcContext^ context, float walkableSlopeAngle, ManagedInputGeom^ inputGeom, array<unsigned char>^ areas)
+		{
+			InputGeom* geom = inputGeom->GetUnmanaged();
+			const float* verts = geom->getMesh()->getVerts();
+			const int nverts = geom->getMesh()->getVertCount();
+			const int* tris = geom->getMesh()->getTris();
+			const int ntris = geom->getMesh()->getTriCount();
+
+			unsigned char* triangle_areas = new unsigned char[ntris];
+			rcMarkWalkableTriangles(context->GetUnmanaged(), walkableSlopeAngle, verts, nverts, tris, ntris, triangle_areas);
+			for (int i = 0; i < ntris; i++)
+			{
+				areas[i] = triangle_areas[i];
+			}
+		}
+
 		void rcMarkWalkableTrianglesWrapped(ManagedRcContext^ context, float walkableSlopeAngle, array<float>^ vertices, int vertexCount, array<int>^ triangles, int triangleCount, array<unsigned char>^ areas)
 		{
 			pin_ptr<float> vertex_start = &vertices[0];
@@ -60,7 +72,20 @@ namespace RecastWrapper
 			}
 		}
 		
-		// m_ctx, verts, nverts, tris, m_triareas, ntris, *m_solid, m_cfg.walkableClimb
+		bool rcRasterizeTrianglesWrapped(ManagedRcContext^ context, ManagedInputGeom^ inputGeom, array<unsigned char>^ areas, ManagedRcHeightfield^ heightfield, int walkableClimb)
+		{
+			InputGeom* geom = inputGeom->GetUnmanaged();
+			const float* verts = geom->getMesh()->getVerts();
+			const int nverts = geom->getMesh()->getVertCount();
+			const int* tris = geom->getMesh()->getTris();
+			const int ntris = geom->getMesh()->getTriCount();
+
+			pin_ptr<unsigned char> areas_start = &areas[0];
+
+			// rcContext* ctx, const float* verts, const int nv, const int* tris, const unsigned char* areas, const int nt, rcHeightfield& solid, const int flagMergeThr = 1
+			return rcRasterizeTriangles(context->GetUnmanaged(), verts, nverts, tris, areas_start, ntris, *heightfield->GetUnmanaged(), walkableClimb);
+		}
+
 		bool rcRasterizeTrianglesWrapped(ManagedRcContext^ context, array<float>^ vertices, int vertexCount, array<int>^ triangles, array<unsigned char>^ areas, int triangleCount, ManagedRcHeightfield^ heightfield, int walkableClimb)
 		{
 			pin_ptr<float> vertex_start = &vertices[0];
@@ -107,6 +132,20 @@ namespace RecastWrapper
 		bool rcErodeWalkableAreaWrapped(ManagedRcContext^ context, int walkableRadius, ManagedRcCompactHeightfield^ compactHeightfield)
 		{
 			return rcErodeWalkableArea(context->GetUnmanaged(), walkableRadius, *compactHeightfield->GetUnmanaged());
+		}
+
+		void rcMarkAllConvexPolyArea(ManagedRcContext^ context, ManagedInputGeom^ inputGeom, ManagedRcCompactHeightfield^ compactHeightfield)
+		{
+			const ConvexVolume* vols = inputGeom->GetUnmanaged()->getConvexVolumes();
+			for (int i = 0; i < inputGeom->GetUnmanaged()->getConvexVolumeCount(); ++i)
+			{
+				rcMarkConvexPolyAreaWrapped(context, vols[i], compactHeightfield);
+			}
+		}
+
+		void rcMarkConvexPolyAreaWrapped(ManagedRcContext^ context, ConvexVolume vol, ManagedRcCompactHeightfield^ compactHeightfield)
+		{
+			rcMarkConvexPolyArea(context->GetUnmanaged(), vol.verts, vol.nverts, vol.hmin, vol.hmax, (unsigned char)vol.area, *compactHeightfield->GetUnmanaged());
 		}
 
 		bool rcBuildDistanceFieldWrapped(ManagedRcContext^ context, ManagedRcCompactHeightfield^ compactHeightfield)
@@ -177,4 +216,4 @@ namespace RecastWrapper
 			rcFreeContourSet(contourSet->GetUnmanaged());
 		}
 	};
-}
+}*/

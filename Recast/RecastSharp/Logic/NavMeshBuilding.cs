@@ -1,5 +1,7 @@
 ﻿namespace GDX.AI.Sharp.Recast.RecastSharp.Logic
 {
+    using System;
+
     using CarbonCore.Utils.Diagnostics;
     using CarbonCore.Utils.IO;
 
@@ -19,7 +21,7 @@
 #if DEBUG
             Diagnostic.Info("Building navigation:");
             Diagnostic.Info($" - {context.Config.width} x {context.Config.height} cells");
-            Diagnostic.Info($" - {context.Model.Triangles.Count / 1000.0f} tris");
+            Diagnostic.Info($" - {Math.Round(context.InputGeom.GetVertCount() / 100.0f) / 10}K verts, {Math.Round(context.InputGeom.GetTriCount() / 100.0f) / 10}K tris");
 #endif
 
             // Step 2
@@ -39,20 +41,6 @@
 
             // Step 7 - Create detail mesh which allows to access approximate height on each polygon
             BuildPolyDetailMesh(context);
-
-#if DEBUG
-            context.ManagedContext.StopTimer();
-            context.ManagedContext.LogBuildTimes();
-
-            Diagnostic.Info(">> Polymesh {0} vertices, {1} polygons", context.PolyMesh.VertexCount, context.PolyMesh.PolygonCount);
-
-            Diagnostic.Info("Printing Context Log:");
-            for (var i = 0; i < context.ManagedContext.getLogCount(); i++)
-            {
-                string msg = context.ManagedContext.getLogText(i);
-                Diagnostic.Info(msg);
-            }
-#endif
         }
 
         private static void LoadModel(NavMeshBuildContext context, CarbonFile sourceFile)
@@ -61,24 +49,15 @@
             {
                 throw new NavMeshBuildException("Source file not defined or not found");
             }
-            
-            using (var stream = sourceFile.OpenRead())
-            {
-                context.Model.Parse(stream);
-            }
 
-            Diagnostic.Info("Model Loaded with {0} Triangles and {1} Normals", context.Model.Triangles.Count, context.Model.Normals.Count);
+            context.InputGeom = new ManagedInputGeom(context.ManagedContext, sourceFile.GetPath());
         }
 
         private static void InitializeBoundsAndConfig(NavMeshBuildContext context)
         {
-            context.Config.bmin[0] = context.Model.BoundingBox.Min.X;
-            context.Config.bmin[1] = context.Model.BoundingBox.Min.Y;
-            context.Config.bmin[2] = context.Model.BoundingBox.Min.Z;
-            context.Config.bmax[0] = context.Model.BoundingBox.Max.X;
-            context.Config.bmax[1] = context.Model.BoundingBox.Max.Y;
-            context.Config.bmax[2] = context.Model.BoundingBox.Max.Z;
-
+            context.Config.bmin = context.InputGeom.GetNavMeshBoundsMin();
+            context.Config.bmax = context.InputGeom.GetNavMeshBoundsMax();
+            
             int width;
             int height;
             RecastWrapper.Instance.rcCalcGridSizeWrapped(context.Config.bmin, context.Config.bmax, context.Config.cs, out width, out height);
@@ -102,30 +81,21 @@
             {
                 throw new NavMeshBuildException("Could not create heightfield");
             }
-
-            float[] vertices = context.Model.GetVerticesArray();
-            int[] triangles = context.Model.GetTriangleArray();
-
+            
             // Find triangles which are walkable based on their slope and rasterize them.
             // If your input data is multiple meshes, you can transform them here, calculate
             // the are type for each of the meshes and rasterize them.
-            context.Areas = new byte[context.Model.Triangles.Count];
+            context.Areas = new byte[context.InputGeom.GetTriCount()];
             RecastWrapper.Instance.rcMarkWalkableTrianglesWrapped(
                 context.ManagedContext,
                 context.Config.walkableSlopeAngle,
-                vertices,
-                context.Model.Vertices.Count,
-                triangles,
-                context.Model.Triangles.Count,
+                context.InputGeom,
                 context.Areas);
             if (
                 !RecastWrapper.Instance.rcRasterizeTrianglesWrapped(
                     context.ManagedContext,
-                    vertices,
-                    context.Model.Vertices.Count,
-                    triangles,
+                    context.InputGeom,
                     context.Areas,
-                    context.Model.Triangles.Count,
                     context.Heightfield,
                     context.Config.walkableClimb))
             {
@@ -188,12 +158,9 @@
                 throw new NavMeshBuildException("Could not erode walkable area");
             }
 
-            // TODO: we don't have the convex volumes in the geometry at the moment
             // (Optional) Mark areas.
-            //const ConvexVolume* vols = m_geom->getConvexVolumes();
-            //for (int i = 0; i < m_geom->getConvexVolumeCount(); ++i)
-            //    rcMarkConvexPolyArea(m_ctx, vols[i].verts, vols[i].nverts, vols[i].hmin, vols[i].hmax, (unsigned char)vols[i].area, *m_chf);
-            
+            RecastWrapper.Instance.rcMarkAllConvexPolyArea(context.ManagedContext, context.InputGeom, context.CompactHeightfield);
+
             switch (context.PartitionType)
             {
                 case PartitionType.Watershed:

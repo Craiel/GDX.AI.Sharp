@@ -45,30 +45,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ManagedRcCompactHeightfield.h">
-      <Filter>Header Files\Recast</Filter>
-    </ClInclude>
-    <ClInclude Include="ManagedRcConfig.h">
-      <Filter>Header Files\Recast</Filter>
-    </ClInclude>
-    <ClInclude Include="ManagedRcContext.h">
-      <Filter>Header Files\Recast</Filter>
-    </ClInclude>
-    <ClInclude Include="ManagedRcContourSet.h">
-      <Filter>Header Files\Recast</Filter>
-    </ClInclude>
-    <ClInclude Include="ManagedRcHeightfield.h">
-      <Filter>Header Files\Recast</Filter>
-    </ClInclude>
-    <ClInclude Include="ManagedRcPolyMesh.h">
-      <Filter>Header Files\Recast</Filter>
-    </ClInclude>
-    <ClInclude Include="ManagedRcPolyMeshDetail.h">
-      <Filter>Header Files\Recast</Filter>
-    </ClInclude>
     <ClInclude Include="BuildContext.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
@@ -159,6 +135,21 @@
     <ClInclude Include="..\Source\Detour\Include\DetourStatus.h">
       <Filter>Header Files\Detour\Native</Filter>
     </ClInclude>
+    <ClInclude Include="ChunkyTriMesh.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="InputGeom.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshLoaderObj.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="ManagedInputGeom.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="RecastClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -197,20 +188,11 @@
     <ClCompile Include="..\Source\Recast\Source\RecastRasterization.cpp">
       <Filter>Source Files\Recast\Native</Filter>
     </ClCompile>
-    <ClCompile Include="RecastWrapper.cpp">
-      <Filter>Source Files\Recast</Filter>
-    </ClCompile>
-    <ClCompile Include="DetourWrapper.cpp">
-      <Filter>Source Files\Detour</Filter>
-    </ClCompile>
     <ClCompile Include="BuildLog.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
     <ClCompile Include="PerfTimer.cpp">
       <Filter>Source Files\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="ManagedRcConfig.cpp">
-      <Filter>Source Files\Recast</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Detour\Source\DetourNode.cpp">
       <Filter>Source Files\Detour\Native</Filter>
@@ -256,6 +238,21 @@
     </ClCompile>
     <ClCompile Include="..\Source\DetourTileCache\Source\DetourTileCacheBuilder.cpp">
       <Filter>Source Files\Detour\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="ChunkyTriMesh.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="InputGeom.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshLoaderObj.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="ManagedInputGeom.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="RecastClient.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1056,7 +1056,7 @@ void dtCrowd::update(const float dt, dtCrowdAgentDebugInfo* debug)
 	checkPathValidity(agents, nagents, dt);
 	
 	// Update async move request and path finder.
-	updateMoveRequest(dt);
+	updateMoveRequest(dt);	
 
 	// Optimize path topology.
 	updateTopologyOptimization(agents, nagents, dt);

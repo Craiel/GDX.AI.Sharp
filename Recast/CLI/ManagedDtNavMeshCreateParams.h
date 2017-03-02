@@ -2,6 +2,7 @@
 
 #include "ManagedRcPolyMesh.h"
 #include "ManagedRcPolyMeshDetail.h"
+#include "ManagedInputGeom.h"
 #include <DetourNavMeshBuilder.h>
 #include <string.h>
 
@@ -10,66 +11,15 @@ namespace RecastWrapper
 	public ref class ManagedDtNavMeshCreateParams
 	{
 	public:
-		const unsigned short* verts;			///< The polygon mesh vertices. [(x, y, z) * #vertCount] [Unit: vx]
-		int vertCount;							///< The number vertices in the polygon mesh. [Limit: >= 3]
-		const unsigned short* polys;			///< The polygon data. [Size: #polyCount * 2 * #nvp]
-		const unsigned short* polyFlags;		///< The user defined flags assigned to each polygon. [Size: #polyCount]
-		const unsigned char* polyAreas;			///< The user defined area ids assigned to each polygon. [Size: #polyCount]
-		int polyCount;							///< Number of polygons in the mesh. [Limit: >= 1]
-		int nvp;								///< Number maximum number of vertices per polygon. [Limit: >= 3]
-
-												/// @}
-												/// @name Height Detail Attributes (Optional)
-												/// See #rcPolyMeshDetail for details related to these attributes.
-												/// @{
-
-		const unsigned int* detailMeshes;		///< The height detail sub-mesh data. [Size: 4 * #polyCount]
-		const float* detailVerts;				///< The detail mesh vertices. [Size: 3 * #detailVertsCount] [Unit: wu]
-		int detailVertsCount;					///< The number of vertices in the detail mesh.
-		const unsigned char* detailTris;		///< The detail mesh triangles. [Size: 4 * #detailTriCount]
-		int detailTriCount;						///< The number of triangles in the detail mesh.
-
-												/// @}
-												/// @name Off-Mesh Connections Attributes (Optional)
-												/// Used to define a custom point-to-point edge within the navigation graph, an 
-												/// off-mesh connection is a user defined traversable connection made up to two vertices, 
-												/// at least one of which resides within a navigation mesh polygon.
-												/// @{
-
-												/// Off-mesh connection vertices. [(ax, ay, az, bx, by, bz) * #offMeshConCount] [Unit: wu]
-		const float* offMeshConVerts;
-		/// Off-mesh connection radii. [Size: #offMeshConCount] [Unit: wu]
-		const float* offMeshConRad;
-		/// User defined flags assigned to the off-mesh connections. [Size: #offMeshConCount]
-		const unsigned short* offMeshConFlags;
-		/// User defined area ids assigned to the off-mesh connections. [Size: #offMeshConCount]
-		const unsigned char* offMeshConAreas;
-		/// The permitted travel direction of the off-mesh connections. [Size: #offMeshConCount]
-		///
-		/// 0 = Travel only from endpoint A to endpoint B.<br/>
-		/// #DT_OFFMESH_CON_BIDIR = Bidirectional travel.
-		const unsigned char* offMeshConDir;
-		/// The user defined ids of the off-mesh connection. [Size: #offMeshConCount]
-		const unsigned int* offMeshConUserID;
-		/// The number of off-mesh connections. [Limit: >= 0]
-		int offMeshConCount;
-
-		/// @}
-		/// @name Tile Attributes
-		/// @note The tile grid/layer data can be left at zero if the destination is a single tile mesh.
-		/// @{
+		ManagedRcPolyMesh^ Poly;
+		ManagedRcPolyMeshDetail^ PolyDetail;
+		ManagedInputGeom^ Geom;
 
 		unsigned int userId;	///< The user defined id of the tile.
 		int tileX;				///< The tile's x-grid location within the multi-tile destination mesh. (Along the x-axis.)
 		int tileY;				///< The tile's y-grid location within the multi-tile desitation mesh. (Along the z-axis.)
 		int tileLayer;			///< The tile's layer within the layered destination mesh. [Limit: >= 0] (Along the y-axis.)
-		array<float>^ bmin;			///< The minimum bounds of the tile. [(x, y, z)] [Unit: wu]
-		array<float>^ bmax;			///< The maximum bounds of the tile. [(x, y, z)] [Unit: wu]
-
-								/// @}
-								/// @name General Configuration Attributes
-								/// @{
-
+		
 		float walkableHeight;	///< The agent height. [Unit: wu]
 		float walkableRadius;	///< The agent radius. [Unit: wu]
 		float walkableClimb;	///< The agent maximum traversable ledge. (Up/Down) [Unit: wu]
@@ -81,11 +31,7 @@ namespace RecastWrapper
 		bool buildBvTree;
 
 	public:
-		ManagedDtNavMeshCreateParams()
-		{
-			bmin = gcnew array<float>(3);
-			bmax = gcnew array<float>(3);
-		}
+		ManagedDtNavMeshCreateParams() { }
 
 	public:
 		dtNavMeshCreateParams GetUnmanaged()
@@ -93,39 +39,40 @@ namespace RecastWrapper
 			dtNavMeshCreateParams params;
 			memset(&params, 0, sizeof(params));
 
-			params.verts = verts;
-			params.vertCount = vertCount;
+			rcPolyMesh* polyMesh = Poly->GetUnmanaged();
+			params.verts = polyMesh->verts;
+			params.vertCount = polyMesh->nverts;
 
-			params.polys = polys;
-			params.polyFlags = polyFlags;
-			params.polyAreas = polyAreas;
-			params.polyCount = polyCount;
+			params.polys = polyMesh->polys;
+			params.polyFlags = polyMesh->flags;
+			params.polyAreas = polyMesh->areas;
+			params.polyCount = polyMesh->npolys;
 
-			params.nvp = nvp;
+			params.nvp = polyMesh->nvp;
 
-			params.detailMeshes = detailMeshes;
-			params.detailVerts = detailVerts;
-			params.detailVertsCount = detailVertsCount;
-			params.detailTris = detailTris;
-			params.detailTriCount = detailTriCount;
+			rcPolyMeshDetail* polyDetailMesh = PolyDetail->GetUnmanaged();
+			params.detailMeshes = polyDetailMesh->meshes;
+			params.detailVerts = polyDetailMesh->verts;
+			params.detailVertsCount = polyDetailMesh->nverts;
+			params.detailTris = polyDetailMesh->tris;
+			params.detailTriCount = polyDetailMesh->ntris;
 
-			params.offMeshConVerts = offMeshConVerts;
-			params.offMeshConRad = offMeshConRad;
-			params.offMeshConFlags = offMeshConFlags;
-			params.offMeshConAreas = offMeshConAreas;
-			params.offMeshConDir = offMeshConDir;
-			params.offMeshConUserID = offMeshConUserID;
-			params.offMeshConCount = offMeshConCount;
+			InputGeom* geom = Geom->GetUnmanaged();
+			params.offMeshConVerts = geom->getOffMeshConnectionVerts();
+			params.offMeshConRad = geom->getOffMeshConnectionRads();
+			params.offMeshConFlags = geom->getOffMeshConnectionFlags();
+			params.offMeshConAreas = geom->getOffMeshConnectionAreas();
+			params.offMeshConDir = geom->getOffMeshConnectionDirs();
+			params.offMeshConUserID = geom->getOffMeshConnectionId();
+			params.offMeshConCount = geom->getOffMeshConnectionCount();
 
 			params.userId = userId;
 			params.tileX = tileX;
 			params.tileY = tileY;
 			params.tileLayer = tileLayer;
 
-			pin_ptr<float> bmin_start = &bmin[0];
-			pin_ptr<float> bmax_start = &bmax[0];
-			rcVcopy(params.bmin, bmin_start);
-			rcVcopy(params.bmax, bmax_start);
+			rcVcopy(params.bmin, polyMesh->bmin);
+			rcVcopy(params.bmax, polyMesh->bmax);
 
 			params.walkableHeight = walkableHeight;
 			params.walkableRadius = walkableRadius;
@@ -135,38 +82,6 @@ namespace RecastWrapper
 			params.buildBvTree = buildBvTree;
 
 			return params;
-		}
-
-		void SetNavMesh(ManagedRcPolyMesh^ polyMesh, ManagedRcPolyMeshDetail^ polyMeshDetail)
-		{
-			rcPolyMesh* poly = polyMesh->GetUnmanaged();
-			rcPolyMeshDetail* detail = polyMeshDetail->GetUnmanaged();
-			verts = poly->verts;
-			vertCount = poly->nverts;
-			polys = poly->polys;
-			polyAreas = poly->areas;
-			polyFlags = poly->flags;
-			polyCount = poly->npolys;
-			nvp = poly->nvp;
-
-			detailMeshes = detail->meshes;
-			detailVerts = detail->verts;
-			detailVertsCount = detail->nverts;
-			detailTris = detail->tris;
-			detailTriCount = detail->ntris;
-
-			pin_ptr<float> bmin_start = &bmin[0];
-			pin_ptr<float> bmax_start = &bmax[0];
-			rcVcopy(bmin_start, poly->bmin);
-			rcVcopy(bmax_start, poly->bmax);
-
-			/*params.offMeshConVerts = m_geom->getOffMeshConnectionVerts();
-		params.offMeshConRad = m_geom->getOffMeshConnectionRads();
-		params.offMeshConDir = m_geom->getOffMeshConnectionDirs();
-		params.offMeshConAreas = m_geom->getOffMeshConnectionAreas();
-		params.offMeshConFlags = m_geom->getOffMeshConnectionFlags();
-		params.offMeshConUserID = m_geom->getOffMeshConnectionId();
-		params.offMeshConCount = m_geom->getOffMeshConnectionCount();*/
 		}
 	};
 }

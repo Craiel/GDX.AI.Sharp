@@ -2,6 +2,8 @@
 {
     using System.Collections.Generic;
 
+    using Enums;
+
     using Geometry;
 
     using Microsoft.Xna.Framework;
@@ -29,30 +31,33 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public IList<Vector3> GetVertices()
+        public void SetDefaultPolyFlags()
         {
-            float[][] rawVertices = this.polyMeshDetail.GetVertices();
-            IList<Vector3> result = new List<Vector3>(rawVertices.Length);
-            for (var i = 0; i < rawVertices.Length; i++)
+            // Update poly flags from areas.
+            for (int i = 0; i < this.polyMesh.PolygonCount; ++i)
             {
-                float[] vertex = rawVertices[i];
-                result.Add(new Vector3(vertex[0], vertex[1], vertex[2]));
+                int area = this.polyMesh.GetArea(i);
+                if (area == RecastWrapper.RC_WALKABLE_AREA_W)
+                {
+                    area = (int)NavMeshPolyArea.Ground;
+                    this.polyMesh.SetArea(i, (int)NavMeshPolyArea.Ground);
+                }
+
+                if (area == (int)NavMeshPolyArea.Ground ||
+                    area == (int)NavMeshPolyArea.Grass ||
+                    area == (int)NavMeshPolyArea.Road)
+                {
+                    this.polyMesh.SetFlags(i, (int)NavMeshPolyFlag.Walk);
+                }
+                else if (area == (int)NavMeshPolyArea.Water)
+                {
+                    this.polyMesh.SetFlags(i, (int)NavMeshPolyFlag.Swim);
+                }
+                else if (area == (int)NavMeshPolyArea.Door)
+                {
+                    this.polyMesh.SetFlags(i, (int)(NavMeshPolyFlag.Walk | NavMeshPolyFlag.Door));
+                }
             }
-
-            return result;
-        }
-
-        public IList<Triangle3Indexed> GetTriangles()
-        {
-            byte[][] rawTriangles = this.polyMeshDetail.GetTriangles();
-            IList<Triangle3Indexed> result = new List<Triangle3Indexed>(rawTriangles.Length);
-            for (var i = 0; i < rawTriangles.Length; i++)
-            {
-                byte[] vertex = rawTriangles[i];
-                result.Add(new Triangle3Indexed(vertex[0], vertex[1], vertex[2]));
-            }
-
-            return result;
         }
 
         // -------------------------------------------------------------------

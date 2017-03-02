@@ -43,7 +43,7 @@
 
         public void Update(float delta)
         {
-            this.managedCrowd.Update(delta);
+            //this.managedCrowd.Update(delta);
         }
 
         public DetourCrowdAgent GetAgent(int index)

@@ -157,23 +157,20 @@
     <ClInclude Include="..\Source\Recast\Include\RecastAlloc.h" />
     <ClInclude Include="..\Source\Recast\Include\RecastAssert.h" />
     <ClInclude Include="BuildContext.h" />
+    <ClInclude Include="ChunkyTriMesh.h" />
     <ClInclude Include="DetourWrapper.h" />
+    <ClInclude Include="InputGeom.h" />
     <ClInclude Include="ManagedDtCrowd.h" />
     <ClInclude Include="ManagedDtCrowdAgent.h" />
     <ClInclude Include="ManagedDtCrowdAgentParams.h" />
     <ClInclude Include="ManagedDtNavMesh.h" />
     <ClInclude Include="ManagedDtNavMeshCreateParams.h" />
     <ClInclude Include="ManagedDtNavMeshQuery.h" />
-    <ClInclude Include="ManagedRcCompactHeightfield.h" />
-    <ClInclude Include="ManagedRcContext.h" />
-    <ClInclude Include="ManagedRcContourSet.h" />
-    <ClInclude Include="ManagedRcHeightfield.h" />
-    <ClInclude Include="ManagedRcPolyMesh.h" />
-    <ClInclude Include="ManagedRcPolyMeshDetail.h" />
+    <ClInclude Include="ManagedInputGeom.h" />
+    <ClInclude Include="MeshLoaderObj.h" />
     <ClInclude Include="PerfTimer.h" />
+    <ClInclude Include="RecastClient.h" />
     <ClInclude Include="RecastWrapper.h" />
-    <ClInclude Include="ManagedRcConfig.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\DetourCrowd\Source\DetourCrowd.cpp" />
@@ -204,10 +201,12 @@
     <ClCompile Include="..\Source\Recast\Source\RecastRegion.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="BuildLog.cpp" />
-    <ClCompile Include="DetourWrapper.cpp" />
+    <ClCompile Include="ChunkyTriMesh.cpp" />
+    <ClCompile Include="InputGeom.cpp" />
+    <ClCompile Include="ManagedInputGeom.cpp" />
+    <ClCompile Include="MeshLoaderObj.cpp" />
     <ClCompile Include="PerfTimer.cpp" />
-    <ClCompile Include="RecastWrapper.cpp" />
-    <ClCompile Include="ManagedRcConfig.cpp" />
+    <ClCompile Include="RecastClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

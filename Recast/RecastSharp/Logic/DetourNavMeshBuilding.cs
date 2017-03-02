@@ -28,12 +28,14 @@
         // -------------------------------------------------------------------
         private static void PrepareContext(DetourNavMeshBuildContext context, NavMeshBuildContext navMeshContext)
         {
-            context.Params.SetNavMesh(navMeshContext.PolyMesh, navMeshContext.PolyMeshDetail);
+            context.Params.Poly = navMeshContext.PolyMesh;
+            context.Params.PolyDetail = navMeshContext.PolyMeshDetail;
+            context.Params.Geom = navMeshContext.InputGeom;
 
             // Copy over some other configuration options
-            context.Params.walkableHeight = navMeshContext.Config.walkableHeight;
-            context.Params.walkableRadius = navMeshContext.Config.walkableRadius;
-            context.Params.walkableClimb = navMeshContext.Config.walkableClimb;
+            context.Params.walkableHeight = context.AgentHeight;
+            context.Params.walkableRadius = context.AgentRadius;
+            context.Params.walkableClimb = context.AgentMaxClimb;
             context.Params.cs = navMeshContext.Config.cs;
             context.Params.ch = navMeshContext.Config.ch;
             context.Params.buildBvTree = true;

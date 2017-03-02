@@ -1,5 +1,9 @@
 ﻿namespace GDX.AI.Sharp.Recast.RecastSharp.Logic
 {
+    using System.Collections.Generic;
+
+    using Enums;
+
     using RecastWrapper;
 
     public class DetourNavMesh
@@ -19,6 +23,10 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
+        public IList<float[]> GetDebugVertices(NavMeshPolyFlag flags = NavMeshPolyFlag.Walk)
+        {
+            return DetourWrapper.Instance.GetNavMeshDebugData(this.navMesh, (ushort)flags);
+        }
 
         // -------------------------------------------------------------------
         // Internal
