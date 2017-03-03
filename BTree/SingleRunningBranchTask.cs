@@ -7,7 +7,7 @@
 
     using Exceptions;
 
-    using Sharp.Utils;
+    using Mathematics;
     
     /// <summary>
     /// A <see cref="SingleRunningBranchTask{T}"/> task is a branch task that supports only one running child at a time
