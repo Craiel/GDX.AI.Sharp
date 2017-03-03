@@ -1,5 +1,11 @@
 #include "RecastClient.h"
 
+static float frand()
+{
+	//	return ((float)(rand() & 0xffff)/(float)0xffff);
+	return (float)rand() / (float)RAND_MAX;
+}
+
 RecastWrapper::RecastClient::RecastClient() :
 	m_pmesh(0),
 	m_dmesh(0),
@@ -8,6 +14,15 @@ RecastWrapper::RecastClient::RecastClient() :
 	m_crowd(0),
 	m_ctx(0)
 {
+	m_vod = dtAllocObstacleAvoidanceDebugData();
+	m_vod->init(2048);
+
+	memset(&m_agentDebug, 0, sizeof(m_agentDebug));
+	m_agentDebug.idx = -1;
+	m_agentDebug.vod = m_vod;
+
+	m_navQuery = dtAllocNavMeshQuery();
+	m_crowd = dtAllocCrowd();
 }
 
 RecastWrapper::RecastClient::~RecastClient()
@@ -17,6 +32,7 @@ RecastWrapper::RecastClient::~RecastClient()
 	dtFreeNavMesh(m_navMesh);
 	dtFreeNavMeshQuery(m_navQuery);
 	dtFreeCrowd(m_crowd);
+	dtFreeObstacleAvoidanceDebugData(m_vod);
 
 	if(m_ctx)
 	{
@@ -92,7 +108,7 @@ bool RecastWrapper::RecastClient::build(class InputGeom* geom)
 	}
 
 	// Step 8. Create Detour data from Recast poly mesh.
-	if(!buildStep8CreateContourData())
+	if(!buildStep8CreateDetourData())
 	{
 		return false;
 	}
@@ -347,7 +363,7 @@ bool RecastWrapper::RecastClient::buildStep7CreateDetailMesh()
 	return true;
 }
 
-bool RecastWrapper::RecastClient::buildStep8CreateContourData()
+bool RecastWrapper::RecastClient::buildStep8CreateDetourData()
 {
 	unsigned char* navData = 0;
 	int navDataSize = 0;
@@ -435,5 +451,17 @@ bool RecastWrapper::RecastClient::buildStep8CreateContourData()
 		return false;
 	}
 
+	if(!m_crowd->init(m_maxAgents, m_agentRadius, m_navMesh))
+	{
+		m_ctx->log(RC_LOG_ERROR, "Coult nod init Crowd");
+		return false;
+	}
+
 	return true;
+}
+
+dtStatus RecastWrapper::RecastClient::findRandomPointAroundCircle(dtPolyRef startRefLocal, const float* center, float maxRadius, dtPolyRef* randomRefLocal, float* point)
+{
+	const dtQueryFilter* filter = m_crowd->getFilter(0);
+	return m_navQuery->findRandomPointAroundCircle(startRefLocal, center, maxRadius, filter, frand, randomRefLocal, point);
 }

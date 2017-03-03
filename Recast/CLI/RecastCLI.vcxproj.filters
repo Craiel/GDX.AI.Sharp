@@ -132,6 +132,12 @@
     <ClInclude Include="ManagedRecastClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ManagedDtCrowdAgentParams.h">
+      <Filter>Header Files\Detour</Filter>
+    </ClInclude>
+    <ClInclude Include="ManagedDtCrowdAgentInfo.h">
+      <Filter>Header Files\Detour</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -235,6 +241,9 @@
     </ClCompile>
     <ClCompile Include="ManagedRecastClient.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ManagedDtCrowdAgentParams.cpp">
+      <Filter>Source Files\Detour</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -12,7 +12,7 @@
 
     using Leafs;
 
-    using Mathematics.Rnd;
+    using Sharp.Utils.Rnd;
 
     /// <summary>
     /// Helper class to build a behavior tree using the fluint API

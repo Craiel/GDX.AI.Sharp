@@ -42,6 +42,9 @@ namespace RecastWrapper {
 	private:
 		rcConfig m_cfg;
 
+		dtCrowdAgentDebugInfo m_agentDebug;
+		dtObstacleAvoidanceDebugData* m_vod;
+
 		rcPolyMesh* m_pmesh;
 		rcPolyMeshDetail* m_dmesh;
 
@@ -75,6 +78,8 @@ namespace RecastWrapper {
 		bool m_filterLedgeSpans = true;
 		bool m_filterWalkableLowHeightSpans = true;
 
+		int m_maxAgents = 1000;
+
 		PartitionType m_partitionType = PARTITION_WATERSHED;
 
 	public:
@@ -86,6 +91,24 @@ namespace RecastWrapper {
 
 		BuildContext* getContext() { return m_ctx; }
 
+		void update(float delta) { m_crowd->update(delta, &m_agentDebug); }
+
+		int addAgent(const float* pos, const dtCrowdAgentParams* params) { return m_crowd->addAgent(pos, params); }
+
+		const dtCrowdAgent* getAgent(int index) { return m_crowd->getAgent(index); }
+
+		dtStatus findNearestPoly(const float* center, const float* extents, dtPolyRef* nearestRef, float* nearestPoint)
+		{
+			const dtQueryFilter* filter = m_crowd->getFilter(0);
+			return m_navQuery->findNearestPoly(center, extents, filter, nearestRef, nearestPoint);
+		}
+
+		dtStatus findRandomPointAroundCircle(dtPolyRef startRefLocal, const float* center_start, float maxRadius, dtPolyRef* randomRefLocal, float* point);
+
+		bool requestMoveTarget(int index, dtPolyRef targetRef, const float* pos) { return m_crowd->requestMoveTarget(index, targetRef, pos); }
+
+		bool resetMoveTarget(int index) { return m_crowd->resetMoveTarget(index); }
+
 	private:
 		void buildStep1InitConfig();
 		bool buildStep2Rasterize();
@@ -94,6 +117,6 @@ namespace RecastWrapper {
 		bool buildStep5TraceAndSimplify();
 		bool buildStep6BuildPolygons();
 		bool buildStep7CreateDetailMesh();
-		bool buildStep8CreateContourData();
+		bool buildStep8CreateDetourData();
 	};
 }

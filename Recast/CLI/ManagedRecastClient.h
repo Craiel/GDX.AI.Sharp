@@ -3,9 +3,12 @@
 #include <msclr\marshal_cppstd.h>
 
 #include "RecastClient.h"
+#include "ManagedDtCrowdAgentInfo.h"
+#include "ManagedDtCrowdAgentParams.h"
 
 using namespace System::Collections;
 using namespace System::Collections::Generic;
+using namespace System::Runtime::InteropServices;
 
 namespace RecastWrapper
 {
@@ -81,6 +84,81 @@ namespace RecastWrapper
 			}
 
 			return result;
+		}
+
+		void Update(float delta)
+		{
+			unmanaged->update(delta);
+		}
+
+		bool FindRandomPointAroundCircle(unsigned int% startRef, array<float>^ centerPosition, float maxRadius, [Out] unsigned int% randomRef, [Out] array<float>^% randomPoint)
+		{
+			dtPolyRef startRefLocal = startRef;
+			dtPolyRef randomRefLocal;
+			float pt[3];
+			pin_ptr<float> center_start = &centerPosition[0];
+			dtStatus status = unmanaged->findRandomPointAroundCircle(startRefLocal, center_start, maxRadius, &randomRefLocal, pt);
+			startRef = startRefLocal;
+			randomRef = randomRefLocal;
+			randomPoint = gcnew array<float>(3);
+			randomPoint[0] = pt[0];
+			randomPoint[1] = pt[1];
+			randomPoint[2] = pt[2];
+
+			return dtStatusSucceed(status);
+		}
+
+		bool FindNearestPoly(array<float>^ center, array<float>^ extents, [Out] unsigned int% nearestPolyRef, [Out] array<float>^% nearestPoint)
+		{
+			pin_ptr<float> center_start = &center[0];
+			pin_ptr<float> extents_start = &extents[0];
+			dtPolyRef nearestPoly;
+			float pt[3];
+			dtStatus status = unmanaged->findNearestPoly(center_start, extents_start, &nearestPoly, pt);
+			nearestPolyRef = nearestPoly;
+			if (nearestPoly != 0) {
+				nearestPoint = gcnew array<float>(3);
+				nearestPoint[0] = pt[0];
+				nearestPoint[1] = pt[1];
+				nearestPoint[2] = pt[2];
+			}
+
+			return dtStatusSucceed(status);
+		}
+
+		int AddAgent(array<float>^ position, ManagedDtCrowdAgentParams^ params)
+		{
+			pin_ptr<float> position_start = &position[0];
+			return unmanaged->addAgent(position_start, &params->GetUnmanaged());
+		}
+
+		bool RequestMoveTarget(int index, unsigned int polyRef, array<float>^ position)
+		{
+			pin_ptr<float> position_start = &position[0];
+			return unmanaged->requestMoveTarget(index, polyRef, position_start);
+		}
+
+		bool ResetMoveTarget(int index)
+		{
+			return unmanaged->resetMoveTarget(index);
+		}
+
+		void GetAgentInfo(int index, [Out] ManagedDtCrowdAgentInfo^% agentInfo)
+		{
+			const dtCrowdAgent* agent = unmanaged->getAgent(index);
+
+			agentInfo = gcnew ManagedDtCrowdAgentInfo();
+			agentInfo->npos[0] = agent->npos[0];
+			agentInfo->npos[1] = agent->npos[1];
+			agentInfo->npos[2] = agent->npos[2];
+			agentInfo->vel[0] = agent->vel[0];
+			agentInfo->vel[1] = agent->vel[1];
+			agentInfo->vel[2] = agent->vel[2];
+
+			agentInfo->targetPos[0] = agent->targetPos[0];
+			agentInfo->targetPos[1] = agent->targetPos[1];
+			agentInfo->targetPos[2] = agent->targetPos[2];
+			agentInfo->targetState = agent->targetState;
 		}
 	};
 }
