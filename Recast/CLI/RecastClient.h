@@ -81,7 +81,10 @@ namespace RecastWrapper {
 		RecastClient();
 		~RecastClient();
 
+		bool build(std::string geom_path);
 		bool build(class InputGeom* geom);
+
+		BuildContext* getContext() { return m_ctx; }
 
 	private:
 		void buildStep1InitConfig();

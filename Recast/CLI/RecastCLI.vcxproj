@@ -160,13 +160,7 @@
     <ClInclude Include="ChunkyTriMesh.h" />
     <ClInclude Include="DetourWrapper.h" />
     <ClInclude Include="InputGeom.h" />
-    <ClInclude Include="ManagedDtCrowd.h" />
-    <ClInclude Include="ManagedDtCrowdAgent.h" />
-    <ClInclude Include="ManagedDtCrowdAgentParams.h" />
-    <ClInclude Include="ManagedDtNavMesh.h" />
-    <ClInclude Include="ManagedDtNavMeshCreateParams.h" />
-    <ClInclude Include="ManagedDtNavMeshQuery.h" />
-    <ClInclude Include="ManagedInputGeom.h" />
+    <ClInclude Include="ManagedRecastClient.h" />
     <ClInclude Include="MeshLoaderObj.h" />
     <ClInclude Include="PerfTimer.h" />
     <ClInclude Include="RecastClient.h" />
@@ -203,7 +197,7 @@
     <ClCompile Include="BuildLog.cpp" />
     <ClCompile Include="ChunkyTriMesh.cpp" />
     <ClCompile Include="InputGeom.cpp" />
-    <ClCompile Include="ManagedInputGeom.cpp" />
+    <ClCompile Include="ManagedRecastClient.cpp" />
     <ClCompile Include="MeshLoaderObj.cpp" />
     <ClCompile Include="PerfTimer.cpp" />
     <ClCompile Include="RecastClient.cpp" />

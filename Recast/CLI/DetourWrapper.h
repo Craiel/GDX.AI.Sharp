@@ -12,7 +12,7 @@
 using namespace System::Runtime::InteropServices;
 using namespace System::Collections;
 using namespace System::Collections::Generic;
-
+/*
 namespace RecastWrapper
 {
 	public ref class DetourWrapper
@@ -133,4 +133,4 @@ namespace RecastWrapper
 			}
 		}
 	};
-}
+}*/

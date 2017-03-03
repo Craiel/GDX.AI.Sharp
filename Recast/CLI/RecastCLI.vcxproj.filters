@@ -57,24 +57,6 @@
     <ClInclude Include="DetourWrapper.h">
       <Filter>Header Files\Detour</Filter>
     </ClInclude>
-    <ClInclude Include="ManagedDtNavMeshCreateParams.h">
-      <Filter>Header Files\Detour</Filter>
-    </ClInclude>
-    <ClInclude Include="ManagedDtNavMesh.h">
-      <Filter>Header Files\Detour</Filter>
-    </ClInclude>
-    <ClInclude Include="ManagedDtNavMeshQuery.h">
-      <Filter>Header Files\Detour</Filter>
-    </ClInclude>
-    <ClInclude Include="ManagedDtCrowd.h">
-      <Filter>Header Files\Detour</Filter>
-    </ClInclude>
-    <ClInclude Include="ManagedDtCrowdAgent.h">
-      <Filter>Header Files\Detour</Filter>
-    </ClInclude>
-    <ClInclude Include="ManagedDtCrowdAgentParams.h">
-      <Filter>Header Files\Detour</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\Recast\Include\Recast.h">
       <Filter>Header Files\Recast\Native</Filter>
     </ClInclude>
@@ -144,10 +126,10 @@
     <ClInclude Include="MeshLoaderObj.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="ManagedInputGeom.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="RecastClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ManagedRecastClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -248,10 +230,10 @@
     <ClCompile Include="MeshLoaderObj.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
-    <ClCompile Include="ManagedInputGeom.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
     <ClCompile Include="RecastClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ManagedRecastClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

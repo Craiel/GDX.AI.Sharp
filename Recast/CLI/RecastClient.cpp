@@ -24,6 +24,15 @@ RecastWrapper::RecastClient::~RecastClient()
 	}
 }
 
+bool RecastWrapper::RecastClient::build(std::string geom_path)
+{
+	InputGeom* geom = new InputGeom();
+	geom->load(m_ctx, geom_path);
+	bool result = build(geom);
+	delete geom;
+	return result;
+}
+
 bool RecastWrapper::RecastClient::build(class InputGeom* geom)
 {
 	m_geom = geom;
@@ -87,6 +96,8 @@ bool RecastWrapper::RecastClient::build(class InputGeom* geom)
 	{
 		return false;
 	}
+
+	m_ctx->log(RC_LOG_PROGRESS, ">> Polymesh: %d vertices  %d polygons", m_pmesh->nverts, m_pmesh->npolys);
 
 	m_ctx->stopTimer(RC_TIMER_TOTAL);
 	
