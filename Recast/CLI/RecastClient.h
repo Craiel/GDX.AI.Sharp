@@ -39,7 +39,7 @@ namespace RecastWrapper {
 
 	class RecastClient
 	{
-	private:
+	protected:
 		rcConfig m_cfg;
 
 		dtCrowdAgentDebugInfo m_agentDebug;
@@ -60,7 +60,7 @@ namespace RecastWrapper {
 
 		class InputGeom* m_geom;
 		
-	public:
+	protected:
 		float m_cellSize = 0.3f;
 		float m_cellHeight = 0.2f;
 		float m_agentMaxSlope = 45.0f;
@@ -109,14 +109,8 @@ namespace RecastWrapper {
 
 		bool resetMoveTarget(int index) { return m_crowd->resetMoveTarget(index); }
 
-	private:
-		void buildStep1InitConfig();
-		bool buildStep2Rasterize();
-		void buildStep3FilterWalkable();
-		bool buildStep4PartitionWalkableSurface();
-		bool buildStep5TraceAndSimplify();
-		bool buildStep6BuildPolygons();
-		bool buildStep7CreateDetailMesh();
-		bool buildStep8CreateDetourData();
+	protected:
+		virtual bool prepareBuild(class InputGeom* geom);
+		virtual bool doBuild();
 	};
 }

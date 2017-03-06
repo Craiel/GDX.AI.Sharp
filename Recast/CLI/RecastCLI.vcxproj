@@ -56,7 +56,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\Source\Detour\Include;$(ProjectDir)..\Source\DetourCrowd\Include;$(ProjectDir)..\Source\DetourTileCache\Include;$(ProjectDir)..\Source\Recast\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Source\Detour\Include;$(ProjectDir)..\Source\DetourCrowd\Include;$(ProjectDir)..\Source\DetourTileCache\Include;$(ProjectDir)..\Source\Recast\Include;$(ProjectDir)..\Source\Contrib\fastlz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -67,7 +67,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\Source\Detour\Include;$(ProjectDir)..\Source\DetourCrowd\Include;$(ProjectDir)..\Source\DetourTileCache\Include;$(ProjectDir)..\Source\Recast\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Source\Detour\Include;$(ProjectDir)..\Source\DetourCrowd\Include;$(ProjectDir)..\Source\DetourTileCache\Include;$(ProjectDir)..\Source\Recast\Include;$(ProjectDir)..\Source\Contrib\fastlz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
     </ClCompile>
@@ -81,6 +81,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Contrib\fastlz\fastlz.h" />
     <ClInclude Include="..\Source\DetourCrowd\Include\DetourCrowd.h" />
     <ClInclude Include="..\Source\DetourCrowd\Include\DetourLocalBoundary.h" />
     <ClInclude Include="..\Source\DetourCrowd\Include\DetourObstacleAvoidance.h" />
@@ -103,7 +104,6 @@
     <ClInclude Include="..\Source\Recast\Include\RecastAssert.h" />
     <ClInclude Include="BuildContext.h" />
     <ClInclude Include="ChunkyTriMesh.h" />
-    <ClInclude Include="DetourWrapper.h" />
     <ClInclude Include="InputGeom.h" />
     <ClInclude Include="ManagedDtCrowdAgentInfo.h" />
     <ClInclude Include="ManagedDtCrowdAgentParams.h" />
@@ -111,9 +111,11 @@
     <ClInclude Include="MeshLoaderObj.h" />
     <ClInclude Include="PerfTimer.h" />
     <ClInclude Include="RecastClient.h" />
-    <ClInclude Include="RecastWrapper.h" />
+    <ClInclude Include="RecastClientSoloMesh.h" />
+    <ClInclude Include="RecastClientTiled.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\Contrib\fastlz\fastlz.cpp" />
     <ClCompile Include="..\Source\DetourCrowd\Source\DetourCrowd.cpp" />
     <ClCompile Include="..\Source\DetourCrowd\Source\DetourLocalBoundary.cpp" />
     <ClCompile Include="..\Source\DetourCrowd\Source\DetourObstacleAvoidance.cpp" />
@@ -149,6 +151,8 @@
     <ClCompile Include="MeshLoaderObj.cpp" />
     <ClCompile Include="PerfTimer.cpp" />
     <ClCompile Include="RecastClient.cpp" />
+    <ClCompile Include="RecastClientSoloMesh.cpp" />
+    <ClCompile Include="RecastClientTiled.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

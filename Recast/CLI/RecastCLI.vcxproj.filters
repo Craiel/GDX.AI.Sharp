@@ -43,6 +43,12 @@
     <Filter Include="Source Files\Detour\Native">
       <UniqueIdentifier>{00d782d6-6b45-4c24-a32a-bd256e30305f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Contrib">
+      <UniqueIdentifier>{159024ee-b9bf-4bfe-a906-93ef695a2af4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Contrib">
+      <UniqueIdentifier>{28e1ffdb-ae28-44b2-a46e-4e76659c1873}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BuildContext.h">
@@ -50,12 +56,6 @@
     </ClInclude>
     <ClInclude Include="PerfTimer.h">
       <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="RecastWrapper.h">
-      <Filter>Header Files\Recast</Filter>
-    </ClInclude>
-    <ClInclude Include="DetourWrapper.h">
-      <Filter>Header Files\Detour</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Recast\Include\Recast.h">
       <Filter>Header Files\Recast\Native</Filter>
@@ -137,6 +137,15 @@
     </ClInclude>
     <ClInclude Include="ManagedDtCrowdAgentInfo.h">
       <Filter>Header Files\Detour</Filter>
+    </ClInclude>
+    <ClInclude Include="RecastClientSoloMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RecastClientTiled.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Contrib\fastlz\fastlz.h">
+      <Filter>Header Files\Contrib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -244,6 +253,15 @@
     </ClCompile>
     <ClCompile Include="ManagedDtCrowdAgentParams.cpp">
       <Filter>Source Files\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="RecastClientSoloMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RecastClientTiled.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Contrib\fastlz\fastlz.cpp">
+      <Filter>Source Files\Contrib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

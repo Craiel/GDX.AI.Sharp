@@ -3,9 +3,7 @@
     using System.Collections.Generic;
 
     using CarbonCore.Utils.IO;
-
-    using Contracts;
-
+    
     using Geometry;
 
     using Microsoft.Xna.Framework;
@@ -14,16 +12,14 @@
 
     public class RecastClient
     {
-        private readonly ILogger logger;
         private readonly ManagedRecastClient managedClient;
 
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        public RecastClient(ILogger logger)
+        public RecastClient()
         {
-            this.logger = logger;
-            this.managedClient = new ManagedRecastClient();
+            this.managedClient = new ManagedRecastClient(false);
         }
 
         // -------------------------------------------------------------------
@@ -33,10 +29,12 @@
         {
             bool result = this.managedClient.Load(file.GetPath());
             
+            this.managedClient.LogBuildTimes();
+
             IList<string> buildlogText = this.managedClient.GetLogText();
             foreach (string line in buildlogText)
             {
-                this.logger.Debug("RecastClient", line);
+                GDXAI.Logger.Debug("RecastClient", line);
             }
 
             return result;

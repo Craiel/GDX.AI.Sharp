@@ -2,7 +2,8 @@
 
 #include <msclr\marshal_cppstd.h>
 
-#include "RecastClient.h"
+#include "RecastClientTiled.h"
+#include "RecastClientSoloMesh.h"
 #include "ManagedDtCrowdAgentInfo.h"
 #include "ManagedDtCrowdAgentParams.h"
 
@@ -25,7 +26,16 @@ namespace RecastWrapper
 		}
 
 	public:
-		ManagedRecastClient() { unmanaged = new RecastClient(); }
+		ManagedRecastClient(bool soloMesh)
+		{
+			if (soloMesh) {
+				unmanaged = new RecastClientSoloMesh();
+			} else
+			{
+				unmanaged = new RecastClientTiled();
+			}
+		}
+
 		~ManagedRecastClient() { delete unmanaged; }
 	internal:
 		RecastClient* GetUnmanaged() { return unmanaged; }
