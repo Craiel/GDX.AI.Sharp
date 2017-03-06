@@ -13,10 +13,17 @@ using namespace System::Runtime::InteropServices;
 
 namespace RecastWrapper
 {
+	public enum class RecastClientMode : int
+	{
+		RECAST_SOLO_MESH,
+		RECAST_TILED_MESH
+	};
+
 	public ref class ManagedRecastClient
 	{
 	private:
 		RecastClient* unmanaged;
+		RecastClientMode mode;
 
 		static void logLine(rcContext& ctx, rcTimerLabel label, const char* name, const float pc)
 		{
@@ -26,9 +33,10 @@ namespace RecastWrapper
 		}
 
 	public:
-		ManagedRecastClient(bool soloMesh)
+		ManagedRecastClient(RecastClientMode recastMode)
 		{
-			if (soloMesh) {
+			mode = recastMode;
+			if (mode == RecastClientMode::RECAST_SOLO_MESH) {
 				unmanaged = new RecastClientSoloMesh();
 			} else
 			{
@@ -41,9 +49,83 @@ namespace RecastWrapper
 		RecastClient* GetUnmanaged() { return unmanaged; }
 
 	public:
-		bool Load(String^ path) {
+		bool LoadObj(String^ path) {
 			std::string unmanagedPath = msclr::interop::marshal_as<std::string>(path);
 			return unmanaged->build(unmanagedPath);
+		}
+
+		bool Load(array<byte>^ data)
+		{
+			GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+			if (mode == RecastClientMode::RECAST_TILED_MESH)
+			{
+				pin_ptr<byte> data_array_start = &data[0];
+
+				GDX::AI::ProtoRecastTiledNavMesh* proto = new GDX::AI::ProtoRecastTiledNavMesh();
+				if (!proto->ParseFromArray(data_array_start, data->Length))
+				{
+					return false;
+				}
+
+				RecastClientTiled* tiled = ((RecastClientTiled*)unmanaged);
+				return tiled->Load(proto);				
+			}
+
+			return false;
+		}
+
+		bool Save([Out] array<byte>^% data)
+		{
+			GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+			if(mode == RecastClientMode::RECAST_TILED_MESH)
+			{
+				RecastClientTiled* tiled = ((RecastClientTiled*)unmanaged);
+				GDX::AI::ProtoRecastTiledNavMesh* proto = new GDX::AI::ProtoRecastTiledNavMesh();
+				if(!tiled->Save(proto))
+				{
+					delete proto;
+					return false;
+				}
+
+				int size = proto->ByteSize();
+				void *buffer = malloc(size);
+				proto->SerializeToArray(buffer, size);
+
+				data = gcnew array<byte>(size);
+				pin_ptr<byte> data_array_start = &data[0];
+				memcpy(data_array_start, buffer, size);
+
+				// clean up
+				delete proto;
+				free(buffer);
+				google::protobuf::ShutdownProtobufLibrary();
+
+				return true;
+			}
+						
+			return false;
+		}
+
+		bool GetDebugNavMesh([Out] array<byte>^% data)
+		{
+			GDX::AI::ProtoRecastDebugNavMesh* proto = new GDX::AI::ProtoRecastDebugNavMesh();
+			if(!unmanaged->getDebugNavMesh(POLYFLAGS_DISABLED, proto))
+			{
+				delete proto;
+				return false;
+			}
+
+			data = gcnew array<byte>(proto->ByteSize());
+			pin_ptr<byte> data_array_start = &data[0];
+			proto->SerializeToArray(data_array_start, proto->ByteSize());
+
+			// clean up
+			delete proto;
+			google::protobuf::ShutdownProtobufLibrary();
+
+			return true;
 		}
 
 		void LogBuildTimes()

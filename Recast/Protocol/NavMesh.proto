@@ -9,12 +9,6 @@ message ProtoNavMeshVector {
 	float z = 3;
 }
 
-message ProtoNavMeshTriangle {
-	uint32 a = 1;
-	uint32 b = 2;
-	uint32 c = 3;
-}
-
 message ProtoRecastTile {
 	uint32 compressed_tile_ref = 1;
 	bytes tile_data = 2;
@@ -26,4 +20,19 @@ message ProtoRecastTiledNavMesh {
 	bytes nav_mesh_params = 3;
 	
 	repeated ProtoRecastTile tiles = 10;
+}
+
+message ProtoRecastDebugNavMesh {
+	repeated ProtoRecastDebugNavMeshOffMeshConnection off_mesh_connections = 1;
+	repeated ProtoRecastDebugNavMeshTriangle triangles = 2;
+}
+
+message ProtoRecastDebugNavMeshOffMeshConnection {
+	ProtoNavMeshVector p_0 = 1;
+	ProtoNavMeshVector p_1 = 2;
+	uint32 flags = 3;
+}
+
+message ProtoRecastDebugNavMeshTriangle {
+	repeated ProtoNavMeshVector vertices = 1;
 }

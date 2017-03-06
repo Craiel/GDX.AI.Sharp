@@ -5,6 +5,7 @@
 #include <DetourNavMeshQuery.h>
 #include <DetourNavMeshBuilder.h>
 #include <DetourCrowd.h>
+#include <NavMesh.pb.h>
 
 #include "BuildContext.h"
 #include "InputGeom.h"
@@ -108,6 +109,8 @@ namespace RecastWrapper {
 		bool requestMoveTarget(int index, dtPolyRef targetRef, const float* pos) { return m_crowd->requestMoveTarget(index, targetRef, pos); }
 
 		bool resetMoveTarget(int index) { return m_crowd->resetMoveTarget(index); }
+
+		bool getDebugNavMesh(const unsigned short polyFlags, GDX::AI::ProtoRecastDebugNavMesh* proto);
 
 	protected:
 		virtual bool prepareBuild(class InputGeom* geom);

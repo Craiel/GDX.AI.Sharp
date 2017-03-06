@@ -214,17 +214,31 @@ bool RecastWrapper::RecastClientTiled::doBuild()
 		return false;
 	}
 
-	// Print the memory use of the nav mesh
-	const dtNavMesh* nav = m_navMesh;
-	int navmeshMemUsage = 0;
-	for (int i = 0; i < nav->getMaxTiles(); ++i)
+	return finalizeLoad(true);
+}
+
+bool RecastWrapper::RecastClientTiled::finalizeLoad(bool traceMemory)
+{
+	// Initialize crowd
+	if (!m_crowd->init(m_maxAgents, m_agentRadius, m_navMesh))
 	{
-		const dtMeshTile* tile = nav->getTile(i);
-		if (tile->header)
-			navmeshMemUsage += tile->dataSize;
+		m_ctx->log(RC_LOG_ERROR, "Coult nod init Crowd");
+		return false;
 	}
 
-	m_ctx->log(RC_LOG_PROGRESS, "navmeshMemUsage = %.1f kB", navmeshMemUsage / 1024.0f);
+	if (traceMemory) {
+		// Print the memory use of the nav mesh
+		const dtNavMesh* nav = m_navMesh;
+		int navmeshMemUsage = 0;
+		for (int i = 0; i < nav->getMaxTiles(); ++i)
+		{
+			const dtMeshTile* tile = nav->getTile(i);
+			if (tile->header)
+				navmeshMemUsage += tile->dataSize;
+		}
+
+		m_ctx->log(RC_LOG_PROGRESS, "navmeshMemUsage = %.1f kB", navmeshMemUsage / 1024.0f);
+	}
 
 	return true;
 }
@@ -412,11 +426,9 @@ int RecastWrapper::RecastClientTiled::rasterizeTileLayers(
 	return n;
 }
 
-GDX::AI::ProtoRecastTiledNavMesh* RecastWrapper::RecastClientTiled::Save()
+bool RecastWrapper::RecastClientTiled::Save(GDX::AI::ProtoRecastTiledNavMesh* proto)
 {
-	GDX::AI::ProtoRecastTiledNavMesh* result = new GDX::AI::ProtoRecastTiledNavMesh();
-
-	int tileCount;
+	int tileCount = 0;
 	for (int i = 0; i < m_tileCache->getTileCount(); ++i)
 	{
 		const dtCompressedTile* tile = m_tileCache->getTile(i);
@@ -424,30 +436,104 @@ GDX::AI::ProtoRecastTiledNavMesh* RecastWrapper::RecastClientTiled::Save()
 		tileCount++;
 	}
 
-	result->set_tile_count(tileCount);
+	proto->set_tile_count(tileCount);
 
 	dtNavMeshParams meshParams;
 	dtTileCacheParams cacheParams;
 	memcpy(&meshParams, m_navMesh->getParams(), sizeof(dtNavMeshParams));
 	memcpy(&cacheParams, m_tileCache->getParams(), sizeof(dtTileCacheParams));
 
-	result->set_nav_mesh_params(reinterpret_cast<char*>(&meshParams), sizeof(dtNavMeshParams));
-	result->set_tile_cache_params(reinterpret_cast<char*>(&cacheParams), sizeof(dtTileCacheParams));
+	proto->set_nav_mesh_params(reinterpret_cast<char*>(&meshParams), sizeof(dtNavMeshParams));
+	proto->set_tile_cache_params(reinterpret_cast<char*>(&cacheParams), sizeof(dtTileCacheParams));
 
 	for(int i = 0; i < tileCount; i++)
 	{
 		const dtCompressedTile* tile = m_tileCache->getTile(i);
 		if (!tile || !tile->header || !tile->dataSize) continue;
 
-		GDX::AI::ProtoRecastTile* protoTile = result->add_tiles();
+		int dataSize = tile->dataSize;
+
+		GDX::AI::ProtoRecastTile* protoTile = proto->add_tiles();
 		protoTile->set_compressed_tile_ref(m_tileCache->getTileRef(tile));
-		protoTile->set_tile_data(tile->data, tile->dataSize);
+
+		unsigned char* buffer = (unsigned char*)malloc(dataSize);
+		memcpy(buffer, tile->data, dataSize);
+		protoTile->set_tile_data(buffer, dataSize);
 	}
 
-	return result;
+	return true;
 }
 
-void RecastWrapper::RecastClientTiled::Load(GDX::AI::ProtoRecastTiledNavMesh* navMesh)
+bool RecastWrapper::RecastClientTiled::Load(GDX::AI::ProtoRecastTiledNavMesh* proto)
 {
-	
+	dtFreeNavMesh(m_navMesh);
+	dtFreeTileCache(m_tileCache);
+
+	m_navMesh = dtAllocNavMesh();
+	if (!m_navMesh)
+	{
+		return false;
+	}
+
+	dtNavMeshParams meshParams;
+	dtTileCacheParams cacheParams;
+	std::string navMeshParamData = proto->nav_mesh_params();
+	std::string cacheParamData = proto->tile_cache_params();
+	memcpy(&meshParams, &navMeshParamData[0], sizeof(dtNavMeshParams));
+	memcpy(&cacheParams, &cacheParamData[0], sizeof(dtTileCacheParams));
+
+	dtStatus status = m_navMesh->init(&meshParams);
+	if (dtStatusFailed(status))
+	{
+		return false;
+	}
+
+	m_tileCache = dtAllocTileCache();
+	if (!m_tileCache)
+	{
+		return false;
+	}
+
+	status = m_tileCache->init(&cacheParams, m_talloc, m_tcomp, m_tmproc);
+	if (dtStatusFailed(status))
+	{
+		return false;
+	}
+
+	// Read tiles
+	for (int i = 0; i < proto->tile_count(); ++i)
+	{
+		GDX::AI::ProtoRecastTile protoTile = proto->tiles().Get(i);
+		std::string dataString = protoTile.tile_data();
+		int dataSize = dataString.length();
+
+		unsigned char* data = (unsigned char*)dtAlloc(dataSize, DT_ALLOC_PERM);
+		if (!data) break;
+		copy(dataString.begin(), dataString.end(), data);
+				
+		dtCompressedTileRef tile = 0;
+		dtStatus addTileStatus = m_tileCache->addTile(data, dataSize, DT_COMPRESSEDTILE_FREE_DATA, &tile);
+		if (dtStatusFailed(addTileStatus))
+		{
+			dtFree(data);
+			return false;
+		}
+
+		if (!tile)
+		{
+			dtFree(data);
+			return false;
+		} 
+
+		m_tileCache->buildNavMeshTile(tile, m_navMesh);
+	}
+
+	status = m_navQuery->init(m_navMesh, 2048);
+	if (dtStatusFailed(status))
+	{
+		m_ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not init Detour navmesh query");
+		return false;
+	}
+
+	return finalizeLoad(false);
 }

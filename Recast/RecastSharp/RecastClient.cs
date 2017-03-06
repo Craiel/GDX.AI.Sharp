@@ -19,15 +19,15 @@
         // -------------------------------------------------------------------
         public RecastClient()
         {
-            this.managedClient = new ManagedRecastClient(false);
+            this.managedClient = new ManagedRecastClient(RecastClientMode.RECAST_TILED_MESH);
         }
 
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public bool Load(CarbonFile file)
+        public bool LoadObj(CarbonFile file)
         {
-            bool result = this.managedClient.Load(file.GetPath());
+            bool result = this.managedClient.LoadObj(file.GetPath());
             
             this.managedClient.LogBuildTimes();
 
@@ -38,6 +38,21 @@
             }
 
             return result;
+        }
+
+        public bool Load(byte[] data)
+        {
+            return this.managedClient.Load(data);
+        }
+
+        public bool Save(out byte[] data)
+        {
+            return this.managedClient.Save(out data);
+        }
+
+        public bool GetDebugNavMesh(out byte[] data)
+        {
+            return this.managedClient.GetDebugNavMesh(out data);
         }
 
         public void Update(float delta)

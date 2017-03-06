@@ -6,6 +6,9 @@
 #include <fastlz.h>
 #include <Recast.h>
 #include <NavMesh.pb.h>
+#include <algorithm>
+#include <iostream>
+#include <iterator>
 
 #include "RecastClient.h"
 
@@ -147,8 +150,8 @@ namespace RecastWrapper {
 		RecastClientTiled();
 		~RecastClientTiled();
 
-		GDX::AI::ProtoRecastTiledNavMesh* Save();
-		void Load(GDX::AI::ProtoRecastTiledNavMesh* navMesh);
+		bool Save(GDX::AI::ProtoRecastTiledNavMesh* proto);
+		bool Load(GDX::AI::ProtoRecastTiledNavMesh* proto);
 
 	protected:
 		int m_maxTiles; // set by code
@@ -180,5 +183,7 @@ namespace RecastWrapper {
 
 		void buildStep1InitConfig();
 		int rasterizeTileLayers(const int tx, const int ty,	TileCacheData* tiles, const int maxTiles);
+
+		bool finalizeLoad(bool traceMemory);
 	};
 }
