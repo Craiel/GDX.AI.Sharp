@@ -49,6 +49,12 @@
     <Filter Include="Source Files\Contrib">
       <UniqueIdentifier>{28e1ffdb-ae28-44b2-a46e-4e76659c1873}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Protocol">
+      <UniqueIdentifier>{897e771c-cd0e-45bc-bd64-8489ebd18b32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Protocol">
+      <UniqueIdentifier>{f9d22045-ca69-4e47-be25-83e99b038c4e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BuildContext.h">
@@ -146,6 +152,9 @@
     </ClInclude>
     <ClInclude Include="..\Source\Contrib\fastlz\fastlz.h">
       <Filter>Header Files\Contrib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Protocol\NavMesh.pb.h">
+      <Filter>Header Files\Protocol</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -262,6 +271,9 @@
     </ClCompile>
     <ClCompile Include="..\Source\Contrib\fastlz\fastlz.cpp">
       <Filter>Source Files\Contrib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Protocol\NavMesh.pb.cc">
+      <Filter>Source Files\Protocol</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

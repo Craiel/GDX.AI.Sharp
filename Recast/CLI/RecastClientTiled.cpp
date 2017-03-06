@@ -411,3 +411,43 @@ int RecastWrapper::RecastClientTiled::rasterizeTileLayers(
 
 	return n;
 }
+
+GDX::AI::ProtoRecastTiledNavMesh* RecastWrapper::RecastClientTiled::Save()
+{
+	GDX::AI::ProtoRecastTiledNavMesh* result = new GDX::AI::ProtoRecastTiledNavMesh();
+
+	int tileCount;
+	for (int i = 0; i < m_tileCache->getTileCount(); ++i)
+	{
+		const dtCompressedTile* tile = m_tileCache->getTile(i);
+		if (!tile || !tile->header || !tile->dataSize) continue;
+		tileCount++;
+	}
+
+	result->set_tile_count(tileCount);
+
+	dtNavMeshParams meshParams;
+	dtTileCacheParams cacheParams;
+	memcpy(&meshParams, m_navMesh->getParams(), sizeof(dtNavMeshParams));
+	memcpy(&cacheParams, m_tileCache->getParams(), sizeof(dtTileCacheParams));
+
+	result->set_nav_mesh_params(reinterpret_cast<char*>(&meshParams), sizeof(dtNavMeshParams));
+	result->set_tile_cache_params(reinterpret_cast<char*>(&cacheParams), sizeof(dtTileCacheParams));
+
+	for(int i = 0; i < tileCount; i++)
+	{
+		const dtCompressedTile* tile = m_tileCache->getTile(i);
+		if (!tile || !tile->header || !tile->dataSize) continue;
+
+		GDX::AI::ProtoRecastTile* protoTile = result->add_tiles();
+		protoTile->set_compressed_tile_ref(m_tileCache->getTileRef(tile));
+		protoTile->set_tile_data(tile->data, tile->dataSize);
+	}
+
+	return result;
+}
+
+void RecastWrapper::RecastClientTiled::Load(GDX::AI::ProtoRecastTiledNavMesh* navMesh)
+{
+	
+}

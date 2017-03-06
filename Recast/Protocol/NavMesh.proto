@@ -1,0 +1,29 @@
+syntax = "proto3";
+package GDX.AI;
+
+option csharp_namespace = "GDX.AI.Recast.Protocol";
+
+message ProtoNavMeshVector {
+	float x = 1;
+	float y = 2;
+	float z = 3;
+}
+
+message ProtoNavMeshTriangle {
+	uint32 a = 1;
+	uint32 b = 2;
+	uint32 c = 3;
+}
+
+message ProtoRecastTile {
+	uint32 compressed_tile_ref = 1;
+	bytes tile_data = 2;
+}
+
+message ProtoRecastTiledNavMesh {
+	uint32 tile_count = 1;
+	bytes tile_cache_params = 2;
+	bytes nav_mesh_params = 3;
+	
+	repeated ProtoRecastTile tiles = 10;
+}

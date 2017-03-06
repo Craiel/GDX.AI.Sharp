@@ -5,6 +5,7 @@
 #include <DetourTileCacheBuilder.h>
 #include <fastlz.h>
 #include <Recast.h>
+#include <NavMesh.pb.h>
 
 #include "RecastClient.h"
 
@@ -145,6 +146,9 @@ namespace RecastWrapper {
 
 		RecastClientTiled();
 		~RecastClientTiled();
+
+		GDX::AI::ProtoRecastTiledNavMesh* Save();
+		void Load(GDX::AI::ProtoRecastTiledNavMesh* navMesh);
 
 	protected:
 		int m_maxTiles; // set by code

@@ -56,10 +56,10 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\Source\Detour\Include;$(ProjectDir)..\Source\DetourCrowd\Include;$(ProjectDir)..\Source\DetourTileCache\Include;$(ProjectDir)..\Source\Recast\Include;$(ProjectDir)..\Source\Contrib\fastlz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Source\Detour\Include;$(ProjectDir)..\Source\DetourCrowd\Include;$(ProjectDir)..\Source\DetourTileCache\Include;$(ProjectDir)..\Source\Recast\Include;$(ProjectDir)..\Source\Contrib\fastlz;$(ProjectDir)..\Source\Protocol;$(ProjectDir)..\Source\Contrib\google;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies />
+      <AdditionalDependencies>$(ProjectDir)..\Lib\libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -67,12 +67,12 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\Source\Detour\Include;$(ProjectDir)..\Source\DetourCrowd\Include;$(ProjectDir)..\Source\DetourTileCache\Include;$(ProjectDir)..\Source\Recast\Include;$(ProjectDir)..\Source\Contrib\fastlz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Source\Detour\Include;$(ProjectDir)..\Source\DetourCrowd\Include;$(ProjectDir)..\Source\DetourTileCache\Include;$(ProjectDir)..\Source\Recast\Include;$(ProjectDir)..\Source\Contrib\fastlz;$(ProjectDir)..\Source\Protocol;$(ProjectDir)..\Source\Contrib\google;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies />
+      <AdditionalDependencies>$(ProjectDir)..\Lib\libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -99,6 +99,7 @@
     <ClInclude Include="..\Source\Detour\Include\DetourNavMeshQuery.h" />
     <ClInclude Include="..\Source\Detour\Include\DetourNode.h" />
     <ClInclude Include="..\Source\Detour\Include\DetourStatus.h" />
+    <ClInclude Include="..\Source\Protocol\NavMesh.pb.h" />
     <ClInclude Include="..\Source\Recast\Include\Recast.h" />
     <ClInclude Include="..\Source\Recast\Include\RecastAlloc.h" />
     <ClInclude Include="..\Source\Recast\Include\RecastAssert.h" />
@@ -131,6 +132,7 @@
     <ClCompile Include="..\Source\Detour\Source\DetourNavMeshBuilder.cpp" />
     <ClCompile Include="..\Source\Detour\Source\DetourNavMeshQuery.cpp" />
     <ClCompile Include="..\Source\Detour\Source\DetourNode.cpp" />
+    <ClCompile Include="..\Source\Protocol\NavMesh.pb.cc" />
     <ClCompile Include="..\Source\Recast\Source\Recast.cpp" />
     <ClCompile Include="..\Source\Recast\Source\RecastAlloc.cpp" />
     <ClCompile Include="..\Source\Recast\Source\RecastArea.cpp" />
