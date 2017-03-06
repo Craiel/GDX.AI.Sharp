@@ -110,10 +110,20 @@ bool RecastWrapper::RecastClient::getDebugNavMesh(const unsigned short polyFlags
 		if (!tile->header) continue;
 		dtPolyRef base = m_navMesh->getPolyRefBase(tile);
 
+		GDX::AI::ProtoRecastDebugNavMeshTile* protoTile = proto->add_tiles();
+		for (int i = 0; i < tile->header->vertCount; i++)
+		{
+			float* vert = &tile->verts[i];
+			GDX::AI::ProtoNavMeshVector* vertex = protoTile->add_vertices();
+			vertex->set_x(vert[0]);
+			vertex->set_y(vert[1]);
+			vertex->set_z(vert[2]);
+		}
+
 		for (int j = 0; j < tile->header->polyCount; ++j)
 		{
 			const dtPoly* p = &tile->polys[j];
-			if ((p->flags & polyFlags) == 0) continue;
+			if ((p->flags & polyFlags) != 0) continue;
 			
 			const dtMeshTile* tile = 0;
 			const dtPoly* poly = 0;
@@ -149,20 +159,20 @@ bool RecastWrapper::RecastClient::getDebugNavMesh(const unsigned short polyFlags
 				for (int i = 0; i < pd->triCount; ++i)
 				{
 					const unsigned char* t = &tile->detailTris[(pd->triBase + i) * 4];
-					GDX::AI::ProtoRecastDebugNavMeshTriangle* triangle = proto->add_triangles();
+					//GDX::AI::ProtoRecastDebugNavMeshTriangle* triangle = proto->add_triangles();
+					unsigned short tri[3];
 					for (int j = 0; j < 3; ++j)
 					{
-						const float* pos;
 						if (t[j] < poly->vertCount)
-							pos = &tile->verts[poly->verts[t[j]] * 3];
+							tri[j] = poly->verts[t[j]];
 						else
-							pos = &tile->detailVerts[(pd->vertBase + t[j] - poly->vertCount) * 3];
-
-						GDX::AI::ProtoNavMeshVector* vertex = triangle->add_vertices();
-						vertex->set_x(pos[0]);
-						vertex->set_y(pos[1]);
-						vertex->set_z(pos[2]);
+							tri[j] = (pd->vertBase + t[j] - poly->vertCount) * 3;
 					}
+
+					GDX::AI::ProtoNavMeshTriangle* triangle = protoTile->add_triangles();
+					triangle->set_x(tri[0]);
+					triangle->set_y(tri[1]);
+					triangle->set_z(tri[2]);
 				}
 			}
 		}
