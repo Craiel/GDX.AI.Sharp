@@ -111,9 +111,10 @@ bool RecastWrapper::RecastClient::getDebugNavMesh(const unsigned short polyFlags
 		dtPolyRef base = m_navMesh->getPolyRefBase(tile);
 
 		GDX::AI::ProtoRecastDebugNavMeshTile* protoTile = proto->add_tiles();
-		for (int i = 0; i < tile->header->vertCount; i++)
+		int tileVerts = tile->header->vertCount;
+		for (int i = 0; i < tileVerts; i++)
 		{
-			float* vert = &tile->verts[i];
+			float* vert = &tile->verts[i*3];
 			GDX::AI::ProtoNavMeshVector* vertex = protoTile->add_vertices();
 			vertex->set_x(vert[0]);
 			vertex->set_y(vert[1]);
