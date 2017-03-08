@@ -12,6 +12,8 @@
 
     public class RecastClient
     {
+        public const uint InvalidObstacleRef = 0;
+
         private readonly ManagedRecastClient managedClient;
 
         // -------------------------------------------------------------------
@@ -109,6 +111,26 @@
                            targetPosition =
                                new Vector3(info.targetPos[0], info.targetPos[1], info.targetPos[2])
                        };
+        }
+
+        public bool AddObstacle(Vector3 position, float radius, float height, out uint obstacleRef)
+        {
+            return this.managedClient.AddObstacle(position.ToArray(), radius, height, out obstacleRef);
+        }
+
+        public bool AddObstacleBox(Vector3 min, Vector3 max, out uint obstacleRef)
+        {
+            return this.managedClient.AddObstacleBox(min.ToArray(), max.ToArray(), out obstacleRef);
+        }
+
+        public bool RemoveObstacle(uint obstacleRef)
+        {
+            return this.managedClient.RemoveObstacle(obstacleRef);
+        }
+
+        public void ClearObstacles()
+        {
+            this.managedClient.ClearObstacles();
         }
     }
 }

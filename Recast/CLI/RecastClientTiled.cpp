@@ -537,3 +537,28 @@ bool RecastWrapper::RecastClientTiled::Load(GDX::AI::ProtoRecastTiledNavMesh* pr
 
 	return finalizeLoad(false);
 }
+
+dtStatus RecastWrapper::RecastClientTiled::addObstacle(const float* pos, float radius, float height, dtObstacleRef* ref)
+{
+	return m_tileCache->addObstacle(pos, radius, height, ref);
+}
+
+dtStatus RecastWrapper::RecastClientTiled::addObstacleBox(const float* bmin, const float* bmax, dtObstacleRef* ref)
+{
+	return m_tileCache->addBoxObstacle(bmin, bmax, ref);
+}
+
+dtStatus RecastWrapper::RecastClientTiled::removeObstacle(dtObstacleRef ref)
+{
+	return m_tileCache->removeObstacle(ref);
+}
+
+void RecastWrapper::RecastClientTiled::clearObstacles()
+{
+	for (int i = 0; i < m_tileCache->getObstacleCount(); ++i)
+	{
+		const dtTileCacheObstacle* ob = m_tileCache->getObstacle(i);
+		if (ob->state == DT_OBSTACLE_EMPTY) continue;
+		m_tileCache->removeObstacle(m_tileCache->getObstacleRef(ob));
+	}
+}

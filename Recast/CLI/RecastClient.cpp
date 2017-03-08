@@ -102,7 +102,7 @@ bool RecastWrapper::RecastClient::getDebugNavMesh(const unsigned short polyFlags
 	{
 		return false;
 	}
-
+	
 	const dtNavMesh& mesh = *m_navMesh;
 	for (int i = 0; i < mesh.getMaxTiles(); ++i)
 	{
@@ -180,4 +180,23 @@ bool RecastWrapper::RecastClient::getDebugNavMesh(const unsigned short polyFlags
 	}
 
 	return true;
+}
+
+dtStatus RecastWrapper::RecastClient::addObstacle(const float* pos, float radius, float height, dtObstacleRef* ref)
+{
+	return DT_FAILURE;
+}
+
+dtStatus RecastWrapper::RecastClient::addObstacleBox(const float* bmin, const float* bmax, dtObstacleRef* ref)
+{
+	return DT_FAILURE;
+}
+
+dtStatus RecastWrapper::RecastClient::removeObstacle(dtObstacleRef ref)
+{
+	return DT_FAILURE;
+}
+
+void RecastWrapper::RecastClient::clearObstacles()
+{
 }

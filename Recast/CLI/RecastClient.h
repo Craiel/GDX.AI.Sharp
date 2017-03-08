@@ -5,6 +5,7 @@
 #include <DetourNavMeshQuery.h>
 #include <DetourNavMeshBuilder.h>
 #include <DetourCrowd.h>
+#include <DetourTileCache.h>
 #include <NavMesh.pb.h>
 
 #include "BuildContext.h"
@@ -92,7 +93,7 @@ namespace RecastWrapper {
 
 		BuildContext* getContext() { return m_ctx; }
 
-		void update(float delta) { m_crowd->update(delta, &m_agentDebug); }
+		virtual dtStatus update(float delta) { m_crowd->update(delta, &m_agentDebug); return DT_SUCCESS; }
 
 		int addAgent(const float* pos, const dtCrowdAgentParams* params) { return m_crowd->addAgent(pos, params); }
 
@@ -111,6 +112,11 @@ namespace RecastWrapper {
 		bool resetMoveTarget(int index) { return m_crowd->resetMoveTarget(index); }
 
 		bool getDebugNavMesh(const unsigned short polyFlags, GDX::AI::ProtoRecastDebugNavMesh* proto);
+
+		virtual dtStatus addObstacle(const float* pos, float radius, float height, dtObstacleRef* ref);
+		virtual dtStatus addObstacleBox(const float* bmin, const float* bmax, dtObstacleRef* ref);
+		virtual dtStatus removeObstacle(dtObstacleRef ref);
+		virtual void clearObstacles();
 
 	protected:
 		virtual bool prepareBuild(class InputGeom* geom);

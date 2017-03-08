@@ -401,3 +401,22 @@ bool RecastWrapper::RecastClientSoloMesh::doBuild()
 
 	return true;
 }
+
+dtStatus RecastWrapper::RecastClientSoloMesh::addObstacle(const float* pos, float radius, float height, dtObstacleRef* ref)
+{
+	return DT_FAILURE;
+}
+
+dtStatus RecastWrapper::RecastClientSoloMesh::addObstacleBox(const float* bmin, const float* bmax, dtObstacleRef* ref)
+{
+	return DT_FAILURE;
+}
+
+dtStatus RecastWrapper::RecastClientSoloMesh::removeObstacle(dtObstacleRef ref)
+{
+	return DT_FAILURE;
+}
+
+void RecastWrapper::RecastClientSoloMesh::clearObstacles()
+{	
+}

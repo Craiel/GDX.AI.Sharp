@@ -252,5 +252,45 @@ namespace RecastWrapper
 			agentInfo->targetPos[2] = agent->targetPos[2];
 			agentInfo->targetState = agent->targetState;
 		}
+
+		bool AddObstacle(array<float>^ position, float radius, float height, [Out] unsigned int% ref)
+		{
+			pin_ptr<float> position_start = &position[0];
+			dtObstacleRef localRef;
+			dtStatus status = unmanaged->addObstacle(position_start, radius, height, &localRef);
+			if(dtStatusSucceed(status))
+			{
+				ref = localRef;
+				return true;
+			}
+
+			return false;
+		}
+
+		bool AddObstacleBox(array<float>^ min, array<float>^ max, [Out] unsigned int% ref)
+		{
+			pin_ptr<float> min_start = &min[0];
+			pin_ptr<float> max_start = &max[0];
+			dtObstacleRef localRef;
+			dtStatus status = unmanaged->addObstacleBox(min_start, max_start, &localRef);
+			if(dtStatusSucceed(status))
+			{
+				ref = localRef;
+				return true;
+			}
+
+			return false;
+		}
+
+		bool RemoveObstacle(unsigned int ref)
+		{
+			dtStatus status = unmanaged->removeObstacle(ref);
+			return dtStatusSucceed(status);
+		}
+
+		void ClearObstacles()
+		{
+			unmanaged->clearObstacles();
+		}
 	};
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <DetourTileCache.h>
 #include "RecastClient.h"
 
 namespace RecastWrapper {
@@ -12,6 +13,11 @@ namespace RecastWrapper {
 	public:
 		RecastClientSoloMesh();
 		~RecastClientSoloMesh();
+
+		virtual dtStatus addObstacle(const float* pos, float radius, float height, dtObstacleRef* ref);
+		virtual dtStatus addObstacleBox(const float* bmin, const float* bmax, dtObstacleRef* ref);
+		virtual dtStatus removeObstacle(dtObstacleRef ref);
+		virtual void clearObstacles();
 
 	private:
 		void buildStep1InitConfig();

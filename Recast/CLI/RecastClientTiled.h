@@ -145,13 +145,29 @@ namespace RecastWrapper {
 	public:
 		static const int EXPECTED_LAYERS_PER_TILE = 4;
 		static const int MAX_LAYERS = 32;
-		int m_maxObstables = 128;
+		int m_maxObstables = 2048;
 
 		RecastClientTiled();
 		~RecastClientTiled();
 
 		bool Save(GDX::AI::ProtoRecastTiledNavMesh* proto);
 		bool Load(GDX::AI::ProtoRecastTiledNavMesh* proto);
+
+		virtual dtStatus update(float delta)
+		{
+			dtStatus status = RecastClient::update(delta);
+			if(dtStatusFailed(status))
+			{
+				return status;
+			}
+
+			return m_tileCache->update(delta, m_navMesh);
+		}
+
+		virtual dtStatus addObstacle(const float* pos, float radius, float height, dtObstacleRef* ref);
+		virtual dtStatus addObstacleBox(const float* bmin, const float* bmax, dtObstacleRef* ref);
+		virtual dtStatus removeObstacle(dtObstacleRef ref);
+		virtual void clearObstacles();
 
 	protected:
 		int m_maxTiles; // set by code
