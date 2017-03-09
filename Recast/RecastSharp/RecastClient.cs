@@ -19,9 +19,9 @@
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        public RecastClient()
+        public RecastClient(RecastClientSettings settings)
         {
-            this.managedClient = new ManagedRecastClient(RecastClientMode.RECAST_TILED_MESH);
+            this.managedClient = new ManagedRecastClient(RecastClientMode.RECAST_TILED_MESH, settings.ToManaged());
         }
 
         // -------------------------------------------------------------------

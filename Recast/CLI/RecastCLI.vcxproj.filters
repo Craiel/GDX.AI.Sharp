@@ -156,6 +156,9 @@
     <ClInclude Include="..\Source\Protocol\NavMesh.pb.h">
       <Filter>Header Files\Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="ManagedRecastSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">

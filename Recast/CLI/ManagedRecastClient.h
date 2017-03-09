@@ -4,6 +4,7 @@
 
 #include "RecastClientTiled.h"
 #include "RecastClientSoloMesh.h"
+#include "ManagedRecastSettings.h"
 #include "ManagedDtCrowdAgentInfo.h"
 #include "ManagedDtCrowdAgentParams.h"
 
@@ -33,7 +34,7 @@ namespace RecastWrapper
 		}
 
 	public:
-		ManagedRecastClient(RecastClientMode recastMode)
+		ManagedRecastClient(RecastClientMode recastMode, ManagedRecastSettings^ settings)
 		{
 			mode = recastMode;
 			if (mode == RecastClientMode::RECAST_SOLO_MESH) {
@@ -42,6 +43,8 @@ namespace RecastWrapper
 			{
 				unmanaged = new RecastClientTiled();
 			}
+
+			settings->Apply(unmanaged);
 		}
 
 		~ManagedRecastClient() { delete unmanaged; }

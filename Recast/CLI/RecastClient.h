@@ -12,16 +12,17 @@
 #include "InputGeom.h"
 
 namespace RecastWrapper {
+
 	enum PartitionType
 	{
-		PARTITION_WATERSHED,
+		PARTITION_WATERSHED = 0,
 		PARTITION_MONOTONE,
 		PARTITION_LAYERS,
 	};
 
 	enum PolyAreas
 	{
-		POLYAREA_GROUND,
+		POLYAREA_GROUND = 0,
 		POLYAREA_WATER,
 		POLYAREA_ROAD,
 		POLYAREA_DOOR,
@@ -62,7 +63,7 @@ namespace RecastWrapper {
 
 		class InputGeom* m_geom;
 		
-	protected:
+	public:
 		float m_cellSize = 0.3f;
 		float m_cellHeight = 0.2f;
 		float m_agentMaxSlope = 45.0f;
