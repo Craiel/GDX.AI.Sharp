@@ -89,6 +89,11 @@
             return this.managedClient.AddAgent(position.ToArray(), parameters.GetManaged());
         }
 
+        public void RemoveAgent(int index)
+        {
+            this.managedClient.RemoveAgent(index);
+        }
+
         public bool RequestMoveTarget(int agentIndex, uint polyRef, Vector3 position)
         {
             return this.managedClient.RequestMoveTarget(agentIndex, polyRef, position.ToArray());

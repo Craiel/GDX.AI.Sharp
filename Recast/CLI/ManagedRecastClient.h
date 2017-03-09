@@ -224,6 +224,11 @@ namespace RecastWrapper
 			return unmanaged->addAgent(position_start, &params->GetUnmanaged());
 		}
 
+		void RemoveAgent(int index)
+		{
+			unmanaged->removeAgent(index);
+		}
+
 		bool RequestMoveTarget(int index, unsigned int polyRef, array<float>^ position)
 		{
 			pin_ptr<float> position_start = &position[0];

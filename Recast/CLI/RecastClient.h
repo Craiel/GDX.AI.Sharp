@@ -99,6 +99,8 @@ namespace RecastWrapper {
 
 		const dtCrowdAgent* getAgent(int index) { return m_crowd->getAgent(index); }
 
+		void removeAgent(int index) { m_crowd->removeAgent(index); }
+
 		dtStatus findNearestPoly(const float* center, const float* extents, dtPolyRef* nearestRef, float* nearestPoint)
 		{
 			const dtQueryFilter* filter = m_crowd->getFilter(0);
