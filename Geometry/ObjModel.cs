@@ -35,8 +35,7 @@
         // Public
         // -------------------------------------------------------------------
         public IList<Vector3> Vertices { get; }
-
-        // TODO: remove the non-indexed triangles once SharpNav is refactored / gone
+        
         public IList<Triangle3> Triangles { get; }
 
         public IList<Triangle3Indexed> TrianglesIndexed { get; }

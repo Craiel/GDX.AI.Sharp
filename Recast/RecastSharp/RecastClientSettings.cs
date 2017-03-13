@@ -2,6 +2,7 @@
 {
     using RecastWrapper;
 
+    // For some info see http://digestingduck.blogspot.ca/2009/08/recast-settings-uncovered.html
     public class RecastClientSettings
     {
         // -------------------------------------------------------------------
