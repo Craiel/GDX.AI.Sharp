@@ -11,25 +11,11 @@
     {
         private static double nextNextGaussian;
         private static bool haveNextGaussian;
-
-        // -------------------------------------------------------------------
-        // Constructor
-        // -------------------------------------------------------------------
-        static MathUtils()
-        {
-            // Initialize Random but can be re-seeded if needed
-            Rnd = new Random((int)DateTime.Now.Ticks);
-        }
-
+        
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-
-        /// <summary>
-        /// The <see cref="Random"/> instance used, re-seed if you want defined behavior
-        /// </summary>
-        public static Random Rnd { get; set; }
-
+        
         /// <summary>
         /// <para>Returns the next pseudorandom, Gaussian ("normally") distributed double value with mean 0.0 and standard deviation 1.0 from this random number generator's sequence.</para>
         /// <para>The general contract of <see cref="NextGaussian"/> is that one double value, chosen from(approximately) the usual
@@ -80,8 +66,8 @@
             double v1, v2, s;
             do
             {
-                v1 = 2 * Rnd.NextDouble() - 1; // between -1 and 1
-                v2 = 2 * Rnd.NextDouble() - 1; // between -1 and 1
+                v1 = 2 * GDXAI.Rand.NextDouble() - 1; // between -1 and 1
+                v2 = 2 * GDXAI.Rand.NextDouble() - 1; // between -1 and 1
                 s = v1 * v1 + v2 * v2;
             }
             while (s >= 1 || Math.Abs(s) < double.Epsilon);
@@ -94,12 +80,12 @@
 
         public static double RandomTriangular(double high)
         {
-            return (Rnd.NextDouble() - Rnd.NextDouble()) * high;
+            return (GDXAI.Rand.NextDouble() - GDXAI.Rand.NextDouble()) * high;
         }
 
         public static double RandomTriangular(double low, double high, double mode)
         {
-            double u = Rnd.NextDouble();
+            double u = GDXAI.Rand.NextDouble();
             double d = high - low;
             if (u <= (mode - low) / d)
             {
@@ -111,12 +97,12 @@
 
         public static float RandomTriangular(float high)
         {
-            return ((float)Rnd.NextDouble() - (float)Rnd.NextDouble()) * high;
+            return ((float)GDXAI.Rand.NextDouble() - (float)GDXAI.Rand.NextDouble()) * high;
         }
 
         public static float RandomTriangular(float low, float high, float mode)
         {
-            float u = (float)Rnd.NextDouble();
+            float u = (float)GDXAI.Rand.NextDouble();
             float d = high - low;
             if (u <= (mode - low) / d)
             {
@@ -124,6 +110,44 @@
             }
 
             return high - (float)Math.Sqrt((1 - u) * d * (high - mode));
+        }
+
+        /// <summary>
+        /// Returns the specified value if the value is already a power of two
+        /// </summary>
+        /// <param name="value">the value to start at</param>
+        /// <returns>the next power of two</returns>
+        public static int NextPowerOfTwo(int value)
+        {
+            if (value == 0)
+            {
+                return 1;
+            }
+
+            value--;
+            value |= value >> 1;
+            value |= value >> 2;
+            value |= value >> 4;
+            value |= value >> 8;
+            value |= value >> 16;
+            return value + 1;
+        }
+
+        public static int NumberOfTrailingZeros(this int i)
+        {
+            // HD, Figure 5-14
+            int y;
+            if (i == 0)
+            {
+                return 32;
+            }
+
+            int n = 31;
+            y = i << 16; if (y != 0) { n = n - 16; i = y; }
+            y = i << 8; if (y != 0) { n = n - 8; i = y; }
+            y = i << 4; if (y != 0) { n = n - 4; i = y; }
+            y = i << 2; if (y != 0) { n = n - 2; i = y; }
+            return n - ((i << 1) >> 31);
         }
     }
 }

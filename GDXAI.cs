@@ -1,5 +1,7 @@
 ﻿namespace GDX.AI.Sharp
 {
+    using System;
+
     using Contracts;
 
     /// <summary>
@@ -11,6 +13,9 @@
     /// </summary>
     public static class GDXAI
     {
+        // -------------------------------------------------------------------
+        // Constructor
+        // -------------------------------------------------------------------
         static GDXAI()
         {
             TimePiece = new DefaultTimePiece();
@@ -21,12 +26,23 @@
 #else
             Logger = new NullLogger();
 #endif
+
+            // Initialize Random but can be re-seeded if needed
+            Rand = new Random((int)DateTime.Now.Ticks);
         }
 
+        // -------------------------------------------------------------------
+        // Public
+        // -------------------------------------------------------------------
         public static ITimePiece TimePiece { get; set; }
 
         public static ILogger Logger { get; set; }
 
         public static IFileSystem FileSystem { get; set; }
+
+        /// <summary>
+        /// The <see cref="Random"/> instance used, re-seed if you want defined behavior
+        /// </summary>
+        public static Random Rand { get; set; }
     }
 }

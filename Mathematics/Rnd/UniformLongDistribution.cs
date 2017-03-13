@@ -33,7 +33,7 @@
 
         public override long NextLong()
         {
-            return this.Low + (long)(MathUtils.Rnd.NextDouble() * (this.High - this.Low));
+            return this.Low + (long)(GDXAI.Rand.NextDouble() * (this.High - this.Low));
         }
 
         public override T Clone<T>()

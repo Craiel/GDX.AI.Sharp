@@ -33,7 +33,7 @@
 
         public override double NextDouble()
         {
-            return this.Low + (MathUtils.Rnd.NextDouble() * (this.High - this.Low));
+            return this.Low + (GDXAI.Rand.NextDouble() * (this.High - this.Low));
         }
 
         public override T Clone<T>()

@@ -10,7 +10,7 @@
     /// <summary>
     /// A Telegram is the container of a message. The <see cref="MessageDispatcher"/> manages telegram life-cycle.
     /// </summary>
-    public class Telegram : IComparable<Telegram>, IEquatable<Telegram>
+    public class Telegram : IComparable, IComparable<Telegram>, IEquatable<Telegram>, IPoolable
     {
         // -------------------------------------------------------------------
         // Constructor
@@ -127,6 +127,11 @@
                 hashCode = (hashCode * 397) ^ (this.ExtraInfo != null ? this.ExtraInfo.GetHashCode() : 0);
                 return hashCode;
             }
+        }
+
+        public int CompareTo(object obj)
+        {
+            return this.CompareTo((Telegram)obj);
         }
     }
 }

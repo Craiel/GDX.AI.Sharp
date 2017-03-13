@@ -83,7 +83,7 @@
                     if (this.CurrentChildIndex < last)
                     {
                         // Random swap
-                        int otherChildIndex = MathUtils.Rnd.Next(this.CurrentChildIndex, last);
+                        int otherChildIndex = GDXAI.Rand.Next(this.CurrentChildIndex, last);
                         Task<T> temp = this.RandomChildren[this.CurrentChildIndex];
                         this.RandomChildren[this.CurrentChildIndex] = this.RandomChildren[otherChildIndex];
                         this.RandomChildren[otherChildIndex] = temp;

@@ -15,7 +15,7 @@ AddReference("MonoGame.Math", ccRoot.."MonoGame.Math.dll")
 AddReference("CarbonCore.Utils", ccRoot.."CarbonCore.Utils.dll")
 AddReference("CarbonCore.Utils.Edge", "$(PROJECT_ROOT)External/CCRelease/CarbonCore.Utils.Edge.dll")
 
-AddProjectReference("$(PROJECT_ROOT)External/gdxAI.Sharp", "gdxAI.Sharp")
+AddProjectReference("$(PROJECT_ROOT)External/GDX.AI.Sharp", "GDX.AI.Sharp")
 
 return WriteProjectFile()
 

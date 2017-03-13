@@ -90,7 +90,7 @@
         // -------------------------------------------------------------------
         private void Decide()
         {
-            if (MathUtils.Rnd.NextDouble() <= this.value)
+            if (GDXAI.Rand.NextDouble() <= this.value)
             {
                 this.Success();
             }

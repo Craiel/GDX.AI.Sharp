@@ -9,6 +9,10 @@
         private int head;
         private int tail;
 
+        // -------------------------------------------------------------------
+        // Constructor
+        // -------------------------------------------------------------------
+
         /// <summary>
         /// Creates a <see cref="CircularBuffer{T}"/>
         /// </summary>
@@ -20,6 +24,9 @@
             this.Resizable = resizable;
         }
 
+        // -------------------------------------------------------------------
+        // Public
+        // -------------------------------------------------------------------
         public bool Resizable { get; set; }
 
         public bool IsEmpty => this.Size == 0;
@@ -133,6 +140,10 @@
                 this.Resize(newCapacity);
             }
         }
+
+        // -------------------------------------------------------------------
+        // Private
+        // -------------------------------------------------------------------
 
         /// <summary>
         /// Creates a new backing array with the specified capacity containing the current items

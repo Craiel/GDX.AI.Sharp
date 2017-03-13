@@ -33,7 +33,7 @@
 
         public override int NextInt()
         {
-            return MathUtils.Rnd.Next(this.Low, this.High);
+            return GDXAI.Rand.Next(this.Low, this.High);
         }
 
         public override T Clone<T>()

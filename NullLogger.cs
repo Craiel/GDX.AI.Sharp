@@ -9,6 +9,9 @@
     /// </summary>
     public sealed class NullLogger : ILogger
     {
+        // -------------------------------------------------------------------
+        // Public
+        // -------------------------------------------------------------------
         public void Debug(string tag, string message, Exception e = null)
         {
         }
