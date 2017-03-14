@@ -18,7 +18,7 @@
         {
         }
 
-        protected LoopDecorator(Task<T> child)
+        protected LoopDecorator(TaskId child)
             : base(child)
         {
         }
@@ -35,30 +35,31 @@
 
         public override void Run()
         {
+            Task<T> child = this.Stream.Get(this.Child);
             this.Condition = true;
             while (this.Condition)
             {
-                if (this.Child.Status == BTTaskStatus.Running)
+                if (child.Status == BTTaskStatus.Running)
                 {
-                    this.Child.Run();
+                    child.Run();
                 }
                 else
                 {
-                    this.Child.SetControl(this);
-                    this.Child.Start();
-                    if (this.Child.CheckGuard(this))
+                    child.SetControl(this.Id, this.Stream);
+                    child.Start();
+                    if (child.CheckGuard(this.Id))
                     {
-                        this.Child.Run();
+                        child.Run();
                     }
                     else
                     {
-                        this.Child.Fail();
+                        child.Fail();
                     }
                 }
             }
         }
 
-        public override void ChildRunning(Task<T> task, Task<T> reporter)
+        public override void ChildRunning(TaskId task, TaskId reporter)
         {
             base.ChildRunning(task, reporter);
             this.Condition = false;

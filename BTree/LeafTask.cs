@@ -53,20 +53,20 @@
             }
         }
         
-        public override Task<T> GetChild(int index)
+        public override TaskId GetChild(int index)
         {
             throw new IndexOutOfRangeException("A leaf task can not have any child");
         }
 
-        public override void ChildRunning(Task<T> task, Task<T> reporter)
+        public override void ChildRunning(TaskId task, TaskId reporter)
         {
         }
 
-        public override void ChildSuccess(Task<T> task)
+        public override void ChildSuccess(TaskId task)
         {
         }
 
-        public override void ChildFail(Task<T> task)
+        public override void ChildFail(TaskId task)
         {
         }
 
@@ -81,7 +81,7 @@
         /// <returns>the status of this leaf task</returns>
         protected abstract BTTaskStatus Execute();
 
-        protected override int AddChildToTask(Task<T> child)
+        protected override int AddChildToTask(TaskId child)
         {
             throw new IllegalStateException("A leaf task cannot have any children");
         }

@@ -18,13 +18,13 @@
         /// </summary>
         /// <param name="task">the task whose status has been set</param>
         /// <param name="previousStatus">the task's status before the update</param>
-        void StatusUpdated(Task<T> task, BTTaskStatus previousStatus);
+        void StatusUpdated(TaskId task, BTTaskStatus previousStatus);
 
         /// <summary>
         /// This method is invoked when a child task is added to the children of a parent task
         /// </summary>
         /// <param name="task">the parent task of the newly added child</param>
         /// <param name="index">the index where the child has been added</param>
-        void ChildAdded(Task<T> task, int index);
+        void ChildAdded(TaskId task, int index);
     }
 }

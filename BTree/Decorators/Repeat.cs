@@ -21,12 +21,12 @@
         {
         }
 
-        public Repeat(Task<T> child)
+        public Repeat(TaskId child)
             : this(child, ConstantIntegerDistribution.NegativeOne)
         {
         }
 
-        public Repeat(Task<T> child, IntegerDistribution times)
+        public Repeat(TaskId child, IntegerDistribution times)
             : base(child)
         {
             this.Times = times;
@@ -55,7 +55,7 @@
             this.count = this.Times.NextInt();
         }
 
-        public override void ChildSuccess(Task<T> task)
+        public override void ChildSuccess(TaskId task)
         {
             if (this.count > 0)
             {
@@ -73,7 +73,7 @@
             }
         }
 
-        public override void ChildFail(Task<T> task)
+        public override void ChildFail(TaskId task)
         {
             this.ChildSuccess(task);
         }

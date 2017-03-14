@@ -10,6 +10,8 @@
     using CarbonCore.Utils;
     using CarbonCore.Utils.Diagnostics;
 
+    using Mathematics;
+
     using Microsoft.Xna.Framework;
 
     public class ObjModel : IEnumerable<Triangle3>
@@ -312,7 +314,12 @@
             target.Max.Z += padding;
         }
 
-        private void RecalculateBounds(float padding = float.Epsilon * 2f)
+        private void RecalculateBounds()
+        {
+            this.RecalculateBounds(MathUtils.Epsilon * 2f);
+        }
+
+        private void RecalculateBounds(float padding)
         {
             var newBounds = new BoundingBox(new Vector3(float.MaxValue), new Vector3(float.MinValue));
             foreach (Triangle3 triangle in this.Triangles)

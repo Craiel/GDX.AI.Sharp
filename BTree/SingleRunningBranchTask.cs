@@ -6,8 +6,6 @@
     using Contracts;
 
     using Exceptions;
-
-    using Mathematics;
     
     /// <summary>
     /// A <see cref="SingleRunningBranchTask{T}"/> task is a branch task that supports only one running child at a time
@@ -31,7 +29,7 @@
         /// Create a branch task with a list of children
         /// </summary>
         /// <param name="children">list of this task's children, can be empty</param>
-        protected SingleRunningBranchTask(IEnumerable<Task<T>> children)
+        protected SingleRunningBranchTask(IEnumerable<TaskId> children)
             : base(children)
         {
         }
@@ -40,7 +38,7 @@
         /// Create a branch task with a list of children
         /// </summary>
         /// <param name="children">parameter list of this task's children, can be empty</param>
-        protected SingleRunningBranchTask(params Task<T>[] children)
+        protected SingleRunningBranchTask(params TaskId[] children)
             : base(children)
         {
         }
@@ -48,27 +46,27 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public override void ChildRunning(Task<T> task, Task<T> reporter)
+        public override void ChildRunning(TaskId task, TaskId reporter)
         {
             this.RunningChild = task;
             this.Running();
         }
 
-        public override void ChildSuccess(Task<T> task)
+        public override void ChildSuccess(TaskId task)
         {
-            this.RunningChild = null;
+            this.RunningChild = TaskId.Invalid;
         }
 
-        public override void ChildFail(Task<T> task)
+        public override void ChildFail(TaskId task)
         {
-            this.RunningChild = null;
+            this.RunningChild = TaskId.Invalid;
         }
 
         public override void Run()
         {
-            if (this.RunningChild != null)
+            if (this.RunningChild != TaskId.Invalid)
             {
-                this.RunningChild.Run();
+                this.Stream.CurrentTaskToRun = new BehaviorStream<T>.BehaviorStreamTaskToRun(this.RunningChild, this.Id);
             }
             else
             {
@@ -84,7 +82,7 @@
                     {
                         // Random swap
                         int otherChildIndex = GDXAI.Rand.Next(this.CurrentChildIndex, last);
-                        Task<T> temp = this.RandomChildren[this.CurrentChildIndex];
+                        TaskId temp = this.RandomChildren[this.CurrentChildIndex];
                         this.RandomChildren[this.CurrentChildIndex] = this.RandomChildren[otherChildIndex];
                         this.RandomChildren[otherChildIndex] = temp;
                     }
@@ -96,23 +94,14 @@
                     this.RunningChild = this.GetChild(this.CurrentChildIndex);
                 }
 
-                this.RunningChild.SetControl(this);
-                this.RunningChild.Start();
-                if (this.RunningChild.CheckGuard(this))
-                {
-                    this.RunningChild.Run();
-                }
-                else
-                {
-                    this.RunningChild.Fail();
-                }
+                this.Stream.CurrentTaskToRun = new BehaviorStream<T>.BehaviorStreamTaskToRun(this.RunningChild, this.Id);
             }
         }
 
         public override void Start()
         {
             this.CurrentChildIndex = 0;
-            this.RunningChild = null;
+            this.RunningChild = TaskId.Invalid;
         }
 
         public override void Reset()
@@ -120,7 +109,7 @@
             base.Reset();
 
             this.CurrentChildIndex = 0;
-            this.RunningChild = null;
+            this.RunningChild = TaskId.Invalid;
             this.RandomChildren = null;
         }
 
@@ -131,7 +120,7 @@
         /// <summary>
         /// The child in the running status or null if no child is running
         /// </summary>
-        protected Task<T> RunningChild { get; set; }
+        protected TaskId RunningChild { get; set; }
 
         /// <summary>
         /// The index of the child currently processed
@@ -141,13 +130,13 @@
         /// <summary>
         /// Array of random children. If it's {@code null} this task is deterministic
         /// </summary>
-        protected Task<T>[] RandomChildren { get; set; }
+        protected TaskId[] RandomChildren { get; set; }
 
         protected override void CancelRunningChildren(int startIndex)
         {
             base.CancelRunningChildren(startIndex);
 
-            this.RunningChild = null;
+            this.RunningChild = TaskId.Invalid;
         }
 
         protected override void CopyTo(Task<T> clone)
@@ -158,7 +147,7 @@
             base.CopyTo(clone);
         }
 
-        protected Task<T>[] CreateRandomChildren()
+        protected TaskId[] CreateRandomChildren()
         {
             return this.Children.ToArray();
         }

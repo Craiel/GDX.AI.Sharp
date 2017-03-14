@@ -19,7 +19,7 @@
         /// <summary>
         /// Create a branch task with no children
         /// </summary>
-        protected BranchTask() : this(new Task<T>[0])
+        protected BranchTask() : this(new TaskId[0])
         {
         }
 
@@ -27,7 +27,7 @@
         /// Create a branch task with a list of children
         /// </summary>
         /// <param name="children">list of this task's children, can be empty</param>
-        protected BranchTask(IEnumerable<Task<T>> children)
+        protected BranchTask(IEnumerable<TaskId> children)
         {
             this.Children = children.ToList();
         }
@@ -36,7 +36,7 @@
         /// Create a branch task with a list of children
         /// </summary>
         /// <param name="children">parameter list of this task's children, can be empty</param>
-        protected BranchTask(params Task<T>[] children)
+        protected BranchTask(params TaskId[] children)
         {
             this.Children = children.ToList();
         }
@@ -48,11 +48,11 @@
         /// <summary>
         /// The children of this branch task
         /// </summary>
-        public IList<Task<T>> Children { get; protected set; }
+        public IList<TaskId> Children { get; protected set; }
 
         public override int ChildCount => this.Children.Count;
 
-        public override Task<T> GetChild(int index)
+        public override TaskId GetChild(int index)
         {
             return this.Children[index];
         }
@@ -60,7 +60,7 @@
         // -------------------------------------------------------------------
         // Protected
         // -------------------------------------------------------------------
-        protected override int AddChildToTask(Task<T> child)
+        protected override int AddChildToTask(TaskId child)
         {
             this.Children.Add(child);
             return this.Children.Count - 1;
@@ -73,7 +73,8 @@
             {
                 for (var i = 0; i < this.Children.Count; i++)
                 {
-                    branch.AddChildToTask(this.GetChild(i).Clone());
+                    Task<T> child = this.Stream.Get(this.GetChild(i));
+                    branch.AddChildToTask(branch.Stream.Add(child.Clone()));
                 }
             }
         }

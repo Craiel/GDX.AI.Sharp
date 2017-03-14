@@ -18,7 +18,7 @@
         {
         }
 
-        public UntilSuccess(Task<T> child)
+        public UntilSuccess(TaskId child)
             : base(child)
         {
         }
@@ -26,12 +26,12 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public override void ChildFail(Task<T> task)
+        public override void ChildFail(TaskId task)
         {
             this.Condition = true;
         }
 
-        public override void ChildSuccess(Task<T> task)
+        public override void ChildSuccess(TaskId task)
         {
             this.Success();
             this.Condition = false;

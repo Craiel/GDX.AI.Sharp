@@ -3,8 +3,7 @@
     using Contracts;
 
     using Leafs;
-
-    using Mathematics;
+    
     using Mathematics.Rnd;
     
     /// <summary>
@@ -28,7 +27,7 @@
         {
         }
 
-        public Random(Task<T> task)
+        public Random(TaskId task)
             : this(task, ConstantFloatDistribution.ZeroPointFive)
         {
         }
@@ -38,7 +37,7 @@
             this.SuccessValue = success;
         }
 
-        public Random(Task<T> task, FloatDistribution success)
+        public Random(TaskId task, FloatDistribution success)
             : base(task)
         {
             this.SuccessValue = success;
@@ -56,9 +55,9 @@
 
         public override void Run()
         {
-            if (this.Child != null)
+            if (this.Child != TaskId.Invalid)
             {
-                this.Child.Run();
+                this.Stream.CurrentTaskToRun = new BehaviorStream<T>.BehaviorStreamTaskToRun(this.Child, this.Id);
             }
             else
             {
@@ -66,12 +65,12 @@
             }
         }
 
-        public override void ChildFail(Task<T> task)
+        public override void ChildFail(TaskId task)
         {
             this.Decide();
         }
 
-        public override void ChildSuccess(Task<T> task)
+        public override void ChildSuccess(TaskId task)
         {
             this.Decide();
         }

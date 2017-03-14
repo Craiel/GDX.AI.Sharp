@@ -18,12 +18,12 @@
         {
         }
 
-        public RandomSelector(IEnumerable<Task<T>> children)
+        public RandomSelector(IEnumerable<TaskId> children)
             : base(children)
         {
         }
 
-        public RandomSelector(params Task<T>[] children)
+        public RandomSelector(params TaskId[] children)
             : base(children)
         {
         }

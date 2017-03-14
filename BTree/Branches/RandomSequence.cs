@@ -18,12 +18,12 @@
         {
         }
 
-        public RandomSequence(IEnumerable<Task<T>> children)
+        public RandomSequence(IEnumerable<TaskId> children)
             : base(children)
         {
         }
 
-        public RandomSequence(params Task<T>[] children)
+        public RandomSequence(params TaskId[] children)
             : base(children)
         {
         }

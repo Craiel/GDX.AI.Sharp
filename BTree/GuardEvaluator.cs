@@ -12,9 +12,9 @@
         {
         }
 
-        public GuardEvaluator(BehaviorTree<T> tree)
+        public GuardEvaluator(BehaviorStream<T> stream)
         {
-            this.Tree = tree;
+            this.Stream = stream;
         }
 
         // -------------------------------------------------------------------
@@ -22,31 +22,31 @@
         // -------------------------------------------------------------------
         public override int ChildCount => 0;
         
-        public override Task<T> GetChild(int index)
+        public override TaskId GetChild(int index)
         {
-            return null;
+            return TaskId.Invalid;
         }
 
         public override void Run()
         {
         }
 
-        public override void ChildSuccess(Task<T> task)
+        public override void ChildSuccess(TaskId task)
         {
         }
 
-        public override void ChildFail(Task<T> task)
+        public override void ChildFail(TaskId task)
         {
         }
 
-        public override void ChildRunning(Task<T> task, Task<T> reporter)
+        public override void ChildRunning(TaskId task, TaskId reporter)
         {
         }
 
         // -------------------------------------------------------------------
         // Protected
         // -------------------------------------------------------------------
-        protected override int AddChildToTask(Task<T> child)
+        protected override int AddChildToTask(TaskId child)
         {
             return 0;
         }

@@ -8,9 +8,9 @@
     {
         public BehaviorTreeLibrary()
         {
-            this.Repository = new Dictionary<string, BehaviorTree<IBlackboard>>();
+            this.Repository = new Dictionary<string, BehaviorStream<IBlackboard>>();
         }
 
-        public IDictionary<string, BehaviorTree<IBlackboard>> Repository { get; private set; }
+        public IDictionary<string, BehaviorStream<IBlackboard>> Repository { get; private set; }
     }
 }

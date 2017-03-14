@@ -15,41 +15,53 @@
     using Mathematics.Rnd;
     
     /// <summary>
-    /// Helper class to build a behavior tree using the fluint API
+    /// Helper class to build a behavior tree using the fluent API
     /// </summary>
     public class BehaviorTreeBuilder<T>
         where T : IBlackboard
     {
-        private readonly Stack<BranchTask<T>> parentStack;
-        
+        private readonly Stack<TaskId> parentStack;
+        private readonly BehaviorStream<T> stream;
+
+        // -------------------------------------------------------------------
+        // Constructor
+        // -------------------------------------------------------------------
         public BehaviorTreeBuilder()
         {
-            this.parentStack = new Stack<BranchTask<T>>();
+            this.parentStack = new Stack<TaskId>();
+            this.stream = new BehaviorStream<T>();
         }
 
-        public BranchTask<T> CurrentParent { get; private set; }
+        // -------------------------------------------------------------------
+        // Public
+        // -------------------------------------------------------------------
+        public TaskId CurrentParent { get; private set; }
 
-        public Decorator<T> CurrentDecorator { get; private set; }
+        public TaskId CurrentDecorator { get; private set; }
 
-        public LeafTask<T> CurrentLeaf { get; private set; }
+        public TaskId CurrentLeaf { get; private set; }
 
         public BehaviorTreeBuilder<T> Branch(BranchTask<T> task)
         {
-            if (this.CurrentDecorator != null)
+            this.CurrentParent = this.stream.Add(task);
+
+            if (this.CurrentDecorator != TaskId.Invalid)
             {
                 // Decorate the branch and close the decorator out
-                this.CurrentDecorator.AddChild(task);
-                this.CurrentDecorator = null;
+                Decorator<T> decorator = (Decorator<T>)this.stream.Get(this.CurrentDecorator);
+                decorator.AddChild(this.CurrentParent);
+
+                this.CurrentDecorator = TaskId.Invalid;
             }
             else if (this.parentStack.Count > 0)
             {
                 // Add as a sub-branch
-                this.parentStack.Peek().AddChild(task);
+                BranchTask<T> parent = (BranchTask<T>)this.stream.Get(this.parentStack.Peek());
+                parent.AddChild(this.CurrentParent);
             }
-
-            this.parentStack.Push(task);
-            this.CurrentParent = task;
-            this.CurrentLeaf = null;
+            
+            this.parentStack.Push(this.CurrentParent);
+            this.CurrentLeaf = TaskId.Invalid;
             return this;
         }
 
@@ -85,21 +97,25 @@
 
         public BehaviorTreeBuilder<T> Leaf(LeafTask<T> task)
         {
-            if (this.CurrentDecorator != null)
+            if (this.CurrentDecorator != TaskId.Invalid)
             {
-                this.CurrentDecorator.AddChild(task);
-                this.CurrentDecorator = null;
-                this.CurrentLeaf = task;
+                Decorator<T> decorator = (Decorator<T>)this.stream.Get(this.CurrentDecorator);
+                decorator.AddChild(this.stream.Add(task));
+
+                this.CurrentDecorator = TaskId.Invalid;
+                this.CurrentLeaf = task.Id;
                 return this;
             }
 
-            if (this.CurrentParent == null)
+            if (this.CurrentParent == TaskId.Invalid)
             {
                 throw new BehaviorTreeBuilderException("No Root node defined yet, add a branch first");
             }
 
-            this.CurrentParent.AddChild(task);
-            this.CurrentLeaf = task;
+            BranchTask<T> parent = (BranchTask<T>)this.stream.Get(this.CurrentParent);
+            parent.AddChild(this.stream.Add(task));
+
+            this.CurrentLeaf = task.Id;
             return this;
         }
 
@@ -125,26 +141,27 @@
 
         public BehaviorTreeBuilder<T> Decorator(Decorator<T> task)
         {
-            if (this.CurrentParent == null)
+            if (this.CurrentParent == TaskId.Invalid)
             {
                 throw new BehaviorTreeBuilderException("No Root node defined yet, add a branch first");
             }
 
-            this.CurrentParent.AddChild(task);
+            BranchTask<T> parent = (BranchTask<T>)this.stream.Get(this.CurrentParent);
+            parent.AddChild(this.stream.Add(task));
 
             if (task.ChildCount <= 0)
             {
                 // This decorator has no child yet, wait for a fluent set of a leaf node
-                this.CurrentDecorator = task;
+                this.CurrentDecorator = task.Id;
             }
 
-            this.CurrentLeaf = null;
+            this.CurrentLeaf = TaskId.Invalid;
             return this;
         }
 
         public BehaviorTreeBuilder<T> AlwaysFail(Task<T> child = null)
         {
-            return this.Decorator(new AlwaysFail<T>(child));
+            return this.Decorator(new AlwaysFail<T>(this.stream.Add(child)));
         }
 
         public BehaviorTreeBuilder<T> AlwaysSucceed(Task<T> child = null)
@@ -159,32 +176,42 @@
 
         public BehaviorTreeBuilder<T> Invert(Task<T> child = null)
         {
-            return this.Decorator(new Invert<T>(child));
+            if (child != null)
+            {
+                return this.Decorator(new Invert<T>(this.stream.Add(child)));
+            }
+
+            return this.Decorator(new Invert<T>());
         }
 
         public BehaviorTreeBuilder<T> Random(Task<T> child = null)
         {
-            return this.Decorator(new Random<T>(child));
+            if (child != null)
+            {
+                return this.Decorator(new Random<T>(this.stream.Add(child)));
+            }
+
+            return this.Decorator(new Random<T>());
         }
 
         public BehaviorTreeBuilder<T> Repeat(Task<T> child, IntegerDistribution times)
         {
-            return this.Decorator(new Repeat<T>(child, times));
+            return this.Decorator(new Repeat<T>(this.stream.Add(child), times));
         }
 
-        public BehaviorTreeBuilder<T> SemaphoreGuard(Task<T> child, string name = null)
+        public BehaviorTreeBuilder<T> SemaphoreGuard(TaskId child, string name = null)
         {
             return this.Decorator(new SemaphoreGuard<T>(name, child));
         }
 
         public BehaviorTreeBuilder<T> UntilFail(Task<T> child)
         {
-            return this.Decorator(new UntilFail<T>(child));
+            return this.Decorator(new UntilFail<T>(this.stream.Add(child)));
         }
 
         public BehaviorTreeBuilder<T> UntilSuccess(Task<T> child)
         {
-            return this.Decorator(new UntilSuccess<T>(child));
+            return this.Decorator(new UntilSuccess<T>(this.stream.Add(child)));
         }
 
         public BehaviorTreeBuilder<T> End()
@@ -199,22 +226,21 @@
             return this;
         }
 
-        public BehaviorTree<T> Build(T blackboard = default(T))
+        public BehaviorStream<T> Build(T blackboard = default(T))
         {
             if (this.parentStack.Count > 1)
             {
                 throw new BehaviorTreeBuilderException("Build() called with open parent nodes, you are missing End() calls");
             }
 
-            if (this.CurrentParent == null)
+            if (this.CurrentParent == TaskId.Invalid)
             {
                 throw new BehaviorTreeBuilderException("Build() called on empty tree");
             }
 
-            var result = new BehaviorTree<T>(this.CurrentParent);
-            result.SetBlackboard(blackboard);
-
-            return result;
+            this.stream.SetBlackboard(blackboard);
+            this.stream.Root = this.CurrentParent;
+            return this.stream;
         }
     }
 }

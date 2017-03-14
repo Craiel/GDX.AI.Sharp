@@ -29,17 +29,17 @@
         // Constructor
         // -------------------------------------------------------------------
         public Parallel(ParallelPolicy policy = ParallelPolicy.Sequence) 
-            : this(policy, new Task<T>[0])
+            : this(policy, new TaskId[0])
         {
         }
 
-        public Parallel(ParallelPolicy policy, IEnumerable<Task<T>> children)
+        public Parallel(ParallelPolicy policy, IEnumerable<TaskId> children)
         {
             this.SetPolicy(policy);
             this.Children = children.ToList();
         }
 
-        public Parallel(ParallelPolicy policy, params Task<T>[] children)
+        public Parallel(ParallelPolicy policy, params TaskId[] children)
         {
             this.SetPolicy(policy);
             this.Children = children.ToList();
@@ -66,16 +66,17 @@
             this.LastResult = null;
             for (this.currentChildIndex = 0; this.currentChildIndex < this.Children.Count; this.currentChildIndex++)
             {
-                Task<T> child = this.GetChild(this.currentChildIndex);
+                TaskId childId = this.GetChild(this.currentChildIndex);
+                Task<T> child = this.Stream.Get(childId);
                 if (child.Status == BTTaskStatus.Running)
                 {
                     child.Run();
                 }
                 else
                 {
-                    child.SetControl(this);
+                    child.SetControl(this.Id, this.Stream);
                     child.Start();
-                    if (child.CheckGuard(this))
+                    if (child.CheckGuard(this.Id))
                     {
                         child.Run();
                     }
@@ -105,17 +106,17 @@
             this.Running();
         }
 
-        public override void ChildRunning(Task<T> task, Task<T> reporter)
+        public override void ChildRunning(TaskId task, TaskId reporter)
         {
             this.NoRunningTasks = false;
         }
 
-        public override void ChildSuccess(Task<T> task)
+        public override void ChildSuccess(TaskId task)
         {
             this.LastResult = this.policyImplementation.ChildSuccess(this);
         }
 
-        public override void ChildFail(Task<T> task)
+        public override void ChildFail(TaskId task)
         {
             this.LastResult = this.policyImplementation.ChildFail(this);
         }

@@ -41,7 +41,7 @@
 
         public override double NextDouble()
         {
-            if (Math.Abs(-this.Low - this.High) < double.Epsilon && Math.Abs(this.Mode) < double.Epsilon)
+            if (Math.Abs(-this.Low - this.High) < MathUtils.DoubleEpsilon && Math.Abs(this.Mode) < MathUtils.DoubleEpsilon)
             {
                 // Faster
                 return MathUtils.RandomTriangular(this.High);

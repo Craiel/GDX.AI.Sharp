@@ -62,7 +62,7 @@
                 throw new NotSupportedException($"A non-lazy {this.GetType().Name} isn't meant to be run!");
             }
 
-            if (this.Child == null)
+            if (this.Child == TaskId.Invalid)
             {
                 this.AddChild(this.CreateSubtreeRootTask());
             }
@@ -79,7 +79,7 @@
                 return base.Clone();
             }
 
-            return this.CreateSubtreeRootTask();
+            throw new NotImplementedException();
         }
 
         // -------------------------------------------------------------------
@@ -103,11 +103,10 @@
             include.Lazy = this.Lazy;
         }
 
-        private Task<T> CreateSubtreeRootTask()
+        private TaskId CreateSubtreeRootTask()
         {
             // TODO: continue
-            return null;
-            //return BehaviorTreeLibraryManager.Instance.CreateRootTask(this.SubTree);
+            throw new NotImplementedException();
         }
     }
 }

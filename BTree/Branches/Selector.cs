@@ -19,12 +19,12 @@
         {
         }
 
-        public Selector(IEnumerable<Task<T>> children)
+        public Selector(IEnumerable<TaskId> children)
             : base(children)
         {
         }
 
-        public Selector(params Task<T>[] children)
+        public Selector(params TaskId[] children)
             : base(children)
         {
         }
@@ -32,13 +32,15 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public override void ChildFail(Task<T> task)
+        public override void ChildFail(TaskId task)
         {
             base.ChildFail(task);
             if (++this.CurrentChildIndex < this.Children.Count)
             {
                 // Run next child
-                this.Run();
+                this.RunningChild = this.Children[this.CurrentChildIndex];
+                this.Stream.CurrentTaskToRun = new BehaviorStream<T>.BehaviorStreamTaskToRun(this.Id, this.Control);
+                this.Running();
             }
             else
             {
@@ -47,7 +49,7 @@
             }
         }
 
-        public override void ChildSuccess(Task<T> task)
+        public override void ChildSuccess(TaskId task)
         {
             base.ChildSuccess(task);
 

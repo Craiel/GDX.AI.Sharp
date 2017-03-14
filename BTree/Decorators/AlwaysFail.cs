@@ -16,7 +16,7 @@
         {
         }
         
-        public AlwaysFail(Task<T> child)
+        public AlwaysFail(TaskId child)
             : base(child)
         {
         }
@@ -24,7 +24,7 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public override void ChildSuccess(Task<T> task)
+        public override void ChildSuccess(TaskId task)
         {
             this.ChildFail(task);
         }

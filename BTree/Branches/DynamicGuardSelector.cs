@@ -18,16 +18,16 @@
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        public DynamicGuardSelector() : this(new Task<T>[0])
+        public DynamicGuardSelector() : this(new TaskId[0])
         {
         }
 
-        public DynamicGuardSelector(IEnumerable<Task<T>> children)
+        public DynamicGuardSelector(IEnumerable<TaskId> children)
         {
             this.Children = children.ToList();
         }
 
-        public DynamicGuardSelector(params Task<T>[] children)
+        public DynamicGuardSelector(params TaskId[] children)
         {
             this.Children = children.ToList();
         }
@@ -39,66 +39,69 @@
         /// <summary>
         /// The child in the running status or null if no child is running
         /// </summary>
-        public Task<T> RunningChild { get; protected set; }
+        public TaskId RunningChild { get; protected set; }
 
-        public override void ChildRunning(Task<T> task, Task<T> reporter)
+        public override void ChildRunning(TaskId task, TaskId reporter)
         {
             this.RunningChild = task;
             this.Running();
         }
 
-        public override void ChildSuccess(Task<T> task)
+        public override void ChildSuccess(TaskId task)
         {
-            this.RunningChild = null;
+            this.RunningChild = TaskId.Invalid;
             this.Success();
         }
 
-        public override void ChildFail(Task<T> task)
+        public override void ChildFail(TaskId task)
         {
-            this.RunningChild = null;
+            this.RunningChild = TaskId.Invalid;
             this.Fail();
         }
 
         public override void Run()
         {
-            Task<T> childToRun = null;
+            TaskId childToRun = TaskId.Invalid;
             for (var i = 0; i < this.Children.Count; i++)
             {
-                Task<T> child = this.GetChild(i);
-                if (child.CheckGuard(this))
+                TaskId childId = this.GetChild(i);
+                Task<T> child = this.Stream.Get(childId);
+                if (child.CheckGuard(this.Id))
                 {
-                    childToRun = child;
+                    childToRun = childId;
                     break;
                 }
             }
 
-            if (this.RunningChild != null && this.RunningChild != childToRun)
+            if (this.RunningChild != TaskId.Invalid && this.RunningChild != childToRun)
             {
-                this.RunningChild.Cancel();
-                this.RunningChild = null;
+                this.Stream.Get(this.RunningChild).Cancel();
+                this.RunningChild = TaskId.Invalid;
             }
 
-            if (childToRun == null)
+            if (childToRun == TaskId.Invalid)
             {
                 this.Fail();
             }
             else
             {
-                if (this.RunningChild == null)
+                if (this.RunningChild == TaskId.Invalid)
                 {
                     this.RunningChild = childToRun;
-                    this.RunningChild.SetControl(this);
-                    this.RunningChild.Start();
+
+                    Task<T> child = this.Stream.Get(this.RunningChild);
+                    child.SetControl(this.Id, this.Stream);
+                    child.Start();
                 }
 
-                this.RunningChild.Run();
+                this.Stream.CurrentTaskToRun = new BehaviorStream<T>.BehaviorStreamTaskToRun(this.RunningChild, this.Id);
             }
         }
 
         public override void Reset()
         {
             base.Reset();
-            this.RunningChild = null;
+            this.RunningChild = TaskId.Invalid;
         }
     }
 }

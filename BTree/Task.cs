@@ -17,9 +17,17 @@
     public abstract class Task<T>
         where T : IBlackboard
     {
+        public const ushort InvalidTaskId = 0;
+        public const ushort FirstValidTaskId = 1;
+
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
+
+        /// <summary>
+        /// Unique Id for this node in the tree, created by the Behavior Tree Builder
+        /// </summary>
+        public TaskId Id { get; set; }
 
         /// <summary>
         /// Gets the number of children of this task
@@ -29,17 +37,17 @@
         /// <summary>
         /// Gets or sets the parent of this task
         /// </summary>
-        public Task<T> Control { get; protected set; }
+        public TaskId Control { get; protected set; }
 
         /// <summary>
         /// Gets or sets The guard of this task
         /// </summary>
-        public Task<T> Guard { get; set; }
+        public TaskId Guard { get; set; }
 
         /// <summary>
-        /// Gets or sets the behavior tree this task belongs to
+        /// Gets or sets the behavior stream this task belongs to
         /// </summary>
-        public BehaviorTree<T> Tree { get; protected set; }
+        public BehaviorStream<T> Stream { get; protected set; }
 
         /// <summary>
         /// Gets or sets the status of this task
@@ -54,12 +62,12 @@
         {
             get
             {
-                if (this.Tree == null)
+                if (this.Stream == null)
                 {
                     throw new IllegalStateException("Task has not ben run");
                 }
 
-                return this.Tree.GetBlackboard();
+                return this.Stream.GetBlackboard();
             }
         }
 
@@ -69,13 +77,13 @@
         /// <param name="child">the child task which will be added</param>
         /// <returns>the index where the child has been added</returns>
         /// <exception cref="IllegalStateException">if the child cannot be added for whatever reason</exception>
-        public int AddChild(Task<T> child)
+        public int AddChild(TaskId child)
         {
             int index = this.AddChildToTask(child);
 
-            if (this.Tree != null && this.Tree.HasListeners)
+            if (this.Stream != null && this.Stream.HasListeners)
             {
-                this.Tree.NotifyChildAdded(this, index);
+                this.Stream.NotifyChildAdded(this.Id, index);
             }
 
             return index;
@@ -86,41 +94,45 @@
         /// </summary>
         /// <param name="index">index of the child</param>
         /// <returns>the child task at the specified index</returns>
-        public abstract Task<T> GetChild(int index);
+        public abstract TaskId GetChild(int index);
 
         /// <summary>
         /// This method will set a task as this task's control (parent)
         /// </summary>
         /// <param name="parent">the parent task</param>
-        public void SetControl(Task<T> parent)
+        /// <param name="parentStream">the stream of the parent task</param>
+        public void SetControl(TaskId parent, BehaviorStream<T> parentStream)
         {
             this.Control = parent;
-            this.Tree = parent.Tree;
+            this.Stream = parentStream;
         }
 
         /// <summary>
         /// Checks the guard of this task
         /// </summary>
-        /// <param name="control">the parent task</param>
+        /// <param name="controlId">the parent task</param>
         /// <returns>true if guard evaluation succeeds or there's no guard; false otherwise</returns>
         /// <exception cref="IllegalStateException">if guard evaluation returns any status other than Succeeded or Failed (<see cref="BTTaskStatus"/>)</exception>
-        public bool CheckGuard(Task<T> control)
+        public bool CheckGuard(TaskId controlId)
         {
-            if (this.Guard == null)
+            if (this.Guard == TaskId.Invalid)
             {
                 return true;
             }
 
+            Task<T> guard = this.Stream.Get(this.Guard);
+            Task<T> control = this.Stream.Get(controlId);
+
             // Guard of guard check, recursive
-            if (!this.Guard.CheckGuard(control))
+            if (!guard.CheckGuard(controlId))
             {
                 return false;
             }
 
-            this.Guard.SetControl(control.Tree.GuardEvaluator);
-            this.Guard.Start();
-            this.Guard.Run();
-            switch (this.Guard.Status)
+            guard.SetControl(control.Stream.GuardEvaluator, control.Stream);
+            guard.Start();
+            guard.Run();
+            switch (guard.Status)
             {
                 case BTTaskStatus.Succeeded:
                     {
@@ -134,7 +146,7 @@
 
                 default:
                     {
-                        throw new IllegalStateException($"Illegal guard status: {this.Guard.Status}. Guards should succeed or fail in one step");
+                        throw new IllegalStateException($"Illegal guard status: {guard.Status}. Guards should succeed or fail in one step");
                     }
             }
         }
@@ -164,19 +176,19 @@
         /// </summary>
         /// <param name="task">the task that needs to run again</param>
         /// <param name="reporter">the task that reports, usually one of this task's children</param>
-        public abstract void ChildRunning(Task<T> task, Task<T> reporter);
+        public abstract void ChildRunning(TaskId task, TaskId reporter);
 
         /// <summary>
         /// This method will be called when one of the children of this task succeeds
         /// </summary>
         /// <param name="task">the task that succeeded</param>
-        public abstract void ChildSuccess(Task<T> task);
+        public abstract void ChildSuccess(TaskId task);
 
         /// <summary>
         /// This method will be called when one of the children of this task fails
         /// </summary>
         /// <param name="task">the task that failed</param>
-        public abstract void ChildFail(Task<T> task);
+        public abstract void ChildFail(TaskId task);
 
         /// <summary>
         /// This method will be called in <see cref="Run"/> to inform control that this task needs to run again
@@ -185,12 +197,18 @@
         {
             BTTaskStatus previous = this.Status;
             this.Status = BTTaskStatus.Running;
-            if (this.Tree.HasListeners)
+            if (this.Stream.HasListeners)
             {
-                this.Tree.NotifyStatusUpdated(this, previous);
+                this.Stream.NotifyStatusUpdated(this.Id, previous);
             }
 
-            this.Control?.ChildRunning(this, this);
+            if (this.Control == TaskId.Invalid)
+            {
+                return;
+            }
+
+            Task<T> control = this.Stream.Get(this.Control);
+            control.ChildRunning(this.Id, this.Id);
         }
 
         /// <summary>
@@ -200,13 +218,20 @@
         {
             BTTaskStatus previous = this.Status;
             this.Status = BTTaskStatus.Succeeded;
-            if (this.Tree.HasListeners)
+            if (this.Stream.HasListeners)
             {
-                this.Tree.NotifyStatusUpdated(this, previous);
+                this.Stream.NotifyStatusUpdated(this.Id, previous);
             }
 
             this.End();
-            this.Control?.ChildSuccess(this);
+
+            if (this.Control == TaskId.Invalid)
+            {
+                return;
+            }
+
+            Task<T> control = this.Stream.Get(this.Control);
+            control.ChildSuccess(this.Id);
         }
 
         /// <summary>
@@ -216,13 +241,20 @@
         {
             BTTaskStatus previous = this.Status;
             this.Status = BTTaskStatus.Failed;
-            if (this.Tree.HasListeners)
+            if (this.Stream.HasListeners)
             {
-                this.Tree.NotifyStatusUpdated(this, previous);
+                this.Stream.NotifyStatusUpdated(this.Id, previous);
             }
 
             this.End();
-            this.Control?.ChildFail(this);
+
+            if (this.Control == TaskId.Invalid)
+            {
+                return;
+            }
+
+            Task<T> control = this.Stream.Get(this.Control);
+            control.ChildFail(this.Id);
         }
 
         /// <summary>
@@ -233,9 +265,9 @@
             this.CancelRunningChildren(0);
             BTTaskStatus previous = this.Status;
             this.Status = BTTaskStatus.Canceled;
-            if (this.Tree.HasListeners)
+            if (this.Stream.HasListeners)
             {
-                this.Tree.NotifyStatusUpdated(this, previous);
+                this.Stream.NotifyStatusUpdated(this.Id, previous);
             }
 
             this.End();
@@ -253,12 +285,12 @@
 
             for (var i = 0; i < this.ChildCount; i++)
             {
-                this.GetChild(i).Reset();
+                this.Stream.Get(this.GetChild(i)).Reset();
             }
 
             this.Status = BTTaskStatus.Fresh;
-            this.Tree = null;
-            this.Control = null;
+            this.Stream = null;
+            this.Control = TaskId.Invalid;
         }
 
         /// <summary>
@@ -284,7 +316,8 @@
             {
                 Task<T> clone = (Task<T>)Activator.CreateInstance(this.GetType());
                 this.CopyTo(clone);
-                clone.Guard = this.Guard?.Clone();
+                clone.Guard = this.Guard;
+
                 return clone;
             }
             catch (Exception e)
@@ -303,7 +336,7 @@
         /// <param name="child">the child task which will be added</param>
         /// <returns>the index where the child has been added</returns>
         /// <exception cref="IllegalStateException">if the child cannot be added for whatever reason</exception>
-        protected abstract int AddChildToTask(Task<T> child);
+        protected abstract int AddChildToTask(TaskId child);
 
         /// <summary>
         /// Copies this task to the given task. This method is invoked by CloneTask only if <see cref="TaskCloner"/> is null which is its default value
@@ -319,10 +352,11 @@
         {
             for (var i = startIndex; i < this.ChildCount; i++)
             {
-                Task<T> child = this.GetChild(i);
-                if (child.Status == BTTaskStatus.Running)
+                TaskId child = this.GetChild(i);
+                Task<T> childTask = this.Stream.Get(child);
+                if (childTask.Status == BTTaskStatus.Running)
                 {
-                    child.Cancel();
+                    childTask.Cancel();
                 }
             }
         }

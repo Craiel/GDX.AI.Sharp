@@ -16,7 +16,7 @@
         {
         }
         
-        public Invert(Task<T> child)
+        public Invert(TaskId child)
             : base(child)
         {
         }
@@ -24,12 +24,12 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public override void ChildSuccess(Task<T> task)
+        public override void ChildSuccess(TaskId task)
         {
             base.ChildFail(task);
         }
 
-        public override void ChildFail(Task<T> task)
+        public override void ChildFail(TaskId task)
         {
             base.ChildSuccess(task);
         }

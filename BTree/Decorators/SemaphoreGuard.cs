@@ -30,7 +30,7 @@
         {
         }
 
-        public SemaphoreGuard(Task<T> child)
+        public SemaphoreGuard(TaskId child)
             : base(child)
         {
         }
@@ -40,7 +40,7 @@
             this.Name = name;
         }
 
-        public SemaphoreGuard(string name, Task<T> child)
+        public SemaphoreGuard(string name, TaskId child)
             : base(child)
         {
             this.Name = name;

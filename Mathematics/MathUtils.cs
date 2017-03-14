@@ -9,13 +9,54 @@
     /// </summary>
     public static class MathUtils
     {
+        public static float Epsilon;
+
+        public static double DoubleEpsilon;
+
         private static double nextNextGaussian;
         private static bool haveNextGaussian;
         
         // -------------------------------------------------------------------
+        // Constructor
+        // -------------------------------------------------------------------
+        static MathUtils()
+        {
+            UpdateEpsilon();
+            UpdateDoubleEpsilon();
+        }
+
+        // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        
+
+        /// <summary>
+        /// Recalculates the epsilon value for floats
+        /// See https://www.johndcook.com/blog/2010/06/08/c-math-gotchas/ for the specific reason why this exists
+        /// </summary>
+        /// <param name="center">the center to calculate for, higher = less precision</param>
+        public static void UpdateEpsilon(float center = 1.0f)
+        {
+            Epsilon = 1f;
+            while (Epsilon + center > center)
+            {
+                Epsilon /= 2f;
+            }
+        }
+
+        /// <summary>
+        /// Recalculates the epsilon value for floats
+        /// See https://www.johndcook.com/blog/2010/06/08/c-math-gotchas/ for the specific reason why this exists
+        /// </summary>
+        /// <param name="center">the center to calculate for, higher = less precision</param>
+        public static void UpdateDoubleEpsilon(double center = 1.0d)
+        {
+            DoubleEpsilon = 1d;
+            while (DoubleEpsilon + center > center)
+            {
+                DoubleEpsilon /= 2d;
+            }
+        }
+
         /// <summary>
         /// <para>Returns the next pseudorandom, Gaussian ("normally") distributed double value with mean 0.0 and standard deviation 1.0 from this random number generator's sequence.</para>
         /// <para>The general contract of <see cref="NextGaussian"/> is that one double value, chosen from(approximately) the usual
@@ -70,7 +111,7 @@
                 v2 = 2 * GDXAI.Rand.NextDouble() - 1; // between -1 and 1
                 s = v1 * v1 + v2 * v2;
             }
-            while (s >= 1 || Math.Abs(s) < double.Epsilon);
+            while (s >= 1 || Math.Abs(s) < DoubleEpsilon);
 
             double multiplier = Math.Sqrt(-2 * Math.Log(s) / s);
             nextNextGaussian = v2 * multiplier;
