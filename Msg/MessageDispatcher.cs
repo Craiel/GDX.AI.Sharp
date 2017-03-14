@@ -18,16 +18,15 @@
 
         private static readonly MessageDispatcherPool Pool = new MessageDispatcherPool();
 
-        private PriorityQueue<Telegram> queue;
+        private readonly PriorityQueue<Telegram> queue;
 
         private readonly IDictionary<int, IList<ITelegraph>> messageListeners;
 
         private readonly IDictionary<int, IList<ITelegramProvider>> messageProviders;
 
-        /// <summary>
-        /// Sets debug mode on/off
-        /// </summary>
-        public bool DebugEnabled { get; set; }
+        // -------------------------------------------------------------------
+        // Constructor
+        // -------------------------------------------------------------------
 
         /// <summary>
         /// Creates a new <see cref="MessageDispatcher"/>
@@ -38,6 +37,15 @@
             this.messageListeners = new Dictionary<int, IList<ITelegraph>>();
             this.messageProviders = new Dictionary<int, IList<ITelegramProvider>>();
         }
+
+        // -------------------------------------------------------------------
+        // Public
+        // -------------------------------------------------------------------
+
+        /// <summary>
+        /// Sets debug mode on/off
+        /// </summary>
+        public bool DebugEnabled { get; set; }
 
         /// <summary>
         /// Registers a listener for the specified message code. 
@@ -67,7 +75,7 @@
                     if (info != null)
                     {
                         ITelegraph sender = info as ITelegraph;
-                        DispatchMessage(0, sender, listener, message, info, false);
+                        this.DispatchMessage(message, 0, sender, listener, info);
                     }
                 }
             }
@@ -235,7 +243,7 @@
         /// <param name="receiver">the receiver of the telegram; if it's <code>null</code> the telegram is broadcasted to all the receivers registered for the specified message code</param>
         /// <param name="extraInfo">an optional object</param>
         /// <param name="needReturnReceipt">whether the return receipt is needed or not</param>
-        private void DispatchMessage(
+        public void DispatchMessage(
             int message,
             float delay = 0f,
             ITelegraph sender = null,
@@ -309,110 +317,128 @@
 
         /// <summary>
         /// Dispatches any delayed telegrams with a timestamp that has expired. Dispatched telegrams are removed from the queue.
-        /// * <p>
-        /// * This method must be called regularly from inside the main game loop to facilitate the correct and timely dispatch of any
-        /// * delayed messages.Notice that the message dispatcher internally calls {@link Timepiece#getTime()
-        /// * GdxAI.getTimepiece().getTime()}
-        /// to get the current AI time and properly dispatch delayed messages.This means that
-        /// * <ul>
-        /// * <li>if you forget to {@link Timepiece#update(float) update the timepiece} the delayed messages won't be dispatched.</li>
-        /// * <li>ideally the timepiece should be updated before the message dispatcher.</li>
-        /// * </ul>
+        /// <para>
+        /// This method must be called regularly from inside the main game loop to facilitate the correct and timely dispatch of any
+        /// delayed messages.Notice that the message dispatcher internally calls <see cref="GDXAI.TimePiece"/>
+        /// to get the current AI time and properly dispatch delayed messages.
+        /// This means that:
+        ///  - if you forget to <see cref="ITimePiece.Update"/> the timepiece the delayed messages won't be dispatched.
+        ///  - ideally the timepiece should be updated before the message dispatcher.
+        /// </para>
         /// </summary>
         public void Update()
         {
-            float currentTime = GdxAI.getTimepiece().getTime();
+            float currentTime = GDXAI.TimePiece.Time;
 
             // Peek at the queue to see if any telegrams need dispatching.
             // Remove all telegrams from the front of the queue that have gone
             // past their time stamp.
             Telegram telegram;
-            while ((telegram = queue.peek()) != null)
+            while ((telegram = this.queue.Peek()) != null)
             {
-
                 // Exit loop if the telegram is in the future
-                if (telegram.getTimestamp() > currentTime) break;
-
-                if (debugEnabled)
+                if (telegram.Timestamp > currentTime)
                 {
-                    GdxAI.getLogger().info(LOG_TAG,
-                        "Queued telegram ready for dispatch: Sent to " + telegram.receiver + ". Message code is " + telegram.message);
+                    break;
+                }
+
+                if (this.DebugEnabled)
+                {
+                    GDXAI.Logger.Info(
+                        LogTag,
+                        string.Format(
+                            "Queued telegram ready for dispatch: Sent to {0}. Message code is {1}",
+                            telegram.Receiver,
+                            telegram.Message));
                 }
 
                 // Send the telegram to the recipient
-                discharge(telegram);
+                this.Discharge(telegram);
 
                 // Remove it from the queue
-                queue.poll();
+                this.queue.Poll();
             }
         }
 
         /// <summary>
-        /// cans the queue and passes pending messages to the given callback in any particular order.
-        /// * <p>
-        /// * Typically this method is used to save (serialize) pending messages and restore (deserialize and schedule) them back on game* loading
+        /// Scans the queue and passes pending messages to the given callback in any particular order.
+        /// <para>
+        /// Typically this method is used to save (serialize) pending messages and restore (deserialize and schedule) them back on game* loading
+        /// </para>
         /// </summary>
-        /// <param name="callback"></param>
-        public void ScanQueue(PendingMessageCallback callback)
+        /// <param name="callback">the callback to pass the messages to</param>
+        public void ScanQueue(IPendingMessageCallback callback)
         {
-            float currentTime = GdxAI.getTimepiece().getTime();
-            int queueSize = queue.size();
+            float currentTime = GDXAI.TimePiece.Time;
+            int queueSize = this.queue.Size;
             for (int i = 0; i < queueSize; i++)
             {
-                Telegram telegram = queue.get(i);
-                callback.report(telegram.getTimestamp() - currentTime, telegram.sender, telegram.receiver, telegram.message,
-                    telegram.extraInfo, telegram.returnReceiptStatus);
+                Telegram telegram = this.queue.Get(i);
+                callback.Report(
+                    telegram.Timestamp - currentTime,
+                    telegram.Sender,
+                    telegram.Receiver,
+                    telegram.Message,
+                    telegram.ExtraInfo,
+                    telegram.ReturnReceiptStatus);
             }
         }
 
         /// <summary>
-        /// This method is used by {@link #dispatchMessage(float, Telegraph, Telegraph, int, Object) dispatchMessage} for immediate telegrams and
-        /// { @link #update(float) update} for delayed telegrams. It first calls the message handling method of the
+        /// This method is used by <see cref="DispatchMessage"/> for immediate telegrams and
+        /// <see cref="Update"/> for delayed telegrams. It first calls the message handling method of the
         /// receiving agents with the specified telegram then returns the telegram to the pool.
         /// </summary>
-        /// <param name="telegram"></param>
+        /// <param name="telegram">the telegram to discharge</param>
         public void Discharge(Telegram telegram)
         {
-            if (telegram.receiver != null)
+            if (telegram.Receiver != null)
             {
                 // Dispatch the telegram to the receiver specified by the telegram itself
-                if (!telegram.receiver.handleMessage(telegram))
+                if (!telegram.Receiver.HandleMessage(telegram))
                 {
                     // Telegram could not be handled
-                    if (debugEnabled) GdxAI.getLogger().info(LOG_TAG, "Message " + telegram.message + " not handled");
+                    if (this.DebugEnabled)
+                    {
+                        GDXAI.Logger.Info(LogTag, string.Format("Message {0} not handled", telegram.Message));
+                    }
                 }
             }
             else
             {
                 // Dispatch the telegram to all the registered receivers
                 int handledCount = 0;
-                Array<Telegraph> listeners = msgListeners.get(telegram.message);
-                if (listeners != null)
+                IList<ITelegraph> listeners;
+                if (this.messageListeners.TryGetValue(telegram.Message, out listeners))
                 {
-                    for (int i = 0; i < listeners.size; i++)
+                    foreach (ITelegraph listener in listeners)
                     {
-                        if (listeners.get(i).handleMessage(telegram))
+                        if (listener.HandleMessage(telegram))
                         {
                             handledCount++;
                         }
                     }
                 }
+
                 // Telegram could not be handled
-                if (debugEnabled && handledCount == 0) GdxAI.getLogger().info(LOG_TAG, "Message " + telegram.message + " not handled");
+                if (this.DebugEnabled && handledCount == 0)
+                {
+                    GDXAI.Logger.Info(LogTag, string.Format("Message {0} not handled", telegram.Message));
+                }
             }
 
-            if (telegram.returnReceiptStatus == Telegram.RETURN_RECEIPT_NEEDED)
+            if (telegram.ReturnReceiptStatus == ReturnReceiptStatus.Needed)
             {
                 // Use this telegram to send the return receipt
-                telegram.receiver = telegram.sender;
-                telegram.sender = this;
-                telegram.returnReceiptStatus = Telegram.RETURN_RECEIPT_SENT;
-                discharge(telegram);
+                telegram.Receiver = telegram.Sender;
+                telegram.Sender = this;
+                telegram.ReturnReceiptStatus = ReturnReceiptStatus.Sent;
+                this.Discharge(telegram);
             }
             else
             {
                 // Release the telegram to the pool
-                POOL.free(telegram);
+                Pool.Free(telegram);
             }
         }
 
@@ -421,6 +447,9 @@
             return false;
         }
 
+        // -------------------------------------------------------------------
+        // Private
+        // -------------------------------------------------------------------
         private class MessageDispatcherPool : Pool<Telegram>
         {
             public MessageDispatcherPool(int initialCapacity = 16, int maxCapacity = int.MaxValue)
