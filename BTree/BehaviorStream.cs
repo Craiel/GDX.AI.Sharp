@@ -8,7 +8,7 @@
     using Enums;
 
     using Exceptions;
-
+    
     /// <summary>
     /// Creates a new BehaviorStream object that is used to execute and maintain the tree at runtime
     /// </summary>
@@ -21,8 +21,6 @@
         private T blackboard;
 
         private TaskId idPool = TaskId.FirstValid;
-
-        private Task<T>[] stream;
 
         // -------------------------------------------------------------------
         // Constructor
@@ -42,7 +40,7 @@
         /// <param name="blackboard">the <see cref="IBlackboard"/>. It can be null</param>
         /// <param name="initialSize">initial size of the stream</param>
         /// <param name="growBy">the amount of elements to grow by if we exceed the size</param>
-        public BehaviorStream(T blackboard, int initialSize = 11, int growBy = 10)
+        public BehaviorStream(T blackboard = default(T), int initialSize = 11, int growBy = 10)
         {
             this.listeners = new List<IListener<T>>();
             this.stream = new Task<T>[initialSize];
@@ -216,10 +214,12 @@
         {
             this.blackboard = newBlackboard;
         }
-
+        
         // -------------------------------------------------------------------
         // Internal
         // -------------------------------------------------------------------
+        internal Task<T>[] stream;
+
         internal BehaviorStreamTaskToRun? CurrentTaskToRun { get; set; }
 
         internal struct BehaviorStreamTaskToRun

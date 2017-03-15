@@ -4,6 +4,8 @@
 
     using Enums;
 
+    using Exceptions;
+    
     public delegate bool ActionDelegate();
 
     /// <summary>
@@ -39,6 +41,11 @@
         // -------------------------------------------------------------------
         protected override BTTaskStatus Execute()
         {
+            if (this.Delegate == null)
+            {
+                throw new IllegalStateException("Delegate not set");
+            }
+
             if (this.Delegate.Invoke())
             {
                 return BTTaskStatus.Succeeded;

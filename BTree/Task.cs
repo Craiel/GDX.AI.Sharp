@@ -9,12 +9,14 @@
 
     using Exceptions;
 
+    using Sharp.Utils;
+
     /// <summary>
     /// This is the abstract base class of all behavior tree tasks. The Task of a behavior tree has a status, one control and a list of children.
     /// </summary>
     /// <typeparam name="T">type of the blackboard object that tasks use to read or modify game state</typeparam>
     [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:ElementsMustAppearInTheCorrectOrder", Justification = "Reviewed. Suppression is OK here.")]
-    public abstract class Task<T>
+    public abstract class Task<T> : IYamlSerializable
         where T : IBlackboard
     {
         public const ushort InvalidTaskId = 0;
@@ -324,6 +326,20 @@
             {
                 throw new TaskCloneException(e);
             }
+        }
+
+        public virtual void Serialize(YamlFluentSerializer serializer)
+        {
+            serializer.Add("Id", this.Id.Value);
+
+            if (this.Guard != TaskId.Invalid)
+            {
+                serializer.Add("Guard", this.Guard.Value);
+            }
+        }
+
+        public virtual void Deserialize(YamlFluentDeserializer deserializer)
+        {
         }
 
         // -------------------------------------------------------------------

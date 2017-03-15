@@ -2,7 +2,7 @@
 --#include "$(PROJECT_ROOT)sys/common.cbi"
 --#include "$(PROJECT_ROOT)sys/default.cbi"
 --#include "$(PROJECT_ROOT)sys/ext_log4net.cbi"
---#include "$(PROJECT_ROOT)sys/ext_json.cbi"
+--#include "$(PROJECT_ROOT)sys/ext_yaml.cbi"
 
 SetFramework("v3.5")
 
@@ -12,7 +12,6 @@ AddSources("$(BUILD_DIR)", "*.cs", true)
 
 SetNamespace("GDX.AI.Sharp")
 
-AddReference("Newtonsoft.Json", ccRoot.."Newtonsoft.Json.dll")
 AddReference("MonoGame.Math", ccRoot.."MonoGame.Math.dll")
 AddReference("CarbonCore.Utils", ccRoot.."CarbonCore.Utils.dll")
 AddReference("CarbonCore.Utils.Edge", "$(PROJECT_ROOT)External/CCRelease/CarbonCore.Utils.Edge.dll")
