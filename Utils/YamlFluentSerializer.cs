@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
 
     using Contracts;
 
@@ -53,7 +54,7 @@
 
             return this;
         }
-
+        
         public YamlFluentSerializer Add(int key, string value)
         {
             return this.Add(key.ToString(CultureInfo.InvariantCulture), value);
@@ -146,8 +147,9 @@
                         }
                         else
                         {
-                            this.AddNodeToParent(new YamlMappingNode());
+                            this.AddNodeToParent(new YamlMappingNode(), true);
                         }
+
                         break;
                     }
 
@@ -159,8 +161,9 @@
                         }
                         else
                         {
-                            this.AddNodeToParent(new YamlSequenceNode());
+                            this.AddNodeToParent(new YamlSequenceNode(), true);
                         }
+
                         break;
                     }
             }
@@ -185,8 +188,12 @@
             {
                 throw new SerializationException("Parent stack was in unexpected state, did you forget to end a list or dictionary?");
             }
-            
-            return this.stream.ToString();
+
+            using (var writer = new StringWriter())
+            {
+                this.stream.Save(writer);
+                return writer.ToString();
+            }
         }
 
         // -------------------------------------------------------------------
@@ -195,34 +202,48 @@
         private void AddNodeToParent(YamlNode key, YamlNode value)
         {
             YamlNode parent = this.parentStack.Peek();
-            YamlMappingNode mapping = parent as YamlMappingNode;
-            if (mapping != null)
+            switch (parent.NodeType)
             {
-                mapping.Add(key, value);
-                return;
-            }
+                case YamlNodeType.Mapping:
+                    {
+                        ((YamlMappingNode)parent).Add(key, value);
+                        break;
+                    }
 
-            throw new SerializationException("Add Node called for unsupported parent: " + parent);
+                default:
+                    {
+                        throw new SerializationException("Add Node called for unsupported parent: " + parent);
+                    }
+            }
         }
 
-        private void AddNodeToParent(YamlNode node)
+        private void AddNodeToParent(YamlNode key, bool pushToStack = false)
         {
             YamlNode parent = this.parentStack.Peek();
-            YamlMappingNode mapping = parent as YamlMappingNode;
-            if (mapping != null)
+            switch (parent.NodeType)
             {
-                mapping.Add(node, null);
-                return;
+                case YamlNodeType.Sequence:
+                    {
+                        ((YamlSequenceNode)parent).Add(key);
+                        break;
+                    }
+
+                case YamlNodeType.Mapping:
+                    {
+                        ((YamlMappingNode)parent).Add(key, string.Empty);
+                        break;
+                    }
+
+                default:
+                    {
+                        throw new SerializationException("Add Node called for unsupported parent: " + parent);
+                    }
             }
 
-            YamlSequenceNode sequence = parent as YamlSequenceNode;
-            if (sequence != null)
+            if (pushToStack)
             {
-                sequence.Add(node);
-                return;
+                this.parentStack.Push(key);
             }
-
-            throw new SerializationException("Add Node called for unsupported parent: " + parent);
         }
     }
 }

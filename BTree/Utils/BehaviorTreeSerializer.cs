@@ -10,9 +10,7 @@
     using Exceptions;
 
     using Sharp.Utils;
-
-    using YamlDotNet.RepresentationModel;
-
+    
     /// <summary>
     /// Serializer for <see cref="BehaviorStream{T}"/>
     /// </summary>
@@ -78,35 +76,52 @@
         /// <exception cref="SerializationException">if the data fails to deserialize</exception>
         public BehaviorStream<T> Deserialize(T blackboard, string data)
         {
-            BehaviorTreeStorage storage;
-            if (!GDXAI.Serializer.Deserialize(data, out storage))
+            int size;
+            int growBy;
+            ushort id;
+            var deserializer = new YamlFluentDeserializer(data)
+                .Read("Size", out size)
+                .Read("GrowBy", out growBy)
+                .Read("RootId", out id);
+
+            BehaviorStream<T> result = new BehaviorStream<T>(blackboard, size, growBy) { Root = new TaskId(id) };
+
+            IDictionary<int, string> typeMap = new Dictionary<int, string>();
+            deserializer.BeginRead();
+            for (var i = 0; i < size; i++)
             {
-                throw new SerializationException("Failed to deserialize tree data");
+                string typeName;
+                deserializer.Read(i, out typeName);
+                typeMap.Add(i, typeName);
             }
 
-            BehaviorStream<T> result = new BehaviorStream<T>(blackboard, storage.Size, storage.GrowBy) { Root = storage.Root };
-            foreach (int index in storage.TaskType.Keys)
+            deserializer.EndRead();
+
+            deserializer.BeginRead();
+            for (var i = 0; i < size; i++)
             {
-                string typeName = storage.TaskType[index];
-                if (string.IsNullOrEmpty(typeName))
+                if (string.IsNullOrEmpty(typeMap[i]))
                 {
                     continue;
                 }
 
-                Type taskType = Type.GetType(typeName);
-                if (taskType == null)
+                Type type = Type.GetType(typeMap[i]);
+                if (type == null)
                 {
-                    throw new SerializationException("Could not load tree, unknown type: " + typeName);
+                    throw new SerializationException("Could not get type information for " + typeMap[i]);
                 }
 
-                object taskObject;
-                if (!GDXAI.Serializer.Deserialize(taskType, storage.TaskContent[index], out taskObject))
+                Task<T> task = (Task<T>)Activator.CreateInstance(type);
+                if (task == null)
                 {
-                    throw new SerializationException("Failed to load Task");
+                    throw new SerializationException("Could not create task from type " + type.AssemblyQualifiedName);
                 }
 
-                result.stream[index] = (Task<T>)taskObject;
+                deserializer.Read(i, task);
+                result.stream[i] = task;
             }
+
+            deserializer.EndRead();
 
             return result;
         }

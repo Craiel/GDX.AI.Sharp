@@ -330,16 +330,29 @@
 
         public virtual void Serialize(YamlFluentSerializer serializer)
         {
-            serializer.Add("Id", this.Id.Value);
+            serializer.Begin(YamlContainerType.Dictionary)
+                .Add("Id", this.Id.Value);
 
             if (this.Guard != TaskId.Invalid)
             {
                 serializer.Add("Guard", this.Guard.Value);
             }
+
+            serializer.End();
         }
 
         public virtual void Deserialize(YamlFluentDeserializer deserializer)
         {
+            deserializer.BeginRead();
+
+            ushort id;
+            deserializer.Read("Id", out id);
+            this.Id = new TaskId(id);
+
+            deserializer.Read("Guard", out id);
+            this.Guard = new TaskId(id);
+
+            deserializer.EndRead();
         }
 
         // -------------------------------------------------------------------
