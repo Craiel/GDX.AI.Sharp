@@ -51,6 +51,8 @@
         public override void Start()
         {
             this.value = this.SuccessValue.NextFloat();
+
+            base.Start();
         }
 
         public override void Run()

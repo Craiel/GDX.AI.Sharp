@@ -41,6 +41,11 @@
 
         public TaskId CurrentLeaf { get; private set; }
 
+        public static BehaviorTreeBuilder<T> Begin()
+        {
+            return new BehaviorTreeBuilder<T>();
+        }
+
         public BehaviorTreeBuilder<T> Branch(BranchTask<T> task)
         {
             this.CurrentParent = this.stream.Add(task);
@@ -194,24 +199,54 @@
             return this.Decorator(new Random<T>());
         }
 
-        public BehaviorTreeBuilder<T> Repeat(Task<T> child, IntegerDistribution times)
+        public BehaviorTreeBuilder<T> Repeat(IntegerDistribution times, Task<T> child = null)
         {
-            return this.Decorator(new Repeat<T>(this.stream.Add(child), times));
+            if (child != null)
+            {
+                return this.Decorator(new Repeat<T>(this.stream.Add(child), times));
+            }
+
+            return this.Decorator(new Repeat<T> { Times = times });
         }
 
-        public BehaviorTreeBuilder<T> SemaphoreGuard(TaskId child, string name = null)
+        public BehaviorTreeBuilder<T> SemaphoreGuard(string name = null, Task<T> child = null)
         {
-            return this.Decorator(new SemaphoreGuard<T>(name, child));
+            if (child != null)
+            {
+                return this.Decorator(new SemaphoreGuard<T>(name, this.stream.Add(child)));
+            }
+
+            return this.Decorator(new SemaphoreGuard<T>(name));
         }
 
-        public BehaviorTreeBuilder<T> UntilFail(Task<T> child)
+        public BehaviorTreeBuilder<T> UntilFail(Task<T> child = null)
         {
-            return this.Decorator(new UntilFail<T>(this.stream.Add(child)));
+            if (child != null)
+            {
+                return this.Decorator(new UntilFail<T>(this.stream.Add(child)));
+            }
+
+            return this.Decorator(new UntilFail<T>());
         }
 
-        public BehaviorTreeBuilder<T> UntilSuccess(Task<T> child)
+        public BehaviorTreeBuilder<T> UntilSuccess(Task<T> child = null)
         {
-            return this.Decorator(new UntilSuccess<T>(this.stream.Add(child)));
+            if (child != null)
+            {
+                return this.Decorator(new UntilSuccess<T>(this.stream.Add(child)));
+            }
+
+            return this.Decorator(new UntilSuccess<T>());
+        }
+
+        public BehaviorTreeBuilder<T> Interval(float seconds = 1.0f, Task<T> child = null)
+        {
+            if (child != null)
+            {
+                return this.Decorator(new Interval<T>(this.stream.Add(child), seconds));
+            }
+
+            return this.Decorator(new Interval<T>(seconds));
         }
 
         public BehaviorTreeBuilder<T> End()

@@ -53,6 +53,8 @@
         public override void Start()
         {
             this.count = this.Times.NextInt();
+
+            base.Start();
         }
 
         public override void ChildSuccess(TaskId task)

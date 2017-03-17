@@ -22,6 +22,8 @@
         public const ushort InvalidTaskId = 0;
         public const ushort FirstValidTaskId = 1;
 
+        private ulong lastRunTick;
+
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
@@ -158,6 +160,12 @@
         /// </summary>
         public virtual void Start()
         {
+            if (this.lastRunTick == GDXAI.TimePiece.Tick)
+            {
+                throw new IllegalStateException("Task was started multiple times in the same frame!");
+            }
+
+            this.lastRunTick = GDXAI.TimePiece.Tick;
         }
 
         /// <summary>

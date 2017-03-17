@@ -61,6 +61,8 @@
         {
             this.timeout = this.Seconds.NextFloat();
             this.startTime = GDXAI.TimePiece.Time;
+
+            base.Start();
         }
 
         /// <summary>

@@ -102,6 +102,7 @@
         {
             this.CurrentChildIndex = 0;
             this.RunningChild = TaskId.Invalid;
+            base.Start();
         }
 
         public override void Reset()

@@ -66,6 +66,8 @@
             {
                 this.AddChild(this.CreateSubtreeRootTask());
             }
+
+            base.Start();
         }
 
         /// <summary>

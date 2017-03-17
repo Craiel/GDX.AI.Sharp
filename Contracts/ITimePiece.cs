@@ -12,6 +12,11 @@
     public interface ITimePiece
     {
         /// <summary>
+        /// The tick of the current frame, used to identify loops and issues in btree's
+        /// </summary>
+        ulong Tick { get; }
+
+        /// <summary>
         /// Returns the time accumulated up to the current frame in seconds
         /// </summary>
         float Time { get; }

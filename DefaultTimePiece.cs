@@ -22,12 +22,15 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
+        public ulong Tick { get; private set; }
+
         public float Time { get; private set; }
 
         public float DeltaTime { get; private set; }
 
         public void Update(float delta)
         {
+            this.Tick++;
             this.DeltaTime = delta > this.maxDeltaTime ? this.maxDeltaTime : delta;
             this.Time += delta;
         }
