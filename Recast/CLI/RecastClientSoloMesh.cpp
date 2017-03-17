@@ -8,6 +8,39 @@ RecastWrapper::RecastClientSoloMesh::~RecastClientSoloMesh()
 {
 }
 
+bool RecastWrapper::RecastClientSoloMesh::build(std::string geom_path)
+{
+	m_geom = new InputGeom();
+	m_geom->load(m_ctx, geom_path);
+
+	m_ctx = new BuildContext();
+
+	const float* bmin = m_geom->getNavMeshBoundsMin();
+	const float* bmax = m_geom->getNavMeshBoundsMax();
+	const float* verts = m_geom->getMesh()->getVerts();
+	const int nverts = m_geom->getMesh()->getVertCount();
+	const int* tris = m_geom->getMesh()->getTris();
+	const int ntris = m_geom->getMesh()->getTriCount();
+
+	prepareBuild();
+
+	// Reset build times gathering.
+	m_ctx->resetTimers();
+
+	// Start the build process.	
+	m_ctx->startTimer(RC_TIMER_TOTAL);
+
+	m_ctx->log(RC_LOG_PROGRESS, "Building navigation:");
+	m_ctx->log(RC_LOG_PROGRESS, " - %d x %d cells", m_cfg.width, m_cfg.height);
+	m_ctx->log(RC_LOG_PROGRESS, " - %.1fK verts, %.1fK tris", nverts / 1000.0f, ntris / 1000.0f);
+
+	doBuild();
+
+	m_ctx->stopTimer(RC_TIMER_TOTAL);
+
+	return true;
+}
+
 void RecastWrapper::RecastClientSoloMesh::buildStep1InitConfig()
 {
 	const float* bmin = m_geom->getNavMeshBoundsMin();
@@ -348,7 +381,7 @@ bool RecastWrapper::RecastClientSoloMesh::buildStep8CreateDetourData()
 	return true;
 }
 
-bool RecastWrapper::RecastClientSoloMesh::prepareBuild(class InputGeom* geom)
+bool RecastWrapper::RecastClientSoloMesh::prepareBuild()
 {
 	// Step 1. Initialize build config.
 	buildStep1InitConfig();

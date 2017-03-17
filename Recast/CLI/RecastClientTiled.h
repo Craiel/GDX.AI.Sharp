@@ -186,7 +186,7 @@ namespace RecastWrapper {
 
 		class dtTileCache* m_tileCache;
 
-		virtual bool prepareBuild(class InputGeom* geom);
+		virtual bool prepareBuild();
 		virtual bool doBuild();
 
 	private:

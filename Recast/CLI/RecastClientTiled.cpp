@@ -103,7 +103,7 @@ void RecastWrapper::RecastClientTiled::buildStep1InitConfig()
 	m_maxPolysPerTile = 1 << polyBits;
 }
 
-bool RecastWrapper::RecastClientTiled::prepareBuild(class InputGeom* geom)
+bool RecastWrapper::RecastClientTiled::prepareBuild()
 {
 	buildStep1InitConfig();
 	return true;

@@ -7,12 +7,14 @@ namespace RecastWrapper {
 	class RecastClientSoloMesh : public RecastClient
 	{
 	protected:
-		virtual bool prepareBuild(class InputGeom* geom);
+		virtual bool prepareBuild();
 		virtual bool doBuild();
 
 	public:
 		RecastClientSoloMesh();
 		~RecastClientSoloMesh();
+
+		bool build(std::string geom_path);
 
 		virtual dtStatus addObstacle(const float* pos, float radius, float height, dtObstacleRef* ref);
 		virtual dtStatus addObstacleBox(const float* bmin, const float* bmax, dtObstacleRef* ref);

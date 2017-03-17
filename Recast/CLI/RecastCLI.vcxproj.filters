@@ -159,6 +159,12 @@
     <ClInclude Include="ManagedRecastSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ManagedRecastClientSoloMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ManagedRecastClientTiled.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">

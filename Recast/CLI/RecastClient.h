@@ -89,9 +89,6 @@ namespace RecastWrapper {
 		RecastClient();
 		~RecastClient();
 
-		bool build(std::string geom_path);
-		bool build(class InputGeom* geom);
-
 		BuildContext* getContext() { return m_ctx; }
 
 		virtual dtStatus update(float delta) { m_crowd->update(delta, &m_agentDebug); return DT_SUCCESS; }
@@ -122,7 +119,7 @@ namespace RecastWrapper {
 		virtual void clearObstacles();
 
 	protected:
-		virtual bool prepareBuild(class InputGeom* geom);
+		virtual bool prepareBuild();
 		virtual bool doBuild();
 	};
 }

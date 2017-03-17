@@ -40,47 +40,7 @@ RecastWrapper::RecastClient::~RecastClient()
 	}
 }
 
-bool RecastWrapper::RecastClient::build(std::string geom_path)
-{
-	InputGeom* geom = new InputGeom();
-	geom->load(m_ctx, geom_path);
-	bool result = build(geom);
-	delete geom;
-	return result;
-}
-
-bool RecastWrapper::RecastClient::build(class InputGeom* geom)
-{
-	m_geom = geom;
-	m_ctx = new BuildContext();
-
-	const float* bmin = m_geom->getNavMeshBoundsMin();
-	const float* bmax = m_geom->getNavMeshBoundsMax();
-	const float* verts = m_geom->getMesh()->getVerts();
-	const int nverts = m_geom->getMesh()->getVertCount();
-	const int* tris = m_geom->getMesh()->getTris();
-	const int ntris = m_geom->getMesh()->getTriCount();
-
-	prepareBuild(geom);
-
-	// Reset build times gathering.
-	m_ctx->resetTimers();
-
-	// Start the build process.	
-	m_ctx->startTimer(RC_TIMER_TOTAL);
-
-	m_ctx->log(RC_LOG_PROGRESS, "Building navigation:");
-	m_ctx->log(RC_LOG_PROGRESS, " - %d x %d cells", m_cfg.width, m_cfg.height);
-	m_ctx->log(RC_LOG_PROGRESS, " - %.1fK verts, %.1fK tris", nverts / 1000.0f, ntris / 1000.0f);
-
-	doBuild();
-	
-	m_ctx->stopTimer(RC_TIMER_TOTAL);
-	
-	return true;
-}
-
-bool RecastWrapper::RecastClient::prepareBuild(class InputGeom* geom)
+bool RecastWrapper::RecastClient::prepareBuild()
 {	
 	return false;
 }

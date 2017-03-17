@@ -109,6 +109,8 @@
     <ClInclude Include="ManagedDtCrowdAgentInfo.h" />
     <ClInclude Include="ManagedDtCrowdAgentParams.h" />
     <ClInclude Include="ManagedRecastClient.h" />
+    <ClInclude Include="ManagedRecastClientSoloMesh.h" />
+    <ClInclude Include="ManagedRecastClientTiled.h" />
     <ClInclude Include="ManagedRecastSettings.h" />
     <ClInclude Include="MeshLoaderObj.h" />
     <ClInclude Include="PerfTimer.h" />
