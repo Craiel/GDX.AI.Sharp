@@ -22,7 +22,7 @@
             
 #if TRACE
             // If we have tracing enabled use the trace logger
-            Logger = new TraceLogger();
+            Logger = new NLogLogger();
 #else
             Logger = new NullLogger();
 #endif

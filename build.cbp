@@ -1,7 +1,7 @@
 ﻿--#include <System>
 --#include "$(PROJECT_ROOT)sys/common.cbi"
 --#include "$(PROJECT_ROOT)sys/default.cbi"
---#include "$(PROJECT_ROOT)sys/ext_log4net.cbi"
+--#include "$(PROJECT_ROOT)sys/ext_nlog.cbi"
 --#include "$(PROJECT_ROOT)sys/ext_yaml.cbi"
 
 SetFramework("v3.5")

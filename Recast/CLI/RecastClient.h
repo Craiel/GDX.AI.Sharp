@@ -6,7 +6,6 @@
 #include <DetourNavMeshBuilder.h>
 #include <DetourCrowd.h>
 #include <DetourTileCache.h>
-#include <NavMesh.pb.h>
 
 #include "BuildContext.h"
 #include "InputGeom.h"
@@ -110,9 +109,7 @@ namespace RecastWrapper {
 		bool requestMoveTarget(int index, dtPolyRef targetRef, const float* pos) { return m_crowd->requestMoveTarget(index, targetRef, pos); }
 
 		bool resetMoveTarget(int index) { return m_crowd->resetMoveTarget(index); }
-
-		bool getDebugNavMesh(const unsigned short polyFlags, GDX::AI::ProtoRecastDebugNavMesh* proto);
-
+		
 		virtual dtStatus addObstacle(const float* pos, float radius, float height, dtObstacleRef* ref);
 		virtual dtStatus addObstacleBox(const float* bmin, const float* bmax, dtObstacleRef* ref);
 		virtual dtStatus removeObstacle(dtObstacleRef ref);
@@ -121,5 +118,6 @@ namespace RecastWrapper {
 	protected:
 		virtual bool prepareBuild();
 		virtual bool doBuild();
+		virtual void cleanup();
 	};
 }

@@ -1,9 +1,7 @@
 ﻿namespace GDX.AI.Sharp.Recast.RecastSharp
 {
     using System.Collections.Generic;
-
-    using CarbonCore.Utils.IO;
-
+    
     using RecastWrapper;
 
     public class RecastClientSoloMesh : RecastClient
@@ -22,9 +20,9 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public bool LoadObj(CarbonFile file)
+        public bool LoadObj(string file)
         {
-            bool result = this.typedClient.LoadObj(file.GetPath());
+            bool result = this.typedClient.LoadObj(file);
 
             this.ManagedClient.LogBuildTimes();
 

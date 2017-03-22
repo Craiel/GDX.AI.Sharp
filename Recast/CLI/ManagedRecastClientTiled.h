@@ -30,6 +30,32 @@ namespace RecastWrapper
 
 		~ManagedRecastClientTiled() { }
 	public:
+		bool GetDebugNavMesh([Out] array<byte>^% data)
+		{
+			GDX::AI::ProtoRecastDebugNavMesh* proto = new GDX::AI::ProtoRecastDebugNavMesh();
+			if (!unmanagedTyped->getDebugNavMesh(POLYFLAGS_DISABLED, proto))
+			{
+				delete proto;
+				return false;
+			}
+
+			data = gcnew array<byte>(proto->ByteSize());
+			pin_ptr<byte> data_array_start = &data[0];
+			proto->SerializeToArray(data_array_start, proto->ByteSize());
+
+			// clean up
+			delete proto;
+			google::protobuf::ShutdownProtobufLibrary();
+
+			return true;
+		}
+
+		bool Generate(String^ path)
+		{
+			std::string unmanagedPath = msclr::interop::marshal_as<std::string>(path);
+			return unmanagedTyped->generate(unmanagedPath);
+		}
+
 		bool Load(array<byte>^ data)
 		{
 			GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -42,7 +68,7 @@ namespace RecastWrapper
 				return false;
 			}
 
-			return unmanagedTyped->Load(proto);
+			return unmanagedTyped->load(proto);
 		}
 
 		bool Save([Out] array<byte>^% data)
@@ -50,7 +76,7 @@ namespace RecastWrapper
 			GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 			GDX::AI::ProtoRecastTiledNavMesh* proto = new GDX::AI::ProtoRecastTiledNavMesh();
-			if (!unmanagedTyped->Save(proto))
+			if (!unmanagedTyped->save(proto))
 			{
 				delete proto;
 				return false;

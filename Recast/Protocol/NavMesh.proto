@@ -41,5 +41,8 @@ message ProtoRecastDebugNavMeshOffMeshConnection {
 
 message ProtoRecastDebugNavMeshTile {
 	repeated ProtoNavMeshTriangle triangles = 1;	
-	repeated ProtoNavMeshVector vertices = 2;
+	repeated ProtoNavMeshVector vertices = 2;	
+	repeated ProtoNavMeshVector bounds = 3;
+	int32 tx = 4;
+	int32 ty = 5;
 }

@@ -381,6 +381,10 @@ bool RecastWrapper::RecastClientSoloMesh::buildStep8CreateDetourData()
 	return true;
 }
 
+void RecastWrapper::RecastClientSoloMesh::cleanup()
+{	
+}
+
 bool RecastWrapper::RecastClientSoloMesh::prepareBuild()
 {
 	// Step 1. Initialize build config.

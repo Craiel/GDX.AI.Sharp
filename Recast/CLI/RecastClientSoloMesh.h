@@ -9,6 +9,7 @@ namespace RecastWrapper {
 	protected:
 		virtual bool prepareBuild();
 		virtual bool doBuild();
+		virtual void cleanup();
 
 	public:
 		RecastClientSoloMesh();

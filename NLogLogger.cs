@@ -2,50 +2,54 @@
 {
     using System;
 
-    using Contracts;
+    using NLog;
 
-    public class TraceLogger : ILogger
+    using ILogger = Contracts.ILogger;
+
+    public class NLogLogger : ILogger
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public void Debug(string tag, string message, Exception e = null)
         {
-            System.Diagnostics.Debug.WriteLine($"{tag}: {message}");
+            Logger.Debug($"{tag}: {message}");
             if (e != null)
             {
-                System.Diagnostics.Debug.Write(e.StackTrace);
+                Logger.Debug(e.StackTrace);
             }
         }
 
         public void DebugFormat(string tag, string message, params object[] formatArguments)
         {
-            System.Diagnostics.Debug.WriteLine($"{tag}: {string.Format(message, formatArguments)}");
+            Logger.Debug($"{tag}: {string.Format(message, formatArguments)}");
         }
 
         public void Info(string tag, string message, Exception e = null)
         {
-            System.Diagnostics.Trace.TraceInformation($"{tag}: {message}");
+            Logger.Info($"{tag}: {message}");
             if (e != null)
             {
-                System.Diagnostics.Trace.TraceInformation(e.StackTrace);
+                Logger.Info(e.StackTrace);
             }
         }
 
         public void InfoFormat(string tag, string message, params object[] formatArguments)
         {
-            System.Diagnostics.Trace.TraceInformation($"{tag}: {string.Format(message, formatArguments)}");
+            Logger.Info($"{tag}: {string.Format(message, formatArguments)}");
         }
 
         public void Error(string tag, string message, Exception e = null)
         {
-            System.Diagnostics.Trace.TraceError($"{tag}: {message}");
+            Logger.Error($"{tag}: {message}");
             if (e != null)
             {
-                System.Diagnostics.Trace.TraceError(e.StackTrace);
+                Logger.Error(e.StackTrace);
             }
         }
 
         public void ErrorFormat(string tag, string message, params object[] formatArguments)
         {
-            System.Diagnostics.Trace.TraceError($"{tag}: {string.Format(message, formatArguments)}");
+            Logger.Error($"{tag}: {string.Format(message, formatArguments)}");
         }
     }
 }

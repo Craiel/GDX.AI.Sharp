@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <NavMesh.pb.h>
 
 #include "RecastClient.h"
 
@@ -150,8 +151,10 @@ namespace RecastWrapper {
 		RecastClientTiled();
 		~RecastClientTiled();
 
-		bool Save(GDX::AI::ProtoRecastTiledNavMesh* proto);
-		bool Load(GDX::AI::ProtoRecastTiledNavMesh* proto);
+		bool generate(std::string geom_path, bool additive = true);
+
+		bool save(GDX::AI::ProtoRecastTiledNavMesh* proto);
+		bool load(GDX::AI::ProtoRecastTiledNavMesh* proto, bool additive = true);
 
 		virtual dtStatus update(float delta)
 		{
@@ -164,6 +167,8 @@ namespace RecastWrapper {
 			return m_tileCache->update(delta, m_navMesh);
 		}
 
+		bool getDebugNavMesh(const unsigned short polyFlags, GDX::AI::ProtoRecastDebugNavMesh* proto);
+
 		virtual dtStatus addObstacle(const float* pos, float radius, float height, dtObstacleRef* ref);
 		virtual dtStatus addObstacleBox(const float* bmin, const float* bmax, dtObstacleRef* ref);
 		virtual dtStatus removeObstacle(dtObstacleRef ref);
@@ -172,7 +177,7 @@ namespace RecastWrapper {
 	protected:
 		int m_maxTiles; // set by code
 		int m_maxPolysPerTile; // set by code
-		float m_tileSize = 48;
+		float m_tileSize = 50;
 
 		int m_cacheCompressedSize;
 		int m_cacheRawSize;
@@ -188,7 +193,8 @@ namespace RecastWrapper {
 
 		virtual bool prepareBuild();
 		virtual bool doBuild();
-
+		virtual void cleanup();
+		
 	private:
 		static int calcLayerBufferSize(const int gridWidth, const int gridHeight)
 		{
@@ -201,5 +207,6 @@ namespace RecastWrapper {
 		int rasterizeTileLayers(const int tx, const int ty,	TileCacheData* tiles, const int maxTiles);
 
 		bool finalizeLoad(bool traceMemory);
+		void rebuildTiles();
 	};
 }

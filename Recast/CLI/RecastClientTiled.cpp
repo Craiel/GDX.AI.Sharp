@@ -43,15 +43,14 @@ RecastWrapper::RecastClientTiled::RecastClientTiled() :
 
 RecastWrapper::RecastClientTiled::~RecastClientTiled()
 {
-	dtFreeTileCache(m_tileCache);
 }
 
 
 void RecastWrapper::RecastClientTiled::buildStep1InitConfig()
 {
 	// Init cache
-	const float* bmin = m_geom->getNavMeshBoundsMin();
-	const float* bmax = m_geom->getNavMeshBoundsMax();
+	const float* bmin = new float[3]{ 0, 0, 0 };//m_geom->getNavMeshBoundsMin();
+	const float* bmax = new float[3]{ 6000, 2000, 6000 }; //m_geom->getNavMeshBoundsMax();
 	int gw = 0, gh = 0;
 	rcCalcGridSize(bmin, bmax, m_cellSize, &gw, &gh);
 	const int ts = (int)m_tileSize;
@@ -112,59 +111,59 @@ bool RecastWrapper::RecastClientTiled::prepareBuild()
 bool RecastWrapper::RecastClientTiled::doBuild()
 {
 	dtStatus status;
-
-	dtFreeTileCache(m_tileCache);
-
-	m_tileCache = dtAllocTileCache();
-	if (!m_tileCache)
-	{
-		m_ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not allocate tile cache.");
-		return false;
-	}
-
-	status = m_tileCache->init(&m_tcparams, m_talloc, m_tcomp, m_tmproc);
-	if (dtStatusFailed(status))
-	{
-		m_ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not init tile cache.");
-		return false;
-	}
-
-	dtFreeNavMesh(m_navMesh);
-
-	m_navMesh = dtAllocNavMesh();
-	if (!m_navMesh)
-	{
-		m_ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not allocate navmesh.");
-		return false;
-	}
-
-	const float* bmin = m_geom->getNavMeshBoundsMin();
-	const float* bmax = m_geom->getNavMeshBoundsMax();
+	
+	const float* bmin = new float[3]{ 0, 0, 0 };//m_geom->getNavMeshBoundsMin();
+	const float* bmax = new float[3]{ 6000, 2000, 6000}; //m_geom->getNavMeshBoundsMax();
 	int gw = 0, gh = 0;
 	rcCalcGridSize(bmin, bmax, m_cellSize, &gw, &gh);
 	const int tw = (gw + (int)m_tileSize - 1) / (int)m_tileSize;
 	const int th = (gh + (int)m_tileSize - 1) / (int)m_tileSize;
 
-	dtNavMeshParams params;
-	memset(&params, 0, sizeof(params));
-	rcVcopy(params.orig, bmin);
-	params.tileWidth = m_tileSize*m_cellSize;
-	params.tileHeight = m_tileSize*m_cellSize;
-	params.maxTiles = m_maxTiles;
-	params.maxPolys = m_maxPolysPerTile;
+	if (!m_tileCache || !m_ctx->additive) {
+		m_tileCache = dtAllocTileCache();
+		if (!m_tileCache)
+		{
+			m_ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not allocate tile cache.");
+			return false;
+		}
 
-	status = m_navMesh->init(&params);
-	if (dtStatusFailed(status))
-	{
-		m_ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not init navmesh.");
-		return false;
-	}
+		status = m_tileCache->init(&m_tcparams, m_talloc, m_tcomp, m_tmproc);
+		if (dtStatusFailed(status))
+		{
+			m_ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not init tile cache.");
+			return false;
+		}
 
-	status = m_navQuery->init(m_navMesh, 2048);
-	if (dtStatusFailed(status))
-	{
-		m_ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not init Detour navmesh query");
-		return false;
+		dtFreeNavMesh(m_navMesh);
+
+		m_navMesh = dtAllocNavMesh();
+		if (!m_navMesh)
+		{
+			m_ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not allocate navmesh.");
+			return false;
+		}
+		
+		dtNavMeshParams params;
+		memset(&params, 0, sizeof(params));
+		rcVcopy(params.orig, bmin);
+		params.tileWidth = m_tileSize*m_cellSize;
+		params.tileHeight = m_tileSize*m_cellSize;
+		params.maxTiles = m_maxTiles;
+		params.maxPolys = m_maxPolysPerTile;
+
+		status = m_navMesh->init(&params);
+		if (dtStatusFailed(status))
+		{
+			m_ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not init navmesh.");
+			return false;
+		}
+
+		status = m_navQuery->init(m_navMesh, 2048);
+		if (dtStatusFailed(status))
+		{
+			m_ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not init Detour navmesh query");
+			return false;
+		}
 	}
 
 	// Preprocess tiles.
@@ -189,8 +188,11 @@ bool RecastWrapper::RecastClientTiled::doBuild()
 				status = m_tileCache->addTile(tile->data, tile->dataSize, DT_COMPRESSEDTILE_FREE_DATA, 0);
 				if (dtStatusFailed(status))
 				{
+					dtTileCacheLayerHeader* header = (dtTileCacheLayerHeader*)tile->data;
+					m_ctx->log(RC_LOG_ERROR, "Tile (%d-%d @ %d-%d) was already occupied: x%.1f y%.1f z%.1f", header->width, header->height, header->tx, header->ty, header->bmin[0], header->bmin[1], header->bmin[2]);
+
 					dtFree(tile->data);
-					tile->data = 0;
+					tile->data = 0;					
 					continue;
 				}
 
@@ -344,6 +346,7 @@ int RecastWrapper::RecastClientTiled::rasterizeTileLayers(
 		m_ctx->log(RC_LOG_ERROR, "buildNavigation: Out of memory 'chf'.");
 		return 0;
 	}
+
 	if (!rcBuildCompactHeightfield(m_ctx, tcfg.walkableHeight, tcfg.walkableClimb, *rc.solid, *rc.chf))
 	{
 		m_ctx->log(RC_LOG_ERROR, "buildNavigation: Could not build compact data.");
@@ -426,7 +429,44 @@ int RecastWrapper::RecastClientTiled::rasterizeTileLayers(
 	return n;
 }
 
-bool RecastWrapper::RecastClientTiled::Save(GDX::AI::ProtoRecastTiledNavMesh* proto)
+void RecastWrapper::RecastClientTiled::cleanup()
+{
+	dtFreeTileCache(m_tileCache);
+}
+
+bool RecastWrapper::RecastClientTiled::generate(std::string geom_path, bool additive)
+{
+	if(!additive)
+	{
+		cleanup();
+	}
+
+	m_geom = new InputGeom();
+	m_geom->load(m_ctx, geom_path);
+
+	m_ctx = new BuildContext();
+	m_ctx->additive = additive;
+	
+	prepareBuild();
+
+	// Reset build times gathering.
+	m_ctx->resetTimers();
+
+	// Start the build process.	
+	m_ctx->startTimer(RC_TIMER_TOTAL);
+
+	m_ctx->log(RC_LOG_PROGRESS, "Building navigation:");
+	m_ctx->log(RC_LOG_PROGRESS, " - %d x %d cells", m_cfg.width, m_cfg.height);
+	m_ctx->log(RC_LOG_PROGRESS, " - %.1fK verts, %.1fK tris", m_geom->getMesh()->getVertCount() / 1000.0f, m_geom->getMesh()->getTriCount() / 1000.0f);
+
+	doBuild();
+
+	m_ctx->stopTimer(RC_TIMER_TOTAL);
+
+	return true;
+}
+
+bool RecastWrapper::RecastClientTiled::save(GDX::AI::ProtoRecastTiledNavMesh* proto)
 {
 	int tileCount = 0;
 	for (int i = 0; i < m_tileCache->getTileCount(); ++i)
@@ -464,40 +504,42 @@ bool RecastWrapper::RecastClientTiled::Save(GDX::AI::ProtoRecastTiledNavMesh* pr
 	return true;
 }
 
-bool RecastWrapper::RecastClientTiled::Load(GDX::AI::ProtoRecastTiledNavMesh* proto)
+bool RecastWrapper::RecastClientTiled::load(GDX::AI::ProtoRecastTiledNavMesh* proto, bool additive)
 {
-	dtFreeNavMesh(m_navMesh);
-	dtFreeTileCache(m_tileCache);
+	if (!m_navMesh || !additive) {
+		dtFreeNavMesh(m_navMesh);
+		dtFreeTileCache(m_tileCache);
 
-	m_navMesh = dtAllocNavMesh();
-	if (!m_navMesh)
-	{
-		return false;
-	}
+		m_navMesh = dtAllocNavMesh();
+		if (!m_navMesh)
+		{
+			return false;
+		}
 
-	dtNavMeshParams meshParams;
-	dtTileCacheParams cacheParams;
-	std::string navMeshParamData = proto->nav_mesh_params();
-	std::string cacheParamData = proto->tile_cache_params();
-	memcpy(&meshParams, &navMeshParamData[0], sizeof(dtNavMeshParams));
-	memcpy(&cacheParams, &cacheParamData[0], sizeof(dtTileCacheParams));
+		dtNavMeshParams meshParams;
+		dtTileCacheParams cacheParams;
+		std::string navMeshParamData = proto->nav_mesh_params();
+		std::string cacheParamData = proto->tile_cache_params();
+		memcpy(&meshParams, &navMeshParamData[0], sizeof(dtNavMeshParams));
+		memcpy(&cacheParams, &cacheParamData[0], sizeof(dtTileCacheParams));
 
-	dtStatus status = m_navMesh->init(&meshParams);
-	if (dtStatusFailed(status))
-	{
-		return false;
-	}
+		dtStatus status = m_navMesh->init(&meshParams);
+		if (dtStatusFailed(status))
+		{
+			return false;
+		}
 
-	m_tileCache = dtAllocTileCache();
-	if (!m_tileCache)
-	{
-		return false;
-	}
+		m_tileCache = dtAllocTileCache();
+		if (!m_tileCache)
+		{
+			return false;
+		}
 
-	status = m_tileCache->init(&cacheParams, m_talloc, m_tcomp, m_tmproc);
-	if (dtStatusFailed(status))
-	{
-		return false;
+		status = m_tileCache->init(&cacheParams, m_talloc, m_tcomp, m_tmproc);
+		if (dtStatusFailed(status))
+		{
+			return false;
+		}
 	}
 
 	// Read tiles
@@ -516,19 +558,19 @@ bool RecastWrapper::RecastClientTiled::Load(GDX::AI::ProtoRecastTiledNavMesh* pr
 		if (dtStatusFailed(addTileStatus))
 		{
 			dtFree(data);
-			return false;
+			continue;
 		}
 
 		if (!tile)
 		{
 			dtFree(data);
 			return false;
-		} 
-
-		m_tileCache->buildNavMeshTile(tile, m_navMesh);
+		}
 	}
 
-	status = m_navQuery->init(m_navMesh, 2048);
+	rebuildTiles();
+	
+	dtStatus status = m_navQuery->init(m_navMesh, 2048);
 	if (dtStatusFailed(status))
 	{
 		m_ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not init Detour navmesh query");
@@ -536,6 +578,18 @@ bool RecastWrapper::RecastClientTiled::Load(GDX::AI::ProtoRecastTiledNavMesh* pr
 	}
 
 	return finalizeLoad(false);
+}
+
+void RecastWrapper::RecastClientTiled::rebuildTiles()
+{
+	int count = m_tileCache->getTileCount();
+	for(int i = 0; i < count; i++)
+	{
+		const dtCompressedTile* tile = m_tileCache->getTile(i);
+		
+		dtCompressedTileRef tileRef = m_tileCache->getTileRef(tile);
+		m_tileCache->buildNavMeshTile(tileRef, m_navMesh);
+	}
 }
 
 dtStatus RecastWrapper::RecastClientTiled::addObstacle(const float* pos, float radius, float height, dtObstacleRef* ref)
@@ -561,4 +615,105 @@ void RecastWrapper::RecastClientTiled::clearObstacles()
 		if (ob->state == DT_OBSTACLE_EMPTY) continue;
 		m_tileCache->removeObstacle(m_tileCache->getObstacleRef(ob));
 	}
+}
+
+bool RecastWrapper::RecastClientTiled::getDebugNavMesh(const unsigned short polyFlags, GDX::AI::ProtoRecastDebugNavMesh* proto)
+{
+	if (!m_navMesh)
+	{
+		return false;
+	}
+
+	const dtNavMesh& mesh = *m_navMesh;
+	for (int i = 0; i < mesh.getMaxTiles(); ++i)
+	{
+		const dtMeshTile* tile = mesh.getTile(i);
+		if (!tile->header) continue;
+		dtPolyRef base = m_navMesh->getPolyRefBase(tile);
+
+		GDX::AI::ProtoRecastDebugNavMeshTile* protoTile = proto->add_tiles();
+
+		GDX::AI::ProtoNavMeshVector* bbmin = protoTile->add_bounds();
+		bbmin->set_x(tile->header->bmin[0]);
+		bbmin->set_y(tile->header->bmin[1]);
+		bbmin->set_z(tile->header->bmin[2]);
+
+		GDX::AI::ProtoNavMeshVector* bbmax = protoTile->add_bounds();
+		bbmax->set_x(tile->header->bmax[0]);
+		bbmax->set_y(tile->header->bmax[1]);
+		bbmax->set_z(tile->header->bmax[2]);
+
+		protoTile->set_tx(tile->header->x);
+		protoTile->set_ty(tile->header->y);
+				
+		int tileVerts = tile->header->vertCount;
+		for (int i = 0; i < tileVerts; i++)
+		{
+			float* vert = &tile->verts[i * 3];
+			GDX::AI::ProtoNavMeshVector* vertex = protoTile->add_vertices();
+			vertex->set_x(vert[0]);
+			vertex->set_y(vert[1]);
+			vertex->set_z(vert[2]);
+		}
+
+		for (int j = 0; j < tile->header->polyCount; ++j)
+		{
+			const dtPoly* p = &tile->polys[j];
+			if ((p->flags & polyFlags) != 0) continue;
+
+			const dtMeshTile* tile = 0;
+			const dtPoly* poly = 0;
+			if (dtStatusFailed(m_navMesh->getTileAndPolyByRef(base | (dtPolyRef)j, &tile, &poly)))
+			{
+				return false;
+			}
+
+			const unsigned int ip = (unsigned int)(poly - tile->polys);
+
+			if (poly->getType() == DT_POLYTYPE_OFFMESH_CONNECTION)
+			{
+				dtOffMeshConnection* con = &tile->offMeshCons[ip - tile->header->offMeshBase];
+
+				GDX::AI::ProtoRecastDebugNavMeshOffMeshConnection* connection = proto->add_off_mesh_connections();
+
+				connection->set_flags(con->flags);
+
+				GDX::AI::ProtoNavMeshVector* point_0 = new GDX::AI::ProtoNavMeshVector();
+				point_0->set_x(con->pos[0]);
+				point_0->set_y(con->pos[1]);
+				point_0->set_z(con->pos[2]);
+				connection->set_allocated_p_0(point_0);
+
+				GDX::AI::ProtoNavMeshVector* point_1 = new GDX::AI::ProtoNavMeshVector();
+				point_1->set_x(con->pos[3]);
+				point_1->set_y(con->pos[4]);
+				point_1->set_z(con->pos[5]);
+				connection->set_allocated_p_1(point_1);
+			}
+			else
+			{
+				const dtPolyDetail* pd = &tile->detailMeshes[ip];
+				for (int i = 0; i < pd->triCount; ++i)
+				{
+					const unsigned char* t = &tile->detailTris[(pd->triBase + i) * 4];
+					//GDX::AI::ProtoRecastDebugNavMeshTriangle* triangle = proto->add_triangles();
+					unsigned short tri[3];
+					for (int j = 0; j < 3; ++j)
+					{
+						if (t[j] < poly->vertCount)
+							tri[j] = poly->verts[t[j]];
+						else
+							tri[j] = (pd->vertBase + t[j] - poly->vertCount) * 3;
+					}
+
+					GDX::AI::ProtoNavMeshTriangle* triangle = protoTile->add_triangles();
+					triangle->set_x(tri[0]);
+					triangle->set_y(tri[1]);
+					triangle->set_z(tri[2]);
+				}
+			}
+		}
+	}
+
+	return true;
 }

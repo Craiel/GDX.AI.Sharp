@@ -13,11 +13,6 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public bool GetDebugNavMesh(out byte[] data)
-        {
-            return this.ManagedClient.GetDebugNavMesh(out data);
-        }
-
         public void Update(float delta)
         {
             this.ManagedClient.Update(delta);
@@ -41,6 +36,12 @@
         {
             float[] pos;
             bool result = this.ManagedClient.FindNearestPoly(center.ToArray(), extents.ToArray(), out nearestRef, out pos);
+            if (pos == null || pos.Length != 3)
+            {
+                nearestPoint = Vector3.Zero;
+                return false;
+            }
+
             nearestPoint = new Vector3(pos[0], pos[1], pos[2]);
             return result;
         }

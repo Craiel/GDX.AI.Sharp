@@ -33,26 +33,6 @@ namespace RecastWrapper
 		RecastClient* GetUnmanaged() { return unmanaged; }
 
 	public:
-		bool GetDebugNavMesh([Out] array<byte>^% data)
-		{
-			GDX::AI::ProtoRecastDebugNavMesh* proto = new GDX::AI::ProtoRecastDebugNavMesh();
-			if(!unmanaged->getDebugNavMesh(POLYFLAGS_DISABLED, proto))
-			{
-				delete proto;
-				return false;
-			}
-
-			data = gcnew array<byte>(proto->ByteSize());
-			pin_ptr<byte> data_array_start = &data[0];
-			proto->SerializeToArray(data_array_start, proto->ByteSize());
-
-			// clean up
-			delete proto;
-			google::protobuf::ShutdownProtobufLibrary();
-
-			return true;
-		}
-
 		void LogBuildTimes()
 		{
 			BuildContext* context = unmanaged->getContext();

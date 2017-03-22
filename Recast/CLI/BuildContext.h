@@ -22,6 +22,8 @@ namespace RecastWrapper {
 	public:
 		BuildContext();
 
+		bool additive;
+
 		/// Returns number of log messages.
 		int getLogCount() const;
 		/// Returns log message text.
