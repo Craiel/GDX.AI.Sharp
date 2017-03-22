@@ -3,6 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Data;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
@@ -10,7 +11,9 @@
     using Mathematics;
 
     using Microsoft.Xna.Framework;
-    
+
+    using Spatial;
+
     public class ObjModel : IEnumerable<Triangle3Indexed>
     {
         private const string LogTag = "ObjModel";
@@ -20,15 +23,26 @@
         private const char PolygonFaceSeparator = '/';
         
         private static readonly char[] LineSplitChars = { ' ' };
-        
+
+        private readonly Octree<Vector3> mergeTree;
+
+        private bool enableMerging;
+
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        public ObjModel()
+        public ObjModel(bool enableMerging = false)
         {
             this.Vertices = new List<Vector3>();
             this.Triangles = new List<Triangle3Indexed>();
             this.Normals = new List<Vector3>();
+            this.NormalMapping = new Dictionary<int, int[]>();
+
+            // Since this is memory heavy we do not provide this by default
+            if (this.enableMerging)
+            {
+                this.mergeTree = new Octree<Vector3>(1f, Vector3.Zero, 1f);
+            }
         }
 
         // -------------------------------------------------------------------
@@ -41,6 +55,8 @@
         public IList<Triangle3Indexed> Triangles { get; }
 
         public IList<Vector3> Normals { get; }
+
+        public IDictionary<int, int[]> NormalMapping { get; }
 
         public BoundingBox BoundingBox { get; private set; }
 
@@ -73,8 +89,7 @@
         {
             GDXAI.Logger.Info(LogTag, "Joining from model");
 
-            this.JoinVerticesAndTriangles(other.Vertices, other.Triangles);
-            this.JoinNormals(other.Normals);
+            this.Join(other.Vertices, other.Normals, other.NormalMapping, other.Triangles, Vector3.Zero);
         }
 
         public void Parse(Stream stream)
@@ -113,11 +128,16 @@
             return result;
         }
 
+        // see https://en.wikipedia.org/wiki/Wavefront_.obj_file
         public void Save(StreamWriter target)
         {
-            int lineCount = 4;
+            GDXAI.Logger.Info(LogTag, "Saving to stream");
 
+            int lineCount = 4;
+            
             target.WriteLine($"g {this.Name ?? "No Name"}");
+
+            GDXAI.Logger.Info(LogTag, string.Format("  - {0} vertices", this.Vertices.Count));
             foreach (Vector3 vertex in this.Vertices)
             {
                 target.WriteLine($"v {vertex.X} {vertex.Y} {vertex.Z}");
@@ -125,6 +145,8 @@
             }
             
             target.WriteLine();
+
+            GDXAI.Logger.Info(LogTag, string.Format("  - {0} normals", this.Normals.Count));
             foreach (Vector3 normal in this.Normals)
             {
                 target.WriteLine($"vn {normal.X} {normal.Y} {normal.Z}");
@@ -132,18 +154,155 @@
             }
 
             target.WriteLine();
-            foreach (Vector3 vertex in this.Vertices)
+            
+            GDXAI.Logger.Info(LogTag, string.Format("  - {0} triangles", this.Triangles.Count));
+            for(var i = 0; i < this.Triangles.Count; i++)
             {
-                target.WriteLine($"vt {vertex.X} {vertex.Y}");
+                var triangle = this.Triangles[i];
+
+                // Currently we do not support texture coordinates
+                if (this.Normals.Count > 0)
+                {
+                    target.WriteLine($"f {triangle.A + 1}//{this.NormalMapping[i][0] + 1} {triangle.B + 1}//{this.NormalMapping[i][1] + 1} {triangle.C + 1}//{this.NormalMapping[i][2] + 1}");
+                }
+                else
+                {
+                    target.WriteLine($"f {triangle.A + 1} {triangle.B + 1} {triangle.C + 1}");
+                }
+
                 lineCount++;
             }
 
-            target.WriteLine();
-            foreach (Triangle3Indexed triangle in this.Triangles)
+            GDXAI.Logger.Info(LogTag, string.Format("  {0} lines", lineCount));
+        }
+
+        public bool Verify()
+        {
+            bool result = true;
+            for (var i = 0; i < this.Triangles.Count; i++)
             {
-                target.WriteLine($"f {triangle.A}/{triangle.A}/{triangle.A} {triangle.B}/{triangle.B}/{triangle.B} {triangle.C}/{triangle.C}/{triangle.C}");
-                lineCount++;
+                var triangle = this.Triangles[i];
+                if (triangle.A < 0 || triangle.A >= this.Vertices.Count 
+                    || triangle.B < 0 || triangle.B >= this.Vertices.Count
+                    || triangle.C < 0 || triangle.C >= this.Vertices.Count)
+                {
+                    GDXAI.Logger.Error(LogTag, string.Format(" - Invalid Triangle {0} / {1}: {2}", i, this.Triangles.Count, triangle));
+                    result = false;
+                }
             }
+
+            return result;
+        }
+
+        public void Join(IList<Vector3> vertices, IList<Triangle3Indexed> triangles, Vector3 offset)
+        {
+            this.Join(vertices, new List<Vector3>(), new Dictionary<int, int[]>(), triangles, offset);
+        }
+
+        public void Join(IList<Vector3> vertices, IList<Vector3> normals, IDictionary<int, int[]> normalMapping, IList<Triangle3Indexed> triangles, Vector3 offset)
+        {
+            int[] indexMap = new int[vertices.Count];
+            int[] normalMap = new int[normals.Count];
+
+            GDXAI.Logger.Info(LogTag, string.Format("- {0} vertices", vertices.Count));
+            bool check = this.Vertices.Count > 0;
+            int skipped = 0;
+            for (var i = 0; i < vertices.Count; i++)
+            {
+                Vector3 finalVertex = vertices[i] + offset;
+                if (!check)
+                {
+                    indexMap[i] = this.AddNewVertex(finalVertex);
+                    continue;
+                }
+
+                if (!this.enableMerging)
+                {
+                    throw new InvalidOperationException("Obj Merge attempted but not enabled");
+                }
+
+                OctreeResult<Vector3> match;
+                if (this.mergeTree.GetAt(finalVertex, out match))
+                {
+                    // TODO
+                }
+                
+                int index = this.Vertices.IndexOf(finalVertex);
+                if (index >= 0)
+                {
+                    indexMap[i] = index;
+                    skipped++;
+                    continue;
+                }
+
+                indexMap[i] = this.AddNewVertex(finalVertex);
+            }
+
+            if (skipped > 0)
+            {
+                GDXAI.Logger.Info(LogTag, string.Format("  {0} duplicates", skipped));
+            }
+
+            GDXAI.Logger.Info(LogTag, string.Format("- {0} normals", normals.Count));
+            bool checkNormals = this.Normals.Count > 0;
+            skipped = 0;
+            for (var i = 0; i < normals.Count; i++)
+            {
+                var normal = normals[i];
+
+                if (!checkNormals)
+                {
+                    normalMap[i] = this.AddNewNormal(normal);
+                    continue;
+                }
+
+                int index = this.Normals.IndexOf(normal);
+                if (index >= 0)
+                {
+                    normalMap[i] = index;
+                    skipped++;
+                    continue;
+                }
+
+                normalMap[i] = this.AddNewNormal(normal);
+            }
+
+            if (skipped > 0)
+            {
+                GDXAI.Logger.Info(LogTag, string.Format("  {0} duplicates", skipped));
+            }
+
+            GDXAI.Logger.Info(LogTag, string.Format("- {0} triangles", triangles.Count));
+            for (var i = 0; i < triangles.Count; i++)
+            {
+                Triangle3Indexed triangle = triangles[i];
+
+                if (check)
+                {
+                    // Re-index the triangle
+                    this.Triangles.Add(new Triangle3Indexed(indexMap[triangle.A], indexMap[triangle.B], indexMap[triangle.C]));
+                }
+                else
+                {
+                    this.Triangles.Add(triangle);
+                }
+
+                // Remap the normals for this triangle and 
+                if (normalMapping.Count > 0)
+                {
+                    int[] map = new int[3];
+                    for (var n = 0; n < 3; n++)
+                    {
+                        int normalIndex = normalMapping[i][n];
+                        map[n] = normalMap[normalIndex];
+                    }
+
+                    this.NormalMapping.Add(this.Triangles.Count - 1, map);
+                }
+            }
+
+            this.CleanOrphans();
+            this.RecalculateBounds();
         }
 
         // -------------------------------------------------------------------
@@ -199,6 +358,47 @@
             context.TempNormals.Add(normal);
         }
 
+        private static void ReadPolyFacePoint(string[] face, out int vertex, out int? texture, out int? normal)
+        {
+            texture = null;
+            normal = null;
+
+            switch (face.Length)
+            {
+                case 1:
+                    {
+                        vertex = int.Parse(face[0]);
+                        return;
+                    }
+
+                case 2:
+                    {
+                        vertex = int.Parse(face[0]);
+                        texture = int.Parse(face[1]);
+                        return;
+                    }
+
+                case 3:
+                    {
+                        vertex = int.Parse(face[0]);
+
+                        if (!string.IsNullOrEmpty(face[1]))
+                        {
+                            // Texture is optional when having normals
+                            texture = int.Parse(face[1]);
+                        }
+
+                        normal = int.Parse(face[2]);
+                        return;
+                    }
+
+                default:
+                    {
+                        throw new DataException("Invalid PolyFace Data");
+                    }
+            }
+        }
+
         [SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1501:StatementMustNotBeOnSingleLine", Justification = "Reviewed. Suppression is OK here.")]
         private static void ProcessPolygonFace(ParsingContext context)
         {
@@ -211,29 +411,47 @@
             if (context.CurrentSegments.Length == 4)
             {
                 int v0, v1, v2;
-                int n0, n1, n2;
+                int? n0, n1, n2;
+                int? t0, t1, t2;
 
-                if (!int.TryParse(context.CurrentSegments[1].Split(PolygonFaceSeparator)[0], out v0)) { return; }
-                if (!int.TryParse(context.CurrentSegments[2].Split(PolygonFaceSeparator)[0], out v1)) { return; }
-                if (!int.TryParse(context.CurrentSegments[3].Split(PolygonFaceSeparator)[0], out v2)) { return; }
-                if (!int.TryParse(context.CurrentSegments[1].Split(PolygonFaceSeparator)[2], out n0)) { return; }
-                if (!int.TryParse(context.CurrentSegments[2].Split(PolygonFaceSeparator)[2], out n1)) { return; }
-                if (!int.TryParse(context.CurrentSegments[3].Split(PolygonFaceSeparator)[2], out n2)) { return; }
+                string[] f0 = context.CurrentSegments[1].Split(PolygonFaceSeparator);
+                string[] f1 = context.CurrentSegments[2].Split(PolygonFaceSeparator);
+                string[] f2 = context.CurrentSegments[3].Split(PolygonFaceSeparator);
+
+                ReadPolyFacePoint(f0, out v0, out n0, out t0);
+                ReadPolyFacePoint(f1, out v1, out n1, out t1);
+                ReadPolyFacePoint(f2, out v2, out n2, out t2);
 
                 v0 -= 1;
                 v1 -= 1;
                 v2 -= 1;
-                n0 -= 1;
-                n1 -= 1;
-                n2 -= 1;
-                
+                if (n0 != null) n0 -= 1;
+                if (n1 != null) n1 -= 1;
+                if (n2 != null) n2 -= 1;
+                if (t0 != null) t0 -= 1;
+                if (t1 != null) t1 -= 1;
+                if (t2 != null) t2 -= 1;
+
                 context.Triangles.Add(new Triangle3Indexed(v0, v1, v2));
 
-                if (context.TempNormals.Count > 0)
+                // Check if we have some normals but not all
+                if (n0 != null || n1 != null || n2 != null)
                 {
-                    context.Normals.Add(context.TempNormals[n0]);
-                    context.Normals.Add(context.TempNormals[n1]);
-                    context.Normals.Add(context.TempNormals[n2]);
+                    if (n0 == null || n1 == null || n2 == null)
+                    {
+                        throw new DataException("Partial normals are not allowed");
+                    }
+                }
+                
+                if (context.TempNormals.Count > 0 && t0 != null && t1 != null && t2 != null)
+                {
+                    context.Normals.Add(context.TempNormals[n0.Value]);
+                    context.Normals.Add(context.TempNormals[n1.Value]);
+                    context.Normals.Add(context.TempNormals[n2.Value]);
+
+                    context.NormalMapping.Add(
+                            context.Triangles.Count - 1,
+                            new[] { context.Normals.Count - 3, context.Normals.Count - 2, context.Normals.Count - 1 });
                 }
             }
             else
@@ -266,6 +484,9 @@
                         context.Normals.Add(context.TempNormals[n0]);
                         context.Normals.Add(context.TempNormals[ni]);
                         context.Normals.Add(context.TempNormals[nii]);
+                        context.NormalMapping.Add(
+                            context.Triangles.Count - 1,
+                            new[] { context.Normals.Count - 3, context.Normals.Count - 2, context.Normals.Count - 1 });
                     }
                 }
             }
@@ -371,78 +592,11 @@
 
             this.BoundingBox = newBounds;
         }
-
-        private void JoinNormals(IList<Vector3> normals)
-        {
-            GDXAI.Logger.Info(LogTag, string.Format("- {0} normals", normals.Count));
-            bool checkNormals = this.Normals.Count > 0;
-            int skipped = 0;
-            foreach (Vector3 normal in normals)
-            {
-                if (!checkNormals || !this.Normals.Contains(normal))
-                {
-                    this.Normals.Add(normal);
-                }
-                else
-                {
-                    skipped++;
-                }
-            }
-
-            if (skipped > 0)
-            {
-                GDXAI.Logger.Info(LogTag, string.Format("  {0} duplicates", skipped));
-            }
-        }
-
-        private void JoinVerticesAndTriangles(IList<Vector3> vertices, IList<Triangle3Indexed> triangles)
-        {
-            int[] indexMap = new int[vertices.Count];
-
-            GDXAI.Logger.Info(LogTag, string.Format("- {0} vertices", vertices.Count));
-            bool check = this.Vertices.Count > 0;
-            int skipped = 0;
-            for (var i = 0; i < vertices.Count; i++)
-            {
-                if (!check || !this.Vertices.Contains(vertices[i]))
-                {
-                    this.Vertices.Add(vertices[i]);
-                    indexMap[i] = this.Vertices.Count - 1;
-                }
-                else
-                {
-                    indexMap[i] = i;
-                    skipped++;
-                }
-            }
-
-            if (skipped > 0)
-            {
-                GDXAI.Logger.Info(LogTag, string.Format("  {0} duplicates", skipped));
-            }
-
-            GDXAI.Logger.Info(LogTag, string.Format("- {0} triangles", triangles.Count));
-            foreach (Triangle3Indexed triangle in triangles)
-            {
-                if (check)
-                {
-                    // Re-index the triangle
-                    this.Triangles.Add(new Triangle3Indexed(indexMap[triangle.A], indexMap[triangle.B], indexMap[triangle.C]));
-                }
-                else
-                {
-                    this.Triangles.Add(triangle);
-                }
-            }
-            
-            this.RecalculateBounds();
-        }
-
+        
         private void Join(ParsingContext context)
         {
             this.Name = this.Name ?? context.Name;
-            this.JoinVerticesAndTriangles(context.TempVertices, context.Triangles);
-            this.JoinNormals(context.Normals);
+            this.Join(context.TempVertices, context.Normals, context.NormalMapping, context.Triangles, Vector3.Zero);
         }
 
         private ParsingContext DoParse(Stream stream)
@@ -479,6 +633,27 @@
             return context;
         }
 
+        private void CleanOrphans()
+        {
+            int[] vertexCheck = new int[this.Vertices.Count];
+            int[] normalCheck = new int[this.Normals.Count];
+            for (var i = 0; i < this.Triangles.Count; i++)
+            {
+                var triangle = this.Triangles[i];
+                if (this.NormalMapping.ContainsKey(i))
+                {
+                    for (var n = 0; n < 3; n++)
+                    {
+                        normalCheck[this.NormalMapping[i][n]]++;
+                    }
+                }
+
+                vertexCheck[triangle.A]++;
+                vertexCheck[triangle.B]++;
+                vertexCheck[triangle.C]++;
+            }
+        }
+
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Reviewed. Suppression is OK here.")]
         private class ParsingContext
         {
@@ -486,6 +661,7 @@
             {
                 this.Triangles = new List<Triangle3Indexed>();
                 this.Normals = new List<Vector3>();
+                this.NormalMapping = new Dictionary<int, int[]>();
 
                 this.TempNormals = new List<Vector3>();
                 this.TempVertices = new List<Vector3>();
@@ -495,6 +671,7 @@
 
             public IList<Triangle3Indexed> Triangles { get; }
             public IList<Vector3> Normals { get; }
+            public IDictionary<int, int[]> NormalMapping { get; }
 
             public IList<Vector3> TempVertices { get; }
             public IList<Vector3> TempNormals { get; }
@@ -502,6 +679,24 @@
             public int CurrentLineNumber { get; set; }
             public string CurrentLine { get; set; }
             public string[] CurrentSegments { get; set; }
+        }
+        
+        private int AddNewVertex(Vector3 vertex)
+        {
+            this.Vertices.Add(vertex);
+
+            if (this.enableMerging)
+            {
+                this.mergeTree.Add(vertex, vertex);
+            }
+
+            return this.Vertices.Count - 1;
+        }
+
+        private int AddNewNormal(Vector3 normal)
+        {
+            this.Normals.Add(normal);
+            return this.Normals.Count - 1;
         }
     }
 }
