@@ -7,6 +7,8 @@
 
     using Enums;
 
+    using NLog;
+
     using Utils;
 
     /// <summary>
@@ -14,7 +16,7 @@
     /// </summary>
     public class MessageDispatcher : ITelegraph
     {
-        public static readonly string LogTag = typeof(MessageDispatcher).Name;
+        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
 
         private static readonly MessageDispatcherPool Pool = new MessageDispatcherPool();
 
@@ -273,9 +275,7 @@
                 if (this.DebugEnabled)
                 {
                     float currentTime = GDXAI.TimePiece.Time;
-                    GDXAI.Logger.Info(
-                        LogTag,
-                        string.Format("Instant telegram dispatched at time: {0} by {1} for {2}. Message code is " + message, currentTime, sender, receiver));
+                    Logger.Info("Instant telegram dispatched at time: {0} by {1} for {2}. Message code is " + message, currentTime, sender, receiver);
                 }
 
                 // Send the telegram to the recipient
@@ -301,15 +301,11 @@
                 {
                     if (added)
                     {
-                        GDXAI.Logger.Info(
-                            LogTag,
-                            string.Format("Delayed telegram from {0} for {1} recorded at time {2}. Message code is {3}", sender, receiver, currentTime, message));
+                        Logger.Info("Delayed telegram from {0} for {1} recorded at time {2}. Message code is {3}", sender, receiver, currentTime, message);
                     }
                     else
                     {
-                        GDXAI.Logger.Info(
-                            LogTag,
-                            string.Format("Delayed telegram from {0} for {1} rejected by the queue. Message code is {2}", sender, receiver, message));
+                        Logger.Info("Delayed telegram from {0} for {1} rejected by the queue. Message code is {2}", sender, receiver, message);
                     }
                 }
             }
@@ -344,14 +340,9 @@
 
                 if (this.DebugEnabled)
                 {
-                    GDXAI.Logger.Info(
-                        LogTag,
-                        string.Format(
-                            "Queued telegram ready for dispatch: Sent to {0}. Message code is {1}",
-                            telegram.Receiver,
-                            telegram.Message));
+                    Logger.Info("Queued telegram ready for dispatch: Sent to {0}. Message code is {1}", telegram.Receiver, telegram.Message);
                 }
-
+                
                 // Send the telegram to the recipient
                 this.Discharge(telegram);
 
@@ -400,7 +391,7 @@
                     // Telegram could not be handled
                     if (this.DebugEnabled)
                     {
-                        GDXAI.Logger.Info(LogTag, string.Format("Message {0} not handled", telegram.Message));
+                        Logger.Info("Message {0} not handled", telegram.Message);
                     }
                 }
             }
@@ -423,7 +414,7 @@
                 // Telegram could not be handled
                 if (this.DebugEnabled && handledCount == 0)
                 {
-                    GDXAI.Logger.Info(LogTag, string.Format("Message {0} not handled", telegram.Message));
+                    Logger.Info("Message {0} not handled", telegram.Message);
                 }
             }
 

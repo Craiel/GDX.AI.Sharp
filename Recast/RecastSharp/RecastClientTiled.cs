@@ -2,10 +2,14 @@
 {
     using System.Collections.Generic;
 
+    using NLog;
+
     using RecastWrapper;
 
     public class RecastClientTiled : RecastClient
     {
+        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly ManagedRecastClientTiled typedClient;
 
         // -------------------------------------------------------------------
@@ -44,7 +48,7 @@
             IList<string> buildlogText = this.ManagedClient.GetLogText();
             foreach (string line in buildlogText)
             {
-                GDXAI.Logger.Info("RecastClient", line);
+                Logger.Info(line);
             }
 
             return result;

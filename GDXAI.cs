@@ -19,13 +19,6 @@
         static GDXAI()
         {
             TimePiece = new DefaultTimePiece();
-            
-#if TRACE
-            // If we have tracing enabled use the trace logger
-            Logger = new NLogLogger();
-#else
-            Logger = new NullLogger();
-#endif
 
             // Initialize Random but can be re-seeded if needed
             Rand = new Random((int)DateTime.Now.Ticks);
@@ -35,11 +28,7 @@
         // Public
         // -------------------------------------------------------------------
         public static ITimePiece TimePiece { get; set; }
-
-        public static ILogger Logger { get; set; }
-
-        public static IFileSystem FileSystem { get; set; }
-
+        
         /// <summary>
         /// The <see cref="Random"/> instance used, re-seed if you want defined behavior
         /// </summary>

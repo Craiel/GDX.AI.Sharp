@@ -4,13 +4,15 @@
 
     using Microsoft.Xna.Framework;
 
+    using NLog;
+
     public class Octree<T>
         where T : class
     {
+        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
+
         private const int RecursionCheckDepth = 20;
-
-        private const string LogTag = "Octree";
-
+        
         private OctreeNode<T> root;
 
         // -------------------------------------------------------------------
@@ -20,7 +22,7 @@
         {
             if (minNodeSize > initialSize)
             {
-                GDXAI.Logger.Info(LogTag, string.Format("Minimum node size must be bigger or equal initial size: {0} > {1}", minNodeSize, initialSize));
+                Logger.Info("Minimum node size must be bigger or equal initial size: {0} > {1}", minNodeSize, initialSize);
                 minNodeSize = initialSize;
             }
 
@@ -65,7 +67,7 @@
 
                 if (++recursionCheck > RecursionCheckDepth)
                 {
-                    GDXAI.Logger.Info(LogTag, "Add Operation exceeded recursion check");
+                    Logger.Info("Add Operation exceeded recursion check");
                     return false;
                 }
             }

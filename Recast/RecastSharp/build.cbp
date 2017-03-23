@@ -2,6 +2,7 @@
 --#include "$(PROJECT_ROOT)sys/common.cbi"
 --#include "$(PROJECT_ROOT)sys/default.cbi"
 --#include "$(PROJECT_ROOT)sys/ext_protobuf.cbi"
+--#include "$(PROJECT_ROOT)sys/ext_nlog.cbi"
 
 print "Configuring Build with CrystalBuild version $(CB_VER) ..."
 

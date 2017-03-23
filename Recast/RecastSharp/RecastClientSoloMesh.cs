@@ -1,11 +1,15 @@
 ﻿namespace GDX.AI.Sharp.Recast.RecastSharp
 {
     using System.Collections.Generic;
-    
+
+    using NLog;
+
     using RecastWrapper;
 
     public class RecastClientSoloMesh : RecastClient
     {
+        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly ManagedRecastClientSoloMesh typedClient;
 
         // -------------------------------------------------------------------
@@ -29,7 +33,7 @@
             IList<string> buildlogText = this.ManagedClient.GetLogText();
             foreach (string line in buildlogText)
             {
-                GDXAI.Logger.Debug("RecastClient", line);
+                Logger.Debug(line);
             }
 
             return result;
