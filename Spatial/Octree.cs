@@ -5,6 +5,7 @@
     using Microsoft.Xna.Framework;
 
     public class Octree<T>
+        where T : class
     {
         private const int RecursionCheckDepth = 20;
 
@@ -27,24 +28,26 @@
             this.MinNodeSize = minNodeSize;
             this.InitialPosition = initialPosition;
             
-            this.root = new OctreeNode<T>(initialSize, minNodeSize, initialPosition);
+            this.root = new OctreeNode<T>(this, initialSize, minNodeSize, initialPosition);
+
+            this.AutoGrow = true;
         }
 
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public float InitialSize { get; private set; }
+        public float InitialSize { get; }
 
-        public float MinNodeSize { get; private set; }
+        public float MinNodeSize { get; }
 
-        public Vector3 InitialPosition { get; private set; }
+        public Vector3 InitialPosition { get; }
         
         public int Count { get; private set; }
 
         public bool AutoGrow { get; set; }
 
         public bool AutoShrink { get; set; }
-
+        
         public bool Add(T obj, Vector3 objPos)
         {
             // Add object or expand the octree until it can be added
@@ -53,7 +56,7 @@
             {
                 if (this.AutoGrow)
                 {
-                    this.Grow(objPos - this.root.Center);
+                    this.Grow();
                 }
                 else
                 {
@@ -89,6 +92,11 @@
             return false;
         }
 
+        public int CountObjects()
+        {
+            return this.root.CountObjects();
+        }
+
         public bool GetAt(Vector3 position, out OctreeResult<T> result)
         {
             return this.root.GetAt(position, out result);
@@ -101,60 +109,20 @@
             return results.Count;
         }
 
-        public void Grow(Vector3 direction)
+        public void Grow()
         {
-            int xDirection = direction.X >= 0 ? 1 : -1;
-            int yDirection = direction.Y >= 0 ? 1 : -1;
-            int zDirection = direction.Z >= 0 ? 1 : -1;
-            OctreeNode<T> oldRoot = this.root;
-            float half = this.root.Size / 2f;
             float newSize = this.root.Size * 2f;
-            Vector3 newCenter = this.root.Center + new Vector3(xDirection * half, yDirection * half, zDirection * half);
             
-            // Create 7 new octree children to go with the old root as children of the new root
-            int rootPos = GetRootPositionIndex(xDirection, yDirection, zDirection);
-            OctreeNode<T>[] children = new OctreeNode<T>[8];
-            for (int i = 0; i < 8; i++)
-            {
-                if (i == rootPos)
-                {
-                    children[i] = oldRoot;
-                }
-                else
-                {
-                    xDirection = i % 2 == 0 ? -1 : 1;
-                    yDirection = i > 3 ? -1 : 1;
-                    zDirection = (i < 2 || (i > 3 && i < 6)) ? -1 : 1;
-                    children[i] = new OctreeNode<T>(newSize, this.MinNodeSize, newCenter + new Vector3(xDirection * half, yDirection * half, zDirection * half));
-                }
-            }
-
-            // Attach the new children to the new root node
-            this.root = new OctreeNode<T>(newSize, this.MinNodeSize, newCenter, children: children);
+            var newRoot = new OctreeNode<T>(this, newSize, this.MinNodeSize, this.InitialPosition);
+            newRoot.Split();
+            int rootPos = OctreeNode<T>.GetChildIndex(newRoot.Center, this.root.Center);
+            newRoot.SetChild(rootPos, this.root);
+            this.root = newRoot;
         }
 
         public bool Shrink()
         {
             return this.root.Shrink(this.InitialSize, ref this.root);
-        }
-
-        // -------------------------------------------------------------------
-        // Private
-        // -------------------------------------------------------------------
-        private static int GetRootPositionIndex(int x, int y, int z)
-        {
-            int result = x > 0 ? 1 : 0;
-            if (y < 0)
-            {
-                result += 4;
-            }
-
-            if (z > 0)
-            {
-                result += 2;
-            }
-
-            return result;
         }
     }
 }

@@ -24,7 +24,7 @@
         
         private static readonly char[] LineSplitChars = { ' ' };
 
-        private readonly Octree<Vector3> mergeTree;
+        private readonly Octree<SpatialInfo> mergeTree;
 
         private bool enableMerging;
 
@@ -38,10 +38,12 @@
             this.Normals = new List<Vector3>();
             this.NormalMapping = new Dictionary<int, int[]>();
 
+            this.enableMerging = enableMerging;
+
             // Since this is memory heavy we do not provide this by default
             if (this.enableMerging)
             {
-                this.mergeTree = new Octree<Vector3>(1f, Vector3.Zero, 1f);
+                this.mergeTree = new Octree<SpatialInfo>(1f, Vector3.Zero, 1f);
             }
         }
 
@@ -199,7 +201,58 @@
             this.Join(vertices, new List<Vector3>(), new Dictionary<int, int[]>(), triangles, offset);
         }
 
-        public void Join(IList<Vector3> vertices, IList<Vector3> normals, IDictionary<int, int[]> normalMapping, IList<Triangle3Indexed> triangles, Vector3 offset)
+        public void Join(
+            IList<Vector3> vertices,
+            IList<Vector3> normals,
+            IDictionary<int, int[]> normalMapping,
+            IList<Triangle3Indexed> triangles,
+            Vector3 offset)
+        {
+            IList<Triangle3> triangleList = new List<Triangle3>();
+            for (var i = 0; i < triangles.Count; i++)
+            {
+                Triangle3Indexed indexed = triangles[i];
+                triangleList.Add(new Triangle3(vertices[indexed.A], vertices[indexed.B], vertices[indexed.C]));
+            }
+
+            Octree<SpatialInfo> cleanTree = new Octree<SpatialInfo>(1, Vector3.Zero, 1);
+            IList<Vector3> cleanVertices = new List<Vector3>();
+            IList<Triangle3Indexed> cleanTriangles = new List<Triangle3Indexed>();
+            
+            for (var i = 0; i < triangleList.Count; i++)
+            {
+                Triangle3 triangle = triangleList[i];
+                int indexA = IndexOfVertex(cleanTree, triangle.A);
+
+                if (indexA < 0)
+                {
+                    indexA = AddNewVertex(cleanVertices, triangle.A, cleanTree);
+                }
+
+                int indexB = IndexOfVertex(cleanTree, triangle.B);
+                if (indexB < 0)
+                {
+                    indexB = AddNewVertex(cleanVertices, triangle.B, cleanTree);
+                }
+
+                int indexC = IndexOfVertex(cleanTree, triangle.C);
+                if (indexC < 0)
+                {
+                    indexC = AddNewVertex(cleanVertices, triangle.C, cleanTree);
+                }
+
+                cleanTriangles.Add(new Triangle3Indexed(indexA, indexB, indexC));
+            }
+
+            if (cleanVertices.Count != vertices.Count)
+            {
+                GDXAI.Logger.Info(LogTag, string.Format("- {0} orphan vertices", vertices.Count - cleanVertices.Count));
+            }
+
+            this.DoJoin(cleanVertices, normals, normalMapping, cleanTriangles, offset);
+        }
+
+        private void DoJoin(IList<Vector3> vertices, IList<Vector3> normals, IDictionary<int, int[]> normalMapping, IList<Triangle3Indexed> triangles, Vector3 offset)
         {
             int[] indexMap = new int[vertices.Count];
             int[] normalMap = new int[normals.Count];
@@ -212,7 +265,7 @@
                 Vector3 finalVertex = vertices[i] + offset;
                 if (!check)
                 {
-                    indexMap[i] = this.AddNewVertex(finalVertex);
+                    indexMap[i] = AddNewVertex(this.Vertices, finalVertex, this.mergeTree);
                     continue;
                 }
 
@@ -220,14 +273,8 @@
                 {
                     throw new InvalidOperationException("Obj Merge attempted but not enabled");
                 }
-
-                OctreeResult<Vector3> match;
-                if (this.mergeTree.GetAt(finalVertex, out match))
-                {
-                    // TODO
-                }
                 
-                int index = this.Vertices.IndexOf(finalVertex);
+                int index = IndexOfVertex(this.mergeTree, finalVertex);
                 if (index >= 0)
                 {
                     indexMap[i] = index;
@@ -235,7 +282,7 @@
                     continue;
                 }
 
-                indexMap[i] = this.AddNewVertex(finalVertex);
+                indexMap[i] = AddNewVertex(this.Vertices, finalVertex, this.mergeTree);
             }
 
             if (skipped > 0)
@@ -252,11 +299,11 @@
 
                 if (!checkNormals)
                 {
-                    normalMap[i] = this.AddNewNormal(normal);
+                    normalMap[i] = AddNewNormal(this.Normals, normal, this.mergeTree);
                     continue;
                 }
 
-                int index = this.Normals.IndexOf(normal);
+                int index = IndexOfNormal(this.mergeTree, normal);
                 if (index >= 0)
                 {
                     normalMap[i] = index;
@@ -264,7 +311,7 @@
                     continue;
                 }
 
-                normalMap[i] = this.AddNewNormal(normal);
+                normalMap[i] = AddNewNormal(this.Normals, normal, this.mergeTree);
             }
 
             if (skipped > 0)
@@ -569,6 +616,70 @@
             target.Max.Z += padding;
         }
 
+        private static int AddNewVertex(IList<Vector3> target, Vector3 vertex, Octree<SpatialInfo> mergeTree)
+        {
+            target.Add(vertex);
+            int index = target.Count - 1;
+
+            if (mergeTree != null)
+            {
+                OctreeResult<SpatialInfo> info;
+                if (mergeTree.GetAt(vertex, out info))
+                {
+                    info.Entry.Vertex = index;
+                }
+                else
+                {
+                    mergeTree.Add(new SpatialInfo(index), vertex);
+                }
+            }
+
+            return index;
+        }
+
+        private static int AddNewNormal(IList<Vector3> target, Vector3 normal, Octree<SpatialInfo> mergeTree)
+        {
+            target.Add(normal);
+            int index = target.Count - 1;
+
+            if (mergeTree != null)
+            {
+                OctreeResult<SpatialInfo> info;
+                if (mergeTree.GetAt(normal, out info))
+                {
+                    info.Entry.Normal = index;
+                }
+                else
+                {
+                    mergeTree.Add(new SpatialInfo(null, index), normal);
+                }
+            }
+
+            return index;
+        }
+
+        private static int IndexOfVertex(Octree<SpatialInfo> tree, Vector3 position)
+        {
+            OctreeResult<SpatialInfo> result;
+            if (tree.GetAt(position, out result) && result.Entry.Vertex != null)
+            {
+                return result.Entry.Vertex.Value;
+            }
+
+            return -1;
+        }
+
+        private static int IndexOfNormal(Octree<SpatialInfo> tree, Vector3 position)
+        {
+            OctreeResult<SpatialInfo> result;
+            if (tree.GetAt(position, out result) && result.Entry.Normal != null)
+            {
+                return result.Entry.Normal.Value;
+            }
+
+            return -1;
+        }
+
         private void RecalculateBounds()
         {
             this.RecalculateBounds(MathUtils.Epsilon * 2f);
@@ -681,22 +792,17 @@
             public string[] CurrentSegments { get; set; }
         }
         
-        private int AddNewVertex(Vector3 vertex)
+        private class SpatialInfo
         {
-            this.Vertices.Add(vertex);
+            public int? Vertex { get; set; }
 
-            if (this.enableMerging)
+            public int? Normal { get; set; }
+
+            public SpatialInfo(int? vertex = null, int? normal = null)
             {
-                this.mergeTree.Add(vertex, vertex);
+                this.Vertex = vertex;
+                this.Normal = normal;
             }
-
-            return this.Vertices.Count - 1;
-        }
-
-        private int AddNewNormal(Vector3 normal)
-        {
-            this.Normals.Add(normal);
-            return this.Normals.Count - 1;
         }
     }
 }

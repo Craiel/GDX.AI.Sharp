@@ -3,6 +3,7 @@
     using Microsoft.Xna.Framework;
 
     public struct OctreeResult<T>
+        where T : class
     {
         public readonly T Entry;
 

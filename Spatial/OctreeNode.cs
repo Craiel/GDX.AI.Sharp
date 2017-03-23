@@ -5,29 +5,33 @@
     using Microsoft.Xna.Framework;
 
     public class OctreeNode<T>
+        where T : class
     {
         private const int DefaultObjectLimit = 15;
+
+        private readonly Octree<T> parent;
 
         private T[] objects;
         private Vector3[] objectPositions;
         private int nextFree;
 
+        private OctreeNode<T>[] children;
+
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        public OctreeNode(float baseSize, float minSize, Vector3 center, int objectLimit = DefaultObjectLimit, OctreeNode<T>[] children = null)
+        public OctreeNode(Octree<T> parent, float size, float minSize, Vector3 min, int objectLimit = DefaultObjectLimit)
         {
-            this.Size = baseSize;
+            this.parent = parent;
+
+            this.Size = size;
             this.MinSize = minSize;
-            this.Center = center;
-
-            Vector3 offset = new Vector3(this.Size);
-            this.Bounds = new BoundingBox(this.Center - offset, this.Center + offset);
-
+            
+            this.Bounds = new BoundingBox(min, min + new Vector3(size));
+            this.Center = this.Bounds.Min + (this.Bounds.Max - this.Bounds.Min) / 2;
+            
             this.objects = new T[objectLimit];
             this.objectPositions = new Vector3[objectLimit];
-
-            this.Children = children;
             
             this.UpdateChildBounds();
         }
@@ -39,23 +43,32 @@
 
         public float Size { get; private set; }
 
-        public float MinSize { get; private set; }
+        public float MinSize { get; }
 
-        public BoundingBox Bounds { get; private set; }
+        public BoundingBox Bounds { get; }
 
         public BoundingBox[] ChildBounds { get; private set; }
-
-        public OctreeNode<T>[] Children { get; private set; }
 
         public bool AutoMerge { get; set; }
 
         public int Count { get; private set; }
+
+        public static int GetChildIndex(Vector3 center, Vector3 position)
+        {
+            return (position.X <= center.X ? 0 : 1) + (position.Y >= center.Y ? 0 : 4) + (position.Z <= center.Z ? 0 : 2);
+        }
 
         public bool Add(T obj, Vector3 position)
         {
             if (this.Bounds.Contains(position) == ContainmentType.Disjoint)
             {
                 return false;
+            }
+
+            if (this.children != null)
+            {
+                int index = GetChildIndex(this.Center, position);
+                return this.children[index].Add(obj, position);
             }
 
             if (this.Count < this.objects.Length || (this.Size / 2) < this.MinSize)
@@ -78,16 +91,17 @@
                     continue;
                 }
 
-                childIndex = this.GetChildIndex(this.objectPositions[i]);
-                this.Children[childIndex].Add(this.objects[i], this.objectPositions[i]);
+                childIndex = GetChildIndex(this.Center, this.objectPositions[i]);
+                this.children[childIndex].Add(this.objects[i], this.objectPositions[i]);
                 this.DeleteObject(i);
             }
 
             this.nextFree = 0;
+            this.Count = 0;
 
             // Now handle the new object we're adding now
-            childIndex = this.GetChildIndex(position);
-            this.Children[childIndex].Add(obj, position);
+            childIndex = GetChildIndex(this.Center, position);
+            this.children[childIndex].Add(obj, position);
 
             return true;
         }
@@ -95,12 +109,12 @@
         public bool Remove(T obj)
         {
             // If we have child nodes check those
-            if (this.Children != null)
+            if (this.children != null)
             {
                 bool found = false;
                 for (int i = 0; i < 8; i++)
                 {
-                    found = this.Children[i].Remove(obj);
+                    found = this.children[i].Remove(obj);
                     if (found)
                     {
                         break;
@@ -140,14 +154,34 @@
             return false;
         }
 
+        public int CountObjects()
+        {
+            int count = this.Count;
+            if (this.children != null)
+            {
+                for (var i = 0; i < this.children.Length; i++)
+                {
+                    count += this.children[i].CountObjects();
+                }
+            }
+
+            return count;
+        }
+
         public bool GetAt(Vector3 position, out OctreeResult<T> result)
         {
             result = default(OctreeResult<T>);
-            if (this.Children != null)
+
+            if (this.Bounds.Contains(position) == ContainmentType.Disjoint)
             {
-                for (var i = 0; i < this.Children.Length; i++)
+                return false;
+            }
+            
+            if (this.children != null)
+            {
+                for (var i = 0; i < this.children.Length; i++)
                 {
-                    if (this.Children[i].GetAt(position, out result))
+                    if (this.children[i].GetAt(position, out result))
                     {
                         return true;
                     }
@@ -158,6 +192,11 @@
 
             for (var i = 0; i < this.objectPositions.Length; i++)
             {
+                if (this.objects[i] == null)
+                {
+                    continue;
+                }
+
                 if (this.objectPositions[i] == position)
                 {
                     result = new OctreeResult<T>(this.objects[i], position);
@@ -180,11 +219,11 @@
             }
 
             // Check children if any
-            if (this.Children != null)
+            if (this.children != null)
             {
-                for (int i = 0; i < this.Children.Length; i++)
+                for (int i = 0; i < this.children.Length; i++)
                 {
-                    this.Children[i].GetNearby(ref ray, ref maxDistance, ref result);
+                    this.children[i].GetNearby(ref ray, ref maxDistance, ref result);
                 }
 
                 return;
@@ -212,7 +251,7 @@
                 return false;
             }
 
-            if (this.Count == 0 && this.Children == null)
+            if (this.Count == 0 && this.children == null)
             {
                 return false;
             }
@@ -220,12 +259,12 @@
             int bestFit = -1;
 
             // Check objects in children if there are any
-            if (this.Children != null)
+            if (this.children != null)
             {
                 bool childHadContent = false;
-                for (int i = 0; i < this.Children.Length; i++)
+                for (int i = 0; i < this.children.Length; i++)
                 {
-                    if (this.Children[i].Count > 0)
+                    if (this.children[i].Count > 0)
                     {
                         if (childHadContent)
                         {
@@ -244,7 +283,7 @@
                     }
                 }
 
-                parentNode = this.Children[bestFit];
+                parentNode = this.children[bestFit];
                 return true;
             }
 
@@ -252,7 +291,7 @@
             for (int i = 0; i < this.objects.Length; i++)
             {
                 Vector3 position = this.objectPositions[i];
-                int newBestFit = this.GetChildIndex(position);
+                int newBestFit = GetChildIndex(this.Center, position);
                 if (i == 0 || newBestFit == bestFit)
                 {
                     if (bestFit < 0)
@@ -268,8 +307,12 @@
             }
             
             this.Size = this.Size / 2;
-            this.Center = this.ChildBounds[bestFit].Min + (this.ChildBounds[bestFit].Max - this.ChildBounds[bestFit].Min);
             return true;
+        }
+
+        public void SetChild(int index, OctreeNode<T> node)
+        {
+            this.children[index] = node;
         }
 
         // -------------------------------------------------------------------
@@ -278,11 +321,6 @@
         private static float RayDistance(Ray ray, Vector3 point)
         {
             return Vector3.Cross(ray.Direction, point - ray.Position).Length();
-        }
-
-        private int GetChildIndex(Vector3 position)
-        {
-            return (position.X <= this.Center.X ? 0 : 1) + (position.Y >= this.Center.Y ? 0 : 4) + (position.Z <= this.Center.Z ? 0 : 2);
         }
         
         private void UpdateChildBounds()
@@ -319,27 +357,26 @@
             }
         }
 
-        private void Split()
+        internal void Split()
         {
-            float quarter = this.Size / 4f;
-            float newLength = this.Size / 2;
-            this.Children = new OctreeNode<T>[8];
-            this.Children[0] = new OctreeNode<T>(newLength, this.MinSize, Center + new Vector3(-quarter, quarter, -quarter));
-            this.Children[1] = new OctreeNode<T>(newLength, this.MinSize, Center + new Vector3(quarter, quarter, -quarter));
-            this.Children[2] = new OctreeNode<T>(newLength, this.MinSize, Center + new Vector3(-quarter, quarter, quarter));
-            this.Children[3] = new OctreeNode<T>(newLength, this.MinSize, Center + new Vector3(quarter, quarter, quarter));
-            this.Children[4] = new OctreeNode<T>(newLength, this.MinSize, Center + new Vector3(-quarter, -quarter, -quarter));
-            this.Children[5] = new OctreeNode<T>(newLength, this.MinSize, Center + new Vector3(quarter, -quarter, -quarter));
-            this.Children[6] = new OctreeNode<T>(newLength, this.MinSize, Center + new Vector3(-quarter, -quarter, quarter));
-            this.Children[7] = new OctreeNode<T>(newLength, this.MinSize, Center + new Vector3(quarter, -quarter, quarter));
+            float half = this.Size / 2f;
+            this.children = new OctreeNode<T>[8];
+            this.children[0] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, half, 0));
+            this.children[1] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, half, 0));
+            this.children[2] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, half, half));
+            this.children[3] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, half, half));
+            this.children[4] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, 0, 0));
+            this.children[5] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, 0, 0));
+            this.children[6] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, 0, half));
+            this.children[7] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, 0, half));
         }
 
         private bool ShouldMerge()
         {
             int count = 0;
-            for (var i = 0; i < this.Children.Length; i++)
+            for (var i = 0; i < this.children.Length; i++)
             {
-                count += this.Children[i].Count;
+                count += this.children[i].Count;
             }
 
             return count < this.objects.Length;
@@ -347,9 +384,9 @@
 
         private void Merge()
         {
-            for (int i = 0; i < this.Children.Length; i++)
+            for (int i = 0; i < this.children.Length; i++)
             {
-                OctreeNode<T> child = this.Children[i];
+                OctreeNode<T> child = this.children[i];
                 int count = child.Count;
                 for (int j = count - 1; j >= 0; j--)
                 {
@@ -360,7 +397,7 @@
             }
 
             // Remove the child nodes (and the objects in them - they've been added elsewhere now)
-            this.Children = null;
+            this.children = null;
         }
     }
 }
