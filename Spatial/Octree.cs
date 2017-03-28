@@ -33,6 +33,7 @@
             this.root = new OctreeNode<T>(this, initialSize, minNodeSize, initialPosition);
 
             this.AutoGrow = true;
+            this.AutoShrink = true;
         }
 
         // -------------------------------------------------------------------

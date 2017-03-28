@@ -12,7 +12,7 @@
     {
         private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Octree<SpatialInfo> mergeTree;
+        private readonly Octree<MeshSpatialInfo> mergeTree;
 
         // -------------------------------------------------------------------
         // Constructor
@@ -24,51 +24,17 @@
 
         public DynamicMesh(Vector3 initialPosition, float initialSize = 1f)
         {
-            this.mergeTree = new Octree<SpatialInfo>(initialSize, initialPosition, 1f);
+            this.mergeTree = new Octree<MeshSpatialInfo>(initialSize, initialPosition, 1f);
         }
 
-        public override void Join(IList<Vector3> vertices, IList<Vector3> normals, IDictionary<int, int[]> normalMapping, IList<Triangle3Indexed> triangles, Vector3 offset)
+        // -------------------------------------------------------------------
+        // Public
+        // -------------------------------------------------------------------
+        public override void Join(IList<Vector3> vertices, IList<Vector3> normals, IDictionary<uint, uint[]> normalMapping, IList<Triangle3Indexed> triangles, Vector3 offset)
         {
-            IList<Triangle3> triangleList = new List<Triangle3>();
-            for (var i = 0; i < triangles.Count; i++)
-            {
-                Triangle3Indexed indexed = triangles[i];
-                triangleList.Add(new Triangle3(vertices[indexed.A], vertices[indexed.B], vertices[indexed.C]));
-            }
-
-            Octree<SpatialInfo> cleanTree = new Octree<SpatialInfo>(1, Vector3.Zero, 1);
-            IList<Vector3> cleanVertices = new List<Vector3>();
-            IList<Triangle3Indexed> cleanTriangles = new List<Triangle3Indexed>();
-
-            for (var i = 0; i < triangleList.Count; i++)
-            {
-                Triangle3 triangle = triangleList[i];
-                int indexA = IndexOfVertex(cleanTree, triangle.A);
-
-                if (indexA < 0)
-                {
-                    indexA = AddNewVertex(cleanVertices, triangle.A, cleanTree);
-                }
-
-                int indexB = IndexOfVertex(cleanTree, triangle.B);
-                if (indexB < 0)
-                {
-                    indexB = AddNewVertex(cleanVertices, triangle.B, cleanTree);
-                }
-
-                int indexC = IndexOfVertex(cleanTree, triangle.C);
-                if (indexC < 0)
-                {
-                    indexC = AddNewVertex(cleanVertices, triangle.C, cleanTree);
-                }
-
-                cleanTriangles.Add(new Triangle3Indexed(indexA, indexB, indexC));
-            }
-
-            if (cleanVertices.Count != vertices.Count)
-            {
-                Logger.Info("- {0} orphan vertices", vertices.Count - cleanVertices.Count);
-            }
+            IList<Vector3> cleanVertices;
+            IList<Triangle3Indexed> cleanTriangles;
+            MeshUtils.CleanOrphanVertices(vertices, triangles, out cleanVertices, out cleanTriangles);
 
             this.DoJoin(cleanVertices, normals, normalMapping, cleanTriangles, offset);
         }
@@ -76,74 +42,10 @@
         // -------------------------------------------------------------------
         // Private
         // -------------------------------------------------------------------
-        private static int AddNewVertex(IList<Vector3> target, Vector3 vertex, Octree<SpatialInfo> mergeTree)
+        private void DoJoin(IList<Vector3> vertices, IList<Vector3> normals, IDictionary<uint, uint[]> normalMapping, IList<Triangle3Indexed> triangles, Vector3 offset)
         {
-            target.Add(vertex);
-            int index = target.Count - 1;
-
-            if (mergeTree != null)
-            {
-                OctreeResult<SpatialInfo> info;
-                if (mergeTree.GetAt(vertex, out info))
-                {
-                    info.Entry.Vertex = index;
-                }
-                else
-                {
-                    mergeTree.Add(new SpatialInfo(index), vertex);
-                }
-            }
-
-            return index;
-        }
-
-        private static int AddNewNormal(IList<Vector3> target, Vector3 normal, Octree<SpatialInfo> mergeTree)
-        {
-            target.Add(normal);
-            int index = target.Count - 1;
-
-            if (mergeTree != null)
-            {
-                OctreeResult<SpatialInfo> info;
-                if (mergeTree.GetAt(normal, out info))
-                {
-                    info.Entry.Normal = index;
-                }
-                else
-                {
-                    mergeTree.Add(new SpatialInfo(null, index), normal);
-                }
-            }
-
-            return index;
-        }
-
-        private static int IndexOfVertex(Octree<SpatialInfo> tree, Vector3 position)
-        {
-            OctreeResult<SpatialInfo> result;
-            if (tree.GetAt(position, out result) && result.Entry.Vertex != null)
-            {
-                return result.Entry.Vertex.Value;
-            }
-
-            return -1;
-        }
-
-        private static int IndexOfNormal(Octree<SpatialInfo> tree, Vector3 position)
-        {
-            OctreeResult<SpatialInfo> result;
-            if (tree.GetAt(position, out result) && result.Entry.Normal != null)
-            {
-                return result.Entry.Normal.Value;
-            }
-
-            return -1;
-        }
-
-        private void DoJoin(IList<Vector3> vertices, IList<Vector3> normals, IDictionary<int, int[]> normalMapping, IList<Triangle3Indexed> triangles, Vector3 offset)
-        {
-            int[] indexMap = new int[vertices.Count];
-            int[] normalMap = new int[normals.Count];
+            uint[] indexMap = new uint[vertices.Count];
+            uint[] normalMap = new uint[normals.Count];
 
             Logger.Info("- {0} vertices", vertices.Count);
             bool check = this.Vertices.Count > 0;
@@ -153,19 +55,19 @@
                 Vector3 finalVertex = vertices[i] + offset;
                 if (!check)
                 {
-                    indexMap[i] = AddNewVertex(this.Vertices, finalVertex, this.mergeTree);
+                    indexMap[i] = MeshUtils.AddNewVertex(this.Vertices, finalVertex, this.mergeTree);
                     continue;
                 }
                 
-                int index = IndexOfVertex(this.mergeTree, finalVertex);
-                if (index >= 0)
+                uint index;
+                if (MeshUtils.IndexOfVertex(this.mergeTree, finalVertex, out index))
                 {
                     indexMap[i] = index;
                     skipped++;
                     continue;
                 }
 
-                indexMap[i] = AddNewVertex(this.Vertices, finalVertex, this.mergeTree);
+                indexMap[i] = MeshUtils.AddNewVertex(this.Vertices, finalVertex, this.mergeTree);
             }
 
             if (skipped > 0)
@@ -182,19 +84,19 @@
 
                 if (!checkNormals)
                 {
-                    normalMap[i] = AddNewNormal(this.Normals, normal, this.mergeTree);
+                    normalMap[i] = MeshUtils.AddNewNormal(this.Normals, normal, this.mergeTree);
                     continue;
                 }
 
-                int index = IndexOfNormal(this.mergeTree, normal);
-                if (index >= 0)
+                uint index;
+                if (MeshUtils.IndexOfNormal(this.mergeTree, normal, out index))
                 {
                     normalMap[i] = index;
                     skipped++;
                     continue;
                 }
 
-                normalMap[i] = AddNewNormal(this.Normals, normal, this.mergeTree);
+                normalMap[i] = MeshUtils.AddNewNormal(this.Normals, normal, this.mergeTree);
             }
 
             if (skipped > 0)
@@ -220,31 +122,18 @@
                 // Remap the normals for this triangle and 
                 if (normalMapping.Count > 0)
                 {
-                    int[] map = new int[3];
+                    uint[] map = new uint[3];
                     for (var n = 0; n < 3; n++)
                     {
-                        int normalIndex = normalMapping[i][n];
+                        uint normalIndex = normalMapping[(uint)i][n];
                         map[n] = normalMap[normalIndex];
                     }
 
-                    this.NormalMapping.Add(this.Triangles.Count - 1, map);
+                    this.NormalMapping.Add((uint)this.Triangles.Count - 1, map);
                 }
             }
             
             this.RecalculateBounds();
-        }
-        
-        private class SpatialInfo
-        {
-            public int? Vertex { get; set; }
-
-            public int? Normal { get; set; }
-
-            public SpatialInfo(int? vertex = null, int? normal = null)
-            {
-                this.Vertex = vertex;
-                this.Normal = normal;
-            }
         }
     }
 }

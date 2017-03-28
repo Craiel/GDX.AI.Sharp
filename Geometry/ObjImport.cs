@@ -200,8 +200,8 @@
                     context.Normals.Add(context.TempNormals[n2.Value]);
 
                     context.NormalMapping.Add(
-                            context.Triangles.Count - 1,
-                            new[] { context.Normals.Count - 3, context.Normals.Count - 2, context.Normals.Count - 1 });
+                            (uint)context.Triangles.Count - 1,
+                            new[] { (uint)context.Normals.Count - 3, (uint)context.Normals.Count - 2, (uint)context.Normals.Count - 1 });
                 }
             }
             else
@@ -235,8 +235,8 @@
                         context.Normals.Add(context.TempNormals[ni]);
                         context.Normals.Add(context.TempNormals[nii]);
                         context.NormalMapping.Add(
-                            context.Triangles.Count - 1,
-                            new[] { context.Normals.Count - 3, context.Normals.Count - 2, context.Normals.Count - 1 });
+                            (uint)context.Triangles.Count - 1,
+                            new[] { (uint)context.Normals.Count - 3, (uint)context.Normals.Count - 2, (uint)context.Normals.Count - 1 });
                     }
                 }
             }
@@ -305,7 +305,7 @@
             {
                 this.Triangles = new List<Triangle3Indexed>();
                 this.Normals = new List<Vector3>();
-                this.NormalMapping = new Dictionary<int, int[]>();
+                this.NormalMapping = new Dictionary<uint, uint[]>();
 
                 this.TempNormals = new List<Vector3>();
                 this.TempVertices = new List<Vector3>();
@@ -315,7 +315,7 @@
 
             public IList<Triangle3Indexed> Triangles { get; }
             public IList<Vector3> Normals { get; }
-            public IDictionary<int, int[]> NormalMapping { get; }
+            public IDictionary<uint, uint[]> NormalMapping { get; }
 
             public IList<Vector3> TempVertices { get; }
             public IList<Vector3> TempNormals { get; }

@@ -11,6 +11,8 @@
 
     using NLog;
 
+    using Spatial;
+
     public class Mesh : IEnumerable<Triangle3Indexed>
     {
         private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
@@ -23,7 +25,7 @@
             this.Vertices = new List<Vector3>();
             this.Triangles = new List<Triangle3Indexed>();
             this.Normals = new List<Vector3>();
-            this.NormalMapping = new Dictionary<int, int[]>();
+            this.NormalMapping = new Dictionary<uint, uint[]>();
         }
 
         // -------------------------------------------------------------------
@@ -37,7 +39,7 @@
 
         public IList<Vector3> Normals { get; }
 
-        public IDictionary<int, int[]> NormalMapping { get; }
+        public IDictionary<uint, uint[]> NormalMapping { get; }
 
         public BoundingBox Bounds { get; private set; }
 
@@ -95,13 +97,13 @@
 
         public void Join(IList<Vector3> vertices, IList<Triangle3Indexed> triangles, Vector3 offset)
         {
-            this.Join(vertices, new List<Vector3>(), new Dictionary<int, int[]>(), triangles, offset);
+            this.Join(vertices, new List<Vector3>(), new Dictionary<uint, uint[]>(), triangles, offset);
         }
 
         public virtual void Join(
             IList<Vector3> vertices,
             IList<Vector3> normals,
-            IDictionary<int, int[]> normalMapping,
+            IDictionary<uint, uint[]> normalMapping,
             IList<Triangle3Indexed> triangles,
             Vector3 offset)
         {
@@ -129,6 +131,8 @@
         // -------------------------------------------------------------------
         // Protected
         // -------------------------------------------------------------------
+        
+
         protected void RecalculateBounds()
         {
             this.RecalculateBounds(MathUtils.Epsilon * 2f);

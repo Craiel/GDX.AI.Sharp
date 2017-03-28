@@ -20,7 +20,7 @@
             this.HasGeometry = false;
         }
 
-        public override void Join(IList<Vector3> vertices, IList<Vector3> normals, IDictionary<int, int[]> normalMapping, IList<Triangle3Indexed> triangles, Vector3 offset)
+        public override void Join(IList<Vector3> vertices, IList<Vector3> normals, IDictionary<uint, uint[]> normalMapping, IList<Triangle3Indexed> triangles, Vector3 offset)
         {
             if (this.HasGeometry)
             {

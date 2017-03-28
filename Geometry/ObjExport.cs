@@ -49,7 +49,7 @@
                 // Currently we do not support texture coordinates
                 if (mesh.Normals.Count > 0)
                 {
-                    target.WriteLine($"f {triangle.A + 1}//{mesh.NormalMapping[i][0] + 1} {triangle.B + 1}//{mesh.NormalMapping[i][1] + 1} {triangle.C + 1}//{mesh.NormalMapping[i][2] + 1}");
+                    target.WriteLine($"f {triangle.A + 1}//{mesh.NormalMapping[(uint)i][0] + 1} {triangle.B + 1}//{mesh.NormalMapping[(uint)i][1] + 1} {triangle.C + 1}//{mesh.NormalMapping[(uint)i][2] + 1}");
                 }
                 else
                 {

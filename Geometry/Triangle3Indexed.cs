@@ -38,6 +38,11 @@
             this.C = c;
         }
 
+        public Triangle3Indexed(uint a, uint b, uint c)
+            : this((int)a, (int)b, (int)c)
+        {
+        }
+
         /// <summary>
         /// Compares two <see cref="Triangle3Indexed"/>'s for equality.
         /// </summary>
