@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
 
     using CarbonCore.Utils.IO;
 
@@ -34,7 +35,7 @@
         // -------------------------------------------------------------------
         public override Stream BeginWrite(CarbonFile file)
         {
-            var stream = this.database.FileStorage.OpenWrite(file.GetPath(), file.FileName);
+            var stream = this.database.FileStorage.OpenWrite(file.GetPathUsingAlternativeSeparator(), file.FileName);
             this.openStreams.Add(stream);
             return stream;
         }
@@ -44,6 +45,17 @@
             var stream = this.database.FileStorage.OpenRead(file.GetPath());
             this.openStreams.Add(stream);
             return stream;
+        }
+
+        public override CarbonFile[] Find(string pattern)
+        {
+            IList<CarbonFile> result = new List<CarbonFile>();
+            foreach (LiteFileInfo fileInfo in this.database.FileStorage.Find(pattern))
+            {
+                result.Add(new CarbonFile(fileInfo.Filename));
+            }
+
+            return result.ToArray();
         }
 
         // -------------------------------------------------------------------

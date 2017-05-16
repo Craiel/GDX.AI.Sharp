@@ -41,6 +41,8 @@
                 stream.Read(data, 0, data.Length);
             }
         }
+
+        public abstract CarbonFile[] Find(string pattern);
         
         // -------------------------------------------------------------------
         // Protected

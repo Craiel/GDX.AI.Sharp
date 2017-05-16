@@ -134,6 +134,11 @@ namespace RecastWrapper
 			unmanaged->removeAgent(index);
 		}
 
+		void UpdateAgent(int index, ManagedDtCrowdAgentParams^ params)
+		{
+			unmanaged->updateAgent(index, &params->GetUnmanaged());
+		}
+
 		bool RequestMoveTarget(int index, unsigned int polyRef, array<float>^ position)
 		{
 			pin_ptr<float> position_start = &position[0];

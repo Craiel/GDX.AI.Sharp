@@ -1,7 +1,8 @@
 ﻿namespace GDX.AI.Sharp.Spatial
 {
+    using System;
     using System.Collections.Generic;
-
+    using Mathematics;
     using Microsoft.Xna.Framework;
 
     using NLog;
@@ -53,6 +54,14 @@
         
         public bool Add(T obj, Vector3 objPos)
         {
+#if DEBUG
+            if (objPos.Length() > MathUtils.MaxFloat)
+            {
+                Logger.Error("Add Operation failed, coordinates are outside of safe range");
+                return false;
+            }
+#endif
+
             // Add object or expand the octree until it can be added
             int recursionCheck = 0;
             while (!this.root.Add(obj, objPos))

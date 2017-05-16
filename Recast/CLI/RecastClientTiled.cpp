@@ -49,10 +49,8 @@ RecastWrapper::RecastClientTiled::~RecastClientTiled()
 void RecastWrapper::RecastClientTiled::buildStep1InitConfig()
 {
 	// Init cache
-	const float* bmin = new float[3]{ 0, 0, 0 };//m_geom->getNavMeshBoundsMin();
-	const float* bmax = new float[3]{ 6000, 2000, 6000 }; //m_geom->getNavMeshBoundsMax();
 	int gw = 0, gh = 0;
-	rcCalcGridSize(bmin, bmax, m_cellSize, &gw, &gh);
+	rcCalcGridSize(m_worldBoundsMin, m_worldBoundsMax, m_cellSize, &gw, &gh);
 	const int ts = (int)m_tileSize;
 	const int tw = (gw + ts - 1) / ts;
 	const int th = (gh + ts - 1) / ts;
@@ -76,12 +74,12 @@ void RecastWrapper::RecastClientTiled::buildStep1InitConfig()
 	m_cfg.height = m_cfg.tileSize + m_cfg.borderSize * 2;
 	m_cfg.detailSampleDist = m_detailSampleDist < 0.9f ? 0 : m_cellSize * m_detailSampleDist;
 	m_cfg.detailSampleMaxError = m_cellHeight * m_detailSampleMaxError;
-	rcVcopy(m_cfg.bmin, bmin);
-	rcVcopy(m_cfg.bmax, bmax);
+	rcVcopy(m_cfg.bmin, m_worldBoundsMin);
+	rcVcopy(m_cfg.bmax, m_worldBoundsMax);
 
 	// Tile cache params.
 	memset(&m_tcparams, 0, sizeof(m_tcparams));
-	rcVcopy(m_tcparams.orig, bmin);
+	rcVcopy(m_tcparams.orig, m_worldBoundsMin);
 	m_tcparams.cs = m_cellSize;
 	m_tcparams.ch = m_cellHeight;
 	m_tcparams.width = (int)m_tileSize;
@@ -112,10 +110,8 @@ bool RecastWrapper::RecastClientTiled::doBuild()
 {
 	dtStatus status;
 	
-	const float* bmin = new float[3]{ 0, 0, 0 };//m_geom->getNavMeshBoundsMin();
-	const float* bmax = new float[3]{ 6000, 2000, 6000}; //m_geom->getNavMeshBoundsMax();
 	int gw = 0, gh = 0;
-	rcCalcGridSize(bmin, bmax, m_cellSize, &gw, &gh);
+	rcCalcGridSize(m_worldBoundsMin, m_worldBoundsMax, m_cellSize, &gw, &gh);
 	const int tw = (gw + (int)m_tileSize - 1) / (int)m_tileSize;
 	const int th = (gh + (int)m_tileSize - 1) / (int)m_tileSize;
 
@@ -145,7 +141,7 @@ bool RecastWrapper::RecastClientTiled::doBuild()
 		
 		dtNavMeshParams params;
 		memset(&params, 0, sizeof(params));
-		rcVcopy(params.orig, bmin);
+		rcVcopy(params.orig, m_worldBoundsMin);
 		params.tileWidth = m_tileSize*m_cellSize;
 		params.tileHeight = m_tileSize*m_cellSize;
 		params.maxTiles = m_maxTiles;

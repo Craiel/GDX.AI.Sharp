@@ -56,6 +56,11 @@
             this.ManagedClient.RemoveAgent(index);
         }
 
+        public void UpdateAgent(int index, DetourCrowdAgentParameters parameters)
+        {
+            this.ManagedClient.UpdateAgent(index, parameters.GetManaged());
+        }
+
         public bool RequestMoveTarget(int agentIndex, uint polyRef, Vector3 position)
         {
             return this.ManagedClient.RequestMoveTarget(agentIndex, polyRef, position.ToArray());

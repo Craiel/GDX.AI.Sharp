@@ -63,6 +63,8 @@ namespace RecastWrapper {
 		class InputGeom* m_geom;
 		
 	public:
+		const float* m_worldBoundsMin = new float[3]{ 0, 0, 0 };
+		const float* m_worldBoundsMax = new float[3]{ 1000, 1000, 1000 };
 		float m_cellSize = 0.3f;
 		float m_cellHeight = 0.2f;
 		float m_agentMaxSlope = 45.0f;
@@ -97,6 +99,8 @@ namespace RecastWrapper {
 		const dtCrowdAgent* getAgent(int index) { return m_crowd->getAgent(index); }
 
 		void removeAgent(int index) { m_crowd->removeAgent(index); }
+
+		void updateAgent(int index, const dtCrowdAgentParams* params) { m_crowd->updateAgentParameters(index, params); }
 
 		dtStatus findNearestPoly(const float* center, const float* extents, dtPolyRef* nearestRef, float* nearestPoint)
 		{

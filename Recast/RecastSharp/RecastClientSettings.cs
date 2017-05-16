@@ -1,5 +1,7 @@
 ﻿namespace GDX.AI.Sharp.Recast.RecastSharp
 {
+    using Geometry;
+    using Microsoft.Xna.Framework;
     using RecastWrapper;
 
     // For some info see http://digestingduck.blogspot.ca/2009/08/recast-settings-uncovered.html
@@ -8,6 +10,8 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
+        public Vector3 WorldBoundsMin { get; set; } = new Vector3(0);
+        public Vector3 WorldBoundsMax { get; set; } = new Vector3(7000, 2000, 7000);
         public float CellSize { get; set; } = 0.3f;
         public float CellHeight { get; set; } = 0.2f;
         public float AgentMaxSlope { get; set; } = 45.0f;
@@ -34,7 +38,7 @@
         // -------------------------------------------------------------------
         internal ManagedRecastSettings ToManaged()
         {
-            return new ManagedRecastSettings
+            var managedSettings = new ManagedRecastSettings
                        {
                            CellSize = this.CellSize,
                            CellHeight = this.CellHeight,
@@ -57,6 +61,10 @@
 
                            PartitionType = (int)this.PartitionType
                        };
+
+            managedSettings.SetWorldBounds(this.WorldBoundsMin.ToArray(), this.WorldBoundsMax.ToArray());
+
+            return managedSettings;
         }
     }
 }

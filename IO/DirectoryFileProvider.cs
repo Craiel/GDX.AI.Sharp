@@ -46,6 +46,18 @@
             return null;
         }
 
+        public override CarbonFile[] Find(string pattern)
+        {
+            CarbonFileResult[] results = this.Root.GetFiles(pattern, SearchOption.AllDirectories);
+            CarbonFile[] result = new CarbonFile[results.Length];
+            for (var i = 0; i < results.Length; i++)
+            {
+                result[i] = results[i].Relative;
+            }
+
+            return result;
+        }
+
         // -------------------------------------------------------------------
         // Protected
         // -------------------------------------------------------------------
@@ -61,5 +73,7 @@
                 this.openStreams.Clear();
             }
         }
+
+        
     }
 }

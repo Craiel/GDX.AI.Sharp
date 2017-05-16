@@ -9,6 +9,12 @@
     /// </summary>
     public static class MathUtils
     {
+        // Largest and lowest safe numbers to do comparisons on, c# gets inaccurate after
+        public const float MinFloat = 1 - (1 << 24);
+        public const float MaxFloat = (1 << 24) - 1;
+        public const double MaxDouble = 9007199254740991;
+        public const double MinDouble = 1 - MaxDouble;
+
         public static float Epsilon;
 
         public static double DoubleEpsilon;
@@ -42,7 +48,7 @@
                 Epsilon /= 2f;
             }
         }
-
+        
         /// <summary>
         /// Recalculates the epsilon value for floats
         /// See https://www.johndcook.com/blog/2010/06/08/c-math-gotchas/ for the specific reason why this exists

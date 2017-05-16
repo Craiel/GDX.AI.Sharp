@@ -1,7 +1,8 @@
 ﻿namespace GDX.AI.Sharp.Geometry
 {
+    using System;
     using System.Collections.Generic;
-
+    using Mathematics;
     using Microsoft.Xna.Framework;
 
     using NLog;
@@ -44,15 +45,26 @@
         // -------------------------------------------------------------------
         private void DoJoin(IList<Vector3> vertices, IList<Vector3> normals, IDictionary<uint, uint[]> normalMapping, IList<Triangle3Indexed> triangles, Vector3 offset)
         {
+            bool[] vertexInvalidMap = new bool[vertices.Count];
             uint[] indexMap = new uint[vertices.Count];
             uint[] normalMap = new uint[normals.Count];
-
+            
             Logger.Info("- {0} vertices", vertices.Count);
             bool check = this.Vertices.Count > 0;
             int skipped = 0;
             for (var i = 0; i < vertices.Count; i++)
             {
                 Vector3 finalVertex = vertices[i] + offset;
+                if (finalVertex.Length() > MathUtils.MaxFloat)
+                {
+                    // Create a zero vertex, we will skip the triangles anyway
+                    indexMap[i] = MeshUtils.AddNewVertex(this.Vertices, new Vector3(0), this.mergeTree);
+                    vertexInvalidMap[i] = false;
+                    Logger.Warn("- Vertex out of Safe Range: " + finalVertex);
+                    skipped++;
+                    continue;
+                }
+
                 if (!check)
                 {
                     indexMap[i] = MeshUtils.AddNewVertex(this.Vertices, finalVertex, this.mergeTree);
@@ -108,6 +120,12 @@
             for (var i = 0; i < triangles.Count; i++)
             {
                 Triangle3Indexed triangle = triangles[i];
+
+                if (vertexInvalidMap[triangle.A] || vertexInvalidMap[triangle.B] || vertexInvalidMap[triangle.C])
+                {
+                    Logger.Warn("Triangle had invalid index mapping, possibly skipped vertices, skipping triangle");
+                    continue;
+                }
 
                 if (check)
                 {
