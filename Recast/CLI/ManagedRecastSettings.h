@@ -5,8 +5,8 @@ namespace RecastWrapper
 	public ref class ManagedRecastSettings
 	{
 	public:
-		float* WorldBoundsMin;
-		float* WorldBoundsMax;
+		const float* WorldBoundsMin;
+		const float* WorldBoundsMax;
 		float CellSize = 0.3f;
 		float CellHeight = 0.2f;
 		float AgentMaxSlope = 45.0f;
@@ -30,8 +30,8 @@ namespace RecastWrapper
 
 		void Apply(RecastClient* client)
 		{
-			client->m_worldBoundsMin = WorldBoundsMin;
-			client->m_worldBoundsMax = WorldBoundsMax;
+			client->setWorldBounds(WorldBoundsMin, WorldBoundsMax);
+
 			client->m_cellSize = CellSize;
 			client->m_cellHeight = CellHeight;
 			client->m_agentMaxSlope = AgentMaxSlope;

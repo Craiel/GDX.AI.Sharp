@@ -63,8 +63,8 @@ namespace RecastWrapper {
 		class InputGeom* m_geom;
 		
 	public:
-		const float* m_worldBoundsMin = new float[3]{ 0, 0, 0 };
-		const float* m_worldBoundsMax = new float[3]{ 1000, 1000, 1000 };
+		float* m_worldBoundsMin = new float[3]{ 0, 0, 0 };
+		float* m_worldBoundsMax = new float[3]{ 1000, 1000, 1000 };
 		float m_cellSize = 0.3f;
 		float m_cellHeight = 0.2f;
 		float m_agentMaxSlope = 45.0f;
@@ -89,6 +89,12 @@ namespace RecastWrapper {
 	public:
 		RecastClient();
 		~RecastClient();
+
+		void setWorldBounds(const float* min, const float* max)
+		{
+			rcVcopy(m_worldBoundsMin, min);
+			rcVcopy(m_worldBoundsMax, max);
+		}
 
 		BuildContext* getContext() { return m_ctx; }
 

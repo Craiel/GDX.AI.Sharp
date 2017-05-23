@@ -166,12 +166,22 @@
 
         public BehaviorTreeBuilder<T> AlwaysFail(Task<T> child = null)
         {
+            if (child == null)
+            {
+                return this.Decorator(new AlwaysFail<T>());
+            }
+
             return this.Decorator(new AlwaysFail<T>(this.stream.Add(child)));
         }
 
         public BehaviorTreeBuilder<T> AlwaysSucceed(Task<T> child = null)
         {
-            return this.Decorator(new AlwaysSucceed<T>());
+            if (child == null)
+            {
+                return this.Decorator(new AlwaysSucceed<T>());
+            }
+
+            return this.Decorator(new AlwaysSucceed<T>(this.stream.Add(child)));
         }
 
         public BehaviorTreeBuilder<T> Include(string subTree = null, bool lazy = false)
