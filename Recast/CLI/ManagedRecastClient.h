@@ -31,7 +31,7 @@ namespace RecastWrapper
 		~ManagedRecastClient() { delete unmanaged; }
 	internal:
 		RecastClient* GetUnmanaged() { return unmanaged; }
-
+		
 	public:
 		void LogBuildTimes()
 		{
@@ -88,7 +88,7 @@ namespace RecastWrapper
 			unmanaged->update(delta);
 		}
 
-		bool FindRandomPointAroundCircle(unsigned int% startRef, array<float>^ centerPosition, float maxRadius, [Out] unsigned int% randomRef, [Out] array<float>^% randomPoint)
+		bool FindRandomPointAroundCircle(unsigned int startRef, array<float>^ centerPosition, float maxRadius, [Out] unsigned int% randomRef, [Out] array<float>^% randomPoint)
 		{
 			dtPolyRef startRefLocal = startRef;
 			dtPolyRef randomRefLocal;
@@ -101,6 +101,57 @@ namespace RecastWrapper
 			randomPoint[0] = pt[0];
 			randomPoint[1] = pt[1];
 			randomPoint[2] = pt[2];
+
+			return dtStatusSucceed(status);
+		}
+
+		bool FindPath(unsigned int startRef, unsigned int endRef, array<float>^ startPosition, array<float>^ endPosition, [Out] array<unsigned int>^% pathPolys)
+		{
+			dtPolyRef startRefLocal = startRef;
+			dtPolyRef endRefLocal = endRef;
+			dtPolyRef path[RecastClient::MAX_PATH_POLYS];
+			int pathCount;
+			pin_ptr<float> start_start = &startPosition[0];
+			pin_ptr<float> end_start = &endPosition[0];
+			dtStatus status = unmanaged->findPath(startRefLocal, endRefLocal, start_start, end_start, path, &pathCount);
+
+			pathPolys = gcnew array<unsigned int>(pathCount);
+			for(int i = 0; i < pathCount; i++)
+			{
+				dtPolyRef ref = path[i];
+				pathPolys[i] = ref;
+			}
+
+			return dtStatusSucceed(status);
+		}
+
+		bool GetSmoothPath(unsigned int startRef, array<float>^ startPosition, array<float>^ endPosition, array<unsigned int>^ pathPolys, [Out] array<float>^% pathPoints)
+		{
+			dtPolyRef startRefLocal = startRef;
+			pin_ptr<float> start_start = &startPosition[0];
+			pin_ptr<float> end_start = &endPosition[0];
+			
+			const int pathLength = pathPolys->Length;
+			if(pathLength <= 0)
+			{
+				return false;
+			}
+
+			dtPolyRef path[RecastClient::MAX_PATH_POLYS];
+			float pathPointData[RecastClient::MAX_PATH_SMOOTH * 3];
+			for(int i = 0; i < pathLength; i++)
+			{
+				path[i] = pathPolys[i];
+			}
+
+			int smoothPathPointCount;
+			dtStatus status = unmanaged->getSmoothPath(startRef, start_start, end_start, path, pathLength, pathPointData, &smoothPathPointCount);
+
+			pathPoints = gcnew array<float>(smoothPathPointCount * 3);
+			for(int i = 0; i < smoothPathPointCount * 3; i++)
+			{
+				pathPoints[i] = pathPointData[i];
+			}
 
 			return dtStatusSucceed(status);
 		}

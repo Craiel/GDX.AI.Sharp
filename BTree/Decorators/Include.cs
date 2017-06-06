@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.BTree.Decorators
+namespace GDX.AI.Sharp.BTree.Decorators
 {
     using System;
 

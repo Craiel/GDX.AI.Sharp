@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Contracts
+namespace GDX.AI.Sharp.Contracts
 {
     /// <summary>
     /// A state machine manages the state transitions of its entity. 

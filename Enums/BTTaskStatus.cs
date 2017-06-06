@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Enums
+namespace GDX.AI.Sharp.Enums
 {
     /// <summary>
     /// The enumeration of the values that a task's status can have

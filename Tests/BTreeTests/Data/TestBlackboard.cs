@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Tests.BTreeTests.Data
+namespace GDX.AI.Sharp.Tests.BTreeTests.Data
 {
     using System.Collections.Generic;
 

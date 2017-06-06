@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp
+namespace GDX.AI.Sharp
 {
     using Contracts;
 

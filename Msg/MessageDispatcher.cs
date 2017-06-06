@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Msg
+namespace GDX.AI.Sharp.Msg
 {
     using System;
     using System.Collections.Generic;

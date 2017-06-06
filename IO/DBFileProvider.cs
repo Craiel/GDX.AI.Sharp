@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.IO
+namespace GDX.AI.Sharp.IO
 {
     using System.Collections.Generic;
     using System.IO;
@@ -7,9 +7,12 @@
     using CarbonCore.Utils.IO;
 
     using LiteDB;
+    using NLog;
 
     public class DBFileProvider : BaseFileProvider
     {
+        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly LiteDatabase database;
 
         private readonly IList<LiteFileStream> openStreams;
@@ -42,7 +45,7 @@
 
         public override Stream BeginRead(CarbonFile file)
         {
-            var stream = this.database.FileStorage.OpenRead(file.GetPath());
+            var stream = this.database.FileStorage.OpenRead(file.GetPathUsingAlternativeSeparator());
             this.openStreams.Add(stream);
             return stream;
         }
@@ -52,7 +55,7 @@
             IList<CarbonFile> result = new List<CarbonFile>();
             foreach (LiteFileInfo fileInfo in this.database.FileStorage.Find(pattern))
             {
-                result.Add(new CarbonFile(fileInfo.Filename));
+                result.Add(new CarbonFile(new CarbonFile(fileInfo.Id).GetPathUsingDefaultSeparator()));
             }
 
             return result.ToArray();

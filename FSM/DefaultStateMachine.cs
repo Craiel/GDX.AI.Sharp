@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.FSM
+namespace GDX.AI.Sharp.FSM
 {
     using Contracts;
 

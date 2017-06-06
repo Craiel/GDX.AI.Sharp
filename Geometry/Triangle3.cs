@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Geometry
+namespace GDX.AI.Sharp.Geometry
 {
     using System;
     using System.Diagnostics.CodeAnalysis;

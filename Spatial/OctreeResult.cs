@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Spatial
+namespace GDX.AI.Sharp.Spatial
 {
     using Microsoft.Xna.Framework;
 

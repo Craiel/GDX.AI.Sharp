@@ -1,8 +1,9 @@
-﻿namespace GDX.AI.Sharp.Mathematics
+namespace GDX.AI.Sharp.Mathematics
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
+    using Microsoft.Xna.Framework;
 
     /// <summary>
     /// Math utilities for GDX-AI
@@ -195,6 +196,11 @@
             y = i << 4; if (y != 0) { n = n - 4; i = y; }
             y = i << 2; if (y != 0) { n = n - 2; i = y; }
             return n - ((i << 1) >> 31);
+        }
+
+        public static Vector3 WithMaxPrecision(this Vector3 source, int precision)
+        {
+            return new Vector3((float)Math.Round(source.X, precision), (float)Math.Round(source.Y, precision), (float)Math.Round(source.Z, precision));
         }
     }
 }

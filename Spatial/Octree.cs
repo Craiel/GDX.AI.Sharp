@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Spatial
+namespace GDX.AI.Sharp.Spatial
 {
     using System;
     using System.Collections.Generic;
@@ -7,12 +7,17 @@
 
     using NLog;
 
+    internal static class OctreeConstants
+    {
+        internal const int RecursionCheckDepth = 20;
+
+        internal const int OctreeFloatPrecision = 4;
+    }
+
     public class Octree<T>
         where T : class
     {
         private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
-
-        private const int RecursionCheckDepth = 20;
         
         private OctreeNode<T> root;
 
@@ -51,20 +56,29 @@
         public bool AutoGrow { get; set; }
 
         public bool AutoShrink { get; set; }
-        
+
         public bool Add(T obj, Vector3 objPos)
         {
 #if DEBUG
-            if (objPos.Length() > MathUtils.MaxFloat)
+            if (Math.Abs(objPos.Length()) > MathUtils.MaxFloat)
             {
                 Logger.Error("Add Operation failed, coordinates are outside of safe range");
                 return false;
             }
 #endif
 
+            Vector3 positionVector = objPos.WithMaxPrecision(OctreeConstants.OctreeFloatPrecision);
+
+            if (positionVector.X < this.root.Bounds.Min.X || positionVector.Y < this.root.Bounds.Min.Y ||
+                positionVector.Z < this.root.Bounds.Min.Z)
+            {
+                Logger.Error("Object position outside of octree lower bounds!");
+                return false;
+            }
+            
             // Add object or expand the octree until it can be added
             int recursionCheck = 0;
-            while (!this.root.Add(obj, objPos))
+            while (!this.root.Add(obj, positionVector))
             {
                 if (this.AutoGrow)
                 {
@@ -75,7 +89,7 @@
                     return false;
                 }
 
-                if (++recursionCheck > RecursionCheckDepth)
+                if (++recursionCheck > OctreeConstants.RecursionCheckDepth)
                 {
                     Logger.Info("Add Operation exceeded recursion check");
                     return false;
@@ -111,7 +125,7 @@
 
         public bool GetAt(Vector3 position, out OctreeResult<T> result)
         {
-            return this.root.GetAt(position, out result);
+            return this.root.GetAt(position.WithMaxPrecision(OctreeConstants.OctreeFloatPrecision), out result);
         }
 
         public int GetNearby(Ray ray, float maxDistance, ref IList<OctreeResult<T>> results)

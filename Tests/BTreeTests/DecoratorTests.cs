@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Tests.BTreeTests
+namespace GDX.AI.Sharp.Tests.BTreeTests
 {
     using BTree;
     using BTree.Decorators;

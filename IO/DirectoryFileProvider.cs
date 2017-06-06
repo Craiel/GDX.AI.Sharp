@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.IO
+namespace GDX.AI.Sharp.IO
 {
     using System.Collections.Generic;
     using System.IO;

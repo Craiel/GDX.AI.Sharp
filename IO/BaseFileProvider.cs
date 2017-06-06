@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.IO
+namespace GDX.AI.Sharp.IO
 {
     using System;
     using System.IO;
@@ -24,6 +24,7 @@
             using (var stream = this.BeginWrite(file))
             {
                 stream.Write(data, 0, data.Length);
+                stream.Flush();
             }
         }
 

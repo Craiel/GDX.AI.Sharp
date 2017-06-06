@@ -1,18 +1,22 @@
-﻿namespace GDX.AI.Sharp.Spatial
+namespace GDX.AI.Sharp.Spatial
 {
+    using System;
     using System.Collections.Generic;
-
+    using Mathematics;
     using Microsoft.Xna.Framework;
+    using NLog;
 
     public class OctreeNode<T>
         where T : class
     {
+        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
+
         private const int DefaultObjectLimit = 15;
 
         private readonly Octree<T> parent;
 
-        private T[] objects;
-        private Vector3[] objectPositions;
+        private readonly T[] objects;
+        private readonly Vector3[] objectPositions;
         private int nextFree;
 
         private OctreeNode<T>[] children;
@@ -27,8 +31,15 @@
             this.Size = size;
             this.MinSize = minSize;
             
-            this.Bounds = new BoundingBox(min, min + new Vector3(size));
-            this.Center = this.Bounds.Min + (this.Bounds.Max - this.Bounds.Min) / 2;
+            if (Math.Abs(this.Size) > MathUtils.MaxFloat)
+            {
+                throw new InvalidOperationException("Octree Node Exceeded safe float range!");
+            }
+
+            this.Bounds = new BoundingBox(min.WithMaxPrecision(OctreeConstants.OctreeFloatPrecision),
+                (min + new Vector3(size)).WithMaxPrecision(OctreeConstants.OctreeFloatPrecision));
+
+            this.Center = (this.Bounds.Min + (this.Bounds.Max - this.Bounds.Min) / 2).WithMaxPrecision(OctreeConstants.OctreeFloatPrecision);
             
             this.objects = new T[objectLimit];
             this.objectPositions = new Vector3[objectLimit];
@@ -57,7 +68,7 @@
         {
             return (position.X <= center.X ? 0 : 1) + (position.Y >= center.Y ? 0 : 4) + (position.Z <= center.Z ? 0 : 2);
         }
-
+        
         public bool Add(T obj, Vector3 position)
         {
             if (this.Bounds.Contains(position) == ContainmentType.Disjoint)

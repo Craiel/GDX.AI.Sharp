@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Spatial
+namespace GDX.AI.Sharp.Spatial
 {
     /// <summary>
     /// Contains methods used for doing index arithmetic to traverse nodes in a binary tree.

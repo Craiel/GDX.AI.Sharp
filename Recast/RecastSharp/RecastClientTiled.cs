@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Recast.RecastSharp
+namespace GDX.AI.Sharp.Recast.RecastSharp
 {
     using System.Collections.Generic;
 

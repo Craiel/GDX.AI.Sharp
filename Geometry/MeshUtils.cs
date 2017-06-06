@@ -1,7 +1,8 @@
-﻿namespace GDX.AI.Sharp.Geometry
+namespace GDX.AI.Sharp.Geometry
 {
+    using System;
     using System.Collections.Generic;
-
+    using Mathematics;
     using Microsoft.Xna.Framework;
 
     using NLog;
@@ -15,20 +16,54 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
+        public static void BuildMinCoordinate(ref Vector3 target, Vector3 coordinate)
+        {
+            if (coordinate.X < target.X) { target.X = coordinate.X; }
+            if (coordinate.Y < target.Y) { target.Y = coordinate.Y; }
+            if (coordinate.Z < target.Z) { target.Z = coordinate.Z; }
+        }
+
+        public static void BuildMaxCoordinate(ref Vector3 target, Vector3 coordinate)
+        {
+            if (coordinate.X > target.X) { target.X = coordinate.X; }
+            if (coordinate.Y > target.Y) { target.Y = coordinate.Y; }
+            if (coordinate.Z > target.Z) { target.Z = coordinate.Z; }
+        }
+
         public static void CleanOrphanVertices(IList<Vector3> vertices, IList<Triangle3Indexed> triangles, out IList<Vector3> cleanVertices, out IList<Triangle3Indexed> cleanTriangles)
         {
+            Vector3 minCoordinate = new Vector3(float.MaxValue);
+            Vector3 maxCoordinate = new Vector3(float.MinValue);
+
             // First we build non-indexed triangles so we can re-index them after the cleanup
             IList<Triangle3> triangleList = new List<Triangle3>();
             for (var i = 0; i < triangles.Count; i++)
             {
                 Triangle3Indexed indexed = triangles[i];
-                triangleList.Add(new Triangle3(vertices[indexed.A], vertices[indexed.B], vertices[indexed.C]));
+                if (!IsVertexValid(vertices[indexed.A]) || !IsVertexValid(vertices[indexed.B]) || !IsVertexValid(vertices[indexed.C]))
+                {
+                    // This triangle has invalid vertices, ignore
+                    Logger.Warn("- Triangle Vertex out of safe range, skipping!");
+                    continue;
+                }
+
+                Triangle3 nonIndexed = new Triangle3(vertices[indexed.A], vertices[indexed.B], vertices[indexed.C]);
+                triangleList.Add(nonIndexed);
+
+                BuildMinCoordinate(ref minCoordinate, nonIndexed.A);
+                BuildMinCoordinate(ref minCoordinate, nonIndexed.B);
+                BuildMinCoordinate(ref minCoordinate, nonIndexed.C);
+
+                BuildMaxCoordinate(ref maxCoordinate, nonIndexed.A);
+                BuildMaxCoordinate(ref maxCoordinate, nonIndexed.B);
+                BuildMaxCoordinate(ref maxCoordinate, nonIndexed.C);
             }
 
             cleanVertices = new List<Vector3>();
             cleanTriangles = new List<Triangle3Indexed>();
 
-            Octree<MeshSpatialInfo> cleanTree = new Octree<MeshSpatialInfo>(1, Vector3.Zero, 1);
+            //float size = Math.Abs((maxCoordinate - minCoordinate).Length());
+            Octree<MeshSpatialInfo> cleanTree = new Octree<MeshSpatialInfo>(1, minCoordinate, 1);
 
             for (var i = 0; i < triangleList.Count; i++)
             {
@@ -64,6 +99,11 @@
         // -------------------------------------------------------------------
         // Internal
         // -------------------------------------------------------------------
+        internal static bool IsVertexValid(Vector3 vertex)
+        {
+            return Math.Abs(vertex.Length()) < MathUtils.MaxFloat;
+        }
+
         internal static uint AddNewVertex(IList<Vector3> target, Vector3 vertex, Octree<MeshSpatialInfo> mergeTree)
         {
             target.Add(vertex);

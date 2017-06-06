@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Exceptions
+namespace GDX.AI.Sharp.Exceptions
 {
     using System;
 

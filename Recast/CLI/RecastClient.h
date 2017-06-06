@@ -6,6 +6,7 @@
 #include <DetourNavMeshBuilder.h>
 #include <DetourCrowd.h>
 #include <DetourTileCache.h>
+#include <DetourCommon.h>
 
 #include "BuildContext.h"
 #include "InputGeom.h"
@@ -84,6 +85,9 @@ namespace RecastWrapper {
 
 		int m_maxAgents = 1000;
 
+		static const int MAX_PATH_POLYS = 256;
+		static const int MAX_PATH_SMOOTH = 2048;
+
 		PartitionType m_partitionType = PARTITION_WATERSHED;
 
 	public:
@@ -115,6 +119,8 @@ namespace RecastWrapper {
 		}
 
 		dtStatus findRandomPointAroundCircle(dtPolyRef startRefLocal, const float* center_start, float maxRadius, dtPolyRef* randomRefLocal, float* point);
+		dtStatus findPath(dtPolyRef startRef, dtPolyRef endRef, const float* startPos, const float* endPos, dtPolyRef* path, int* pathCount);
+		dtStatus getSmoothPath(dtPolyRef startRef, const float* startPos, const float* endPos, dtPolyRef* path, int pathCount, float* pathPoints, int* smoothPathCount);
 
 		bool requestMoveTarget(int index, dtPolyRef targetRef, const float* pos) { return m_crowd->requestMoveTarget(index, targetRef, pos); }
 

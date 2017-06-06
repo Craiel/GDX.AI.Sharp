@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Recast.RecastSharp
+namespace GDX.AI.Sharp.Recast.RecastSharp
 {
     using Geometry;
 
@@ -18,11 +18,11 @@
             this.ManagedClient.Update(delta);
         }
 
-        public bool FindRandomPointAroundCircle(ref uint startRef, Vector3 centerPosition, float maxRadius, out uint randomRef, out Vector3 randomPosition)
+        public bool FindRandomPointAroundCircle(uint startRef, Vector3 centerPosition, float maxRadius, out uint randomRef, out Vector3 randomPosition)
         {
             float[] pos;
             bool result = this.ManagedClient.FindRandomPointAroundCircle(
-                ref startRef,
+                startRef,
                 centerPosition.ToArray(),
                 maxRadius,
                 out randomRef,
@@ -30,6 +30,19 @@
 
             randomPosition = new Vector3(pos[0], pos[1], pos[2]);
             return result;
+        }
+
+        public bool FindPath(uint startRef, uint endRef, Vector3 startPos, Vector3 endPos, out uint[] path)
+        {
+            bool result = this.ManagedClient.FindPath(startRef, endRef, startPos.ToArray(), endPos.ToArray(),
+                out path);
+            
+            return result;
+        }
+
+        public bool GetSmoothPath(uint startRef, Vector3 startPos, Vector3 endPos, uint[] path, out float[] points)
+        {
+            return this.ManagedClient.GetSmoothPath(startRef, startPos.ToArray(), endPos.ToArray(), path, out points);
         }
         
         public bool FindNearestPoly(Vector3 center, Vector3 extents, out uint nearestRef, out Vector3 nearestPoint)

@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.BTree.Leafs
+namespace GDX.AI.Sharp.BTree.Leafs
 {
     using BTree;
 

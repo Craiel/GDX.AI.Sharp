@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.BTree
+namespace GDX.AI.Sharp.BTree
 {
     using System;
     using System.Collections.Generic;

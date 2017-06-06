@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Enums
+namespace GDX.AI.Sharp.Enums
 {
     public enum YamlContainerType
     {

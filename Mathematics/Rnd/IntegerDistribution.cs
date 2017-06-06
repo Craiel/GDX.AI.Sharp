@@ -1,4 +1,4 @@
-﻿namespace GDX.AI.Sharp.Mathematics.Rnd
+namespace GDX.AI.Sharp.Mathematics.Rnd
 {
     using Contracts;
 
