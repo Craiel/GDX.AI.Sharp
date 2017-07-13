@@ -4,13 +4,10 @@ namespace GDX.AI.Sharp.Spatial
     using System.Collections.Generic;
     using Mathematics;
     using Microsoft.Xna.Framework;
-    using NLog;
-
+    
     public class OctreeNode<T>
         where T : class
     {
-        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
-
         private const int DefaultObjectLimit = 15;
 
         private readonly Octree<T> parent;
@@ -326,6 +323,20 @@ namespace GDX.AI.Sharp.Spatial
             this.children[index] = node;
         }
 
+        public void ForceMerge()
+        {
+            if (this.AutoMerge)
+            {
+                // No need to do anything, we are auto-merging
+                return;
+            }
+
+            if (this.ShouldMerge())
+            {
+                this.Merge();
+            }
+        }
+
         // -------------------------------------------------------------------
         // Private
         // -------------------------------------------------------------------
@@ -372,22 +383,27 @@ namespace GDX.AI.Sharp.Spatial
         {
             float half = this.Size / 2f;
             this.children = new OctreeNode<T>[8];
-            this.children[0] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, half, 0));
-            this.children[1] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, half, 0));
-            this.children[2] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, half, half));
-            this.children[3] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, half, half));
-            this.children[4] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, 0, 0));
-            this.children[5] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, 0, 0));
-            this.children[6] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, 0, half));
-            this.children[7] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, 0, half));
+            this.children[0] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, half, 0)) {AutoMerge = this.AutoMerge};
+            this.children[1] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, half, 0)) { AutoMerge = this.AutoMerge };
+            this.children[2] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, half, half)) { AutoMerge = this.AutoMerge };
+            this.children[3] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, half, half)) { AutoMerge = this.AutoMerge };
+            this.children[4] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, 0, 0)) { AutoMerge = this.AutoMerge };
+            this.children[5] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, 0, 0)) { AutoMerge = this.AutoMerge };
+            this.children[6] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, 0, half)) { AutoMerge = this.AutoMerge };
+            this.children[7] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, 0, half)) { AutoMerge = this.AutoMerge };
         }
 
         private bool ShouldMerge()
         {
+            if (this.children == null)
+            {
+                return false;
+            }
+
             int count = 0;
             for (var i = 0; i < this.children.Length; i++)
             {
-                count += this.children[i].Count;
+                count += this.children[i].CountObjects();
             }
 
             return count < this.objects.Length;

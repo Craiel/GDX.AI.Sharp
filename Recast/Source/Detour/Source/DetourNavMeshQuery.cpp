@@ -88,7 +88,7 @@ inline bool dtQueryFilter::passFilter(const dtPolyRef /*ref*/,
 									  const dtMeshTile* /*tile*/,
 									  const dtPoly* poly) const
 {
- 	return (poly->flags & m_includeFlags) != 0 && (poly->flags & m_excludeFlags) == 0;
+	return (poly->flags & m_includeFlags) != 0 && (poly->flags & m_excludeFlags) == 0;
 }
 
 inline float dtQueryFilter::getCost(const float* pa, const float* pb,

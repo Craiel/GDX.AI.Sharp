@@ -14,11 +14,14 @@ namespace GDX.AI.Sharp.Spatial
         internal const int OctreeFloatPrecision = 4;
     }
 
+    internal static class OctreeStatic
+    {
+        internal static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
+    }
+    
     public class Octree<T>
         where T : class
     {
-        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
-        
         private OctreeNode<T> root;
 
         // -------------------------------------------------------------------
@@ -28,7 +31,7 @@ namespace GDX.AI.Sharp.Spatial
         {
             if (minNodeSize > initialSize)
             {
-                Logger.Info("Minimum node size must be bigger or equal initial size: {0} > {1}", minNodeSize, initialSize);
+                OctreeStatic.Logger.Info("Minimum node size must be bigger or equal initial size: {0} > {1}", minNodeSize, initialSize);
                 minNodeSize = initialSize;
             }
 
@@ -57,12 +60,18 @@ namespace GDX.AI.Sharp.Spatial
 
         public bool AutoShrink { get; set; }
 
+        public bool AutoMerge
+        {
+            get => this.root.AutoMerge;
+            set => this.root.AutoMerge = value;
+        }
+
         public bool Add(T obj, Vector3 objPos)
         {
 #if DEBUG
             if (Math.Abs(objPos.Length()) > MathUtils.MaxFloat)
             {
-                Logger.Error("Add Operation failed, coordinates are outside of safe range");
+                OctreeStatic.Logger.Error("Add Operation failed, coordinates are outside of safe range");
                 return false;
             }
 #endif
@@ -72,7 +81,7 @@ namespace GDX.AI.Sharp.Spatial
             if (positionVector.X < this.root.Bounds.Min.X || positionVector.Y < this.root.Bounds.Min.Y ||
                 positionVector.Z < this.root.Bounds.Min.Z)
             {
-                Logger.Error("Object position outside of octree lower bounds!");
+                OctreeStatic.Logger.Error("Object position outside of octree lower bounds!");
                 return false;
             }
             
@@ -91,7 +100,7 @@ namespace GDX.AI.Sharp.Spatial
 
                 if (++recursionCheck > OctreeConstants.RecursionCheckDepth)
                 {
-                    Logger.Info("Add Operation exceeded recursion check");
+                    OctreeStatic.Logger.Info("Add Operation exceeded recursion check");
                     return false;
                 }
             }
@@ -138,8 +147,13 @@ namespace GDX.AI.Sharp.Spatial
         public void Grow()
         {
             float newSize = this.root.Size * 2f;
-            
-            var newRoot = new OctreeNode<T>(this, newSize, this.MinNodeSize, this.InitialPosition);
+
+            var newRoot =
+                new OctreeNode<T>(this, newSize, this.MinNodeSize, this.InitialPosition)
+                {
+                    AutoMerge = this.root.AutoMerge
+                };
+
             newRoot.Split();
             int rootPos = OctreeNode<T>.GetChildIndex(newRoot.Center, this.root.Center);
             newRoot.SetChild(rootPos, this.root);
@@ -149,6 +163,11 @@ namespace GDX.AI.Sharp.Spatial
         public bool Shrink()
         {
             return this.root.Shrink(this.InitialSize, ref this.root);
+        }
+
+        public void Merge()
+        {
+            this.root.ForceMerge();
         }
     }
 }

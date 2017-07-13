@@ -1,6 +1,5 @@
 namespace GDX.AI.Sharp.Geometry
 {
-    using System;
     using System.Collections.Generic;
     using Mathematics;
     using Microsoft.Xna.Framework;

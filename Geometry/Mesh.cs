@@ -10,9 +10,7 @@ namespace GDX.AI.Sharp.Geometry
     using Microsoft.Xna.Framework;
 
     using NLog;
-
-    using Spatial;
-
+    
     public class Mesh : IEnumerable<Triangle3Indexed>
     {
         private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
@@ -90,6 +88,21 @@ namespace GDX.AI.Sharp.Geometry
             return result;
         }
 
+        public int[] GetIndexArray()
+        {
+            int[] result = new int[this.Triangles.Count * 3];
+
+            int index = 0;
+            for (var i = 0; i < this.Triangles.Count; i++)
+            {
+                result[index++] = this.Triangles[i].A;
+                result[index++] = this.Triangles[i].B;
+                result[index++] = this.Triangles[i].C;
+            }
+
+            return result;
+        }
+
         public void Join(Mesh other)
         {
             this.Join(other.Vertices, other.Normals, other.NormalMapping, other.Triangles, Vector3.Zero);
@@ -110,6 +123,47 @@ namespace GDX.AI.Sharp.Geometry
             throw new NotSupportedException("Join not supported in this mesh type");
         }
 
+        public virtual int Split(uint triangleCount, ref IList<Mesh> results)
+        {
+            if (results == null)
+            {
+                return 0;
+            }
+
+            Mesh currentPart = null;
+            for (var i = 0; i < this.Triangles.Count; i++)
+            {
+                if (currentPart == null)
+                {
+                    currentPart = new Mesh();
+                }
+
+                Triangle3Indexed triangle3 = this.Triangles[i];
+                Vector3 vertexA = this.Vertices[triangle3.A];
+                Vector3 vertexB = this.Vertices[triangle3.B];
+                Vector3 vertexC = this.Vertices[triangle3.C];
+
+                int index = currentPart.Vertices.Count;
+                currentPart.Vertices.Add(vertexA);
+                currentPart.Vertices.Add(vertexB);
+                currentPart.Vertices.Add(vertexC);
+                currentPart.Triangles.Add(new Triangle3Indexed(index, index + 1, index + 2));
+
+                if (currentPart.Triangles.Count >= triangleCount)
+                {
+                    results.Add(currentPart);
+                    currentPart = null;
+                }
+            }
+
+            if (currentPart != null)
+            {
+                results.Add(currentPart);
+            }
+
+            return results.Count;
+        }
+
         public bool Verify()
         {
             bool result = true;
@@ -128,16 +182,14 @@ namespace GDX.AI.Sharp.Geometry
             return result;
         }
 
-        // -------------------------------------------------------------------
-        // Protected
-        // -------------------------------------------------------------------
-        
-
-        protected void RecalculateBounds()
+        public void RecalculateBounds()
         {
             this.RecalculateBounds(MathUtils.Epsilon * 2f);
         }
 
+        // -------------------------------------------------------------------
+        // Protected
+        // -------------------------------------------------------------------
         protected void RecalculateBounds(float padding)
         {
             var newBounds = new BoundingBox(new Vector3(float.MaxValue), new Vector3(float.MinValue));
