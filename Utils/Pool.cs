@@ -10,7 +10,7 @@ namespace GDX.AI.Sharp.Utils
     /// </summary>
     /// <typeparam name="T">the object to pool</typeparam>
     public abstract class Pool<T>
-        where T : IPoolable
+        where T : class, IPoolable
     {
         private readonly Stack<T> freeObjects;
 
@@ -40,7 +40,7 @@ namespace GDX.AI.Sharp.Utils
         /// The object may be new (from <see cref="NewObject"/>) or reused
         /// </summary>
         /// <returns>Returns an object from this pool</returns>
-        public T Obtain()
+        public virtual T Obtain()
         {
             return this.freeObjects.Count == 0 ? this.NewObject() : this.freeObjects.Pop();
         }
