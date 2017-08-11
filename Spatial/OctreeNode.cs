@@ -100,7 +100,11 @@ namespace GDX.AI.Sharp.Spatial
                 }
 
                 childIndex = GetChildIndex(this.Center, this.objectPositions[i]);
-                this.children[childIndex].Add(this.objects[i], this.objectPositions[i]);
+                if (!this.children[childIndex].Add(this.objects[i], this.objectPositions[i]))
+                {
+                    throw new InvalidOperationException("Add failed, child index invalid?");
+                }
+
                 this.DeleteObject(i);
             }
 
@@ -109,7 +113,10 @@ namespace GDX.AI.Sharp.Spatial
 
             // Now handle the new object we're adding now
             childIndex = GetChildIndex(this.Center, position);
-            this.children[childIndex].Add(obj, position);
+            if (!this.children[childIndex].Add(obj, position))
+            {
+                throw new InvalidOperationException("Add failed, child index invalid?");
+            }
 
             return true;
         }
@@ -383,7 +390,7 @@ namespace GDX.AI.Sharp.Spatial
         {
             float half = this.Size / 2f;
             this.children = new OctreeNode<T>[8];
-            this.children[0] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, half, 0)) {AutoMerge = this.AutoMerge};
+            this.children[0] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, half, 0)) { AutoMerge = this.AutoMerge };
             this.children[1] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, half, 0)) { AutoMerge = this.AutoMerge };
             this.children[2] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, half, half)) { AutoMerge = this.AutoMerge };
             this.children[3] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, half, half)) { AutoMerge = this.AutoMerge };

@@ -202,5 +202,19 @@ namespace GDX.AI.Sharp.Mathematics
         {
             return new Vector3((float)Math.Round(source.X, precision), (float)Math.Round(source.Y, precision), (float)Math.Round(source.Z, precision));
         }
+
+        public static float Max(params float[] values)
+        {
+            float result = float.MinValue;
+            for (var i = 0; i < values.Length; i++)
+            {
+                if (result < values[i])
+                {
+                    result = values[i];
+                }
+            }
+
+            return result;
+        }
     }
 }
