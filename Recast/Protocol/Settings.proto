@@ -1,0 +1,68 @@
+syntax = "proto3";
+package GDX.AI;
+
+option csharp_namespace = "GDX.AI.Recast.Protocol";
+
+import "Protocol/NavMesh.proto";
+
+message ProtoRecastSettings {
+	repeated float world_bounds_min = 1;
+	repeated float world_bounds_max = 2;
+	
+	float cell_size = 3;
+	float cell_height = 4;
+	
+	float agent_max_slope = 5;
+	float agent_height = 6;
+	float agent_max_climb = 7;
+	float agent_radius = 8;
+	
+	float edge_max_len = 9;
+	float edge_max_error = 10;
+	
+	float region_min_size = 11;
+	float region_merge_size = 12;
+	
+	float detail_sample_dist = 13;
+	float detail_sample_max_error = 14;
+	
+	bool filter_low_hanging_obstacles = 15;
+	bool filter_ledge_spans = 16;
+	bool filter_walkable_low_height_spans = 17;
+	
+	uint32 max_agents = 18;
+	uint32 partition_type = 19;
+}
+
+message ProtoCrowdAgentParameters {
+	float radius = 1;
+	float height = 2;
+	float max_acceleration = 3;
+	float max_speed = 4;
+	float collision_query_range = 5;
+	float path_optimization_range = 6;
+	float separation_weight = 7;
+	float obstacle_avoidance_type = 8;
+	float query_filter_type = 9;
+	
+	uint32 update_flags = 10;
+	
+	ProtoNavMeshVector initial_position = 11;
+}
+
+message ProtoCrowdAgentInfo {
+	ProtoNavMeshVector position = 1;
+	ProtoNavMeshVector velocity = 2;
+	uint32 targetState = 3;
+	ProtoNavMeshVector target_position = 4;
+}
+
+message ProtoRecastPathInfo {
+	bool has_detail = 1;
+	repeated uint32 path_refs = 2;
+	repeated float path_details = 3;
+}
+
+message ProtoRecastLog {
+	repeated string messages = 1;
+}

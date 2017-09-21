@@ -1,42 +1,55 @@
 namespace GDX.AI.Sharp.Recast.RecastSharp
 {
-    using System.Collections.Generic;
-
+    using System;
+    using AI.Recast.Protocol;
     using NLog;
-
-    using RecastWrapper;
 
     public class RecastClientSoloMesh : RecastClient
     {
         private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly ManagedRecastClientSoloMesh typedClient;
-
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        public RecastClientSoloMesh(RecastClientSettings settings)
+        public RecastClientSoloMesh(uint area, uint layer)
+            : base(area, layer)
         {
-            this.typedClient = new ManagedRecastClientSoloMesh(settings.ToManaged());
-            this.ManagedClient = this.typedClient;
+            _Initialize(area, layer, true);
         }
 
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public bool LoadObj(string file)
+        public bool LoadObj(string path)
         {
-            bool result = this.typedClient.LoadObj(file);
+            IntPtr ptr = GetStringPtr(path);
+            bool result = _Build(this.Slot.Area, this.Slot.Layer, ptr, path.Length);
 
-            this.ManagedClient.LogBuildTimes();
+            _LogBuildTimes(this.Slot.Area, this.Slot.Layer);
 
-            IList<string> buildlogText = this.ManagedClient.GetLogText();
-            foreach (string line in buildlogText)
+            IntPtr logPtr;
+            int logSize;
+            if (!_GetLog(this.Slot.Area, this.Slot.Layer, out logPtr, out logSize))
             {
-                Logger.Debug(line);
+                return result;
+            }
+
+            byte[] logData = GetArrayFromPtr(logPtr, logSize);
+            var log = ProtoRecastLog.Parser.ParseFrom(logData);
+            foreach (string message in log.Messages)
+            {
+                Logger.Info(message);
             }
 
             return result;
+        }
+
+        // -------------------------------------------------------------------
+        // Protected
+        // -------------------------------------------------------------------
+        protected override void Dispose(bool isDisposing)
+        {
+            _Destroy(this.Slot.Area, this.Slot.Layer);
         }
     }
 }

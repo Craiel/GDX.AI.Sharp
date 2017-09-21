@@ -169,5 +169,10 @@ namespace GDX.AI.Sharp.Spatial
         {
             this.root.ForceMerge();
         }
+
+        public void Clear()
+        {
+            this.root = new OctreeNode<T>(this, this.InitialSize, this.MinNodeSize, this.InitialPosition);
+        }
     }
 }

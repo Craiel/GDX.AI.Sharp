@@ -1,10 +1,9 @@
-#pragma once
+/*#pragma once
 
 #include <msclr\marshal_cppstd.h>
 
 #include "RecastClientTiled.h"
 #include "RecastClientSoloMesh.h"
-#include "ManagedRecastSettings.h"
 #include "ManagedDtCrowdAgentInfo.h"
 #include "ManagedDtCrowdAgentParams.h"
 #include "ManagedRecastClient.h"
@@ -21,11 +20,10 @@ namespace RecastWrapper
 		RecastClientSoloMesh* unmanagedTyped;
 
 	public:
-		ManagedRecastClientSoloMesh(ManagedRecastSettings^ settings)
+		ManagedRecastClientSoloMesh()
 		{
 			unmanagedTyped = new RecastClientSoloMesh();
 			unmanaged = unmanagedTyped;
-			settings->Apply(unmanaged);
 		}
 
 		~ManagedRecastClientSoloMesh() { }
@@ -35,4 +33,4 @@ namespace RecastWrapper
 			return unmanagedTyped->build(unmanagedPath);
 		}
 	};
-}
+}*/

@@ -1,8 +1,9 @@
 namespace GDX.AI.Sharp.Recast.RecastSharp
 {
+    using AI.Recast.Protocol;
     using Geometry;
+    using Google.Protobuf;
     using Microsoft.Xna.Framework;
-    using RecastWrapper;
 
     // For some info see http://digestingduck.blogspot.ca/2009/08/recast-settings-uncovered.html
     public class RecastClientSettings
@@ -29,17 +30,16 @@ namespace GDX.AI.Sharp.Recast.RecastSharp
         public bool FilterLedgeSpans { get; set; } = true;
         public bool FilterWalkableLowHeightSpans { get; set; } = true;
 
-        public int MaxAgents { get; set; } = 1000;
+        public uint MaxAgents { get; set; } = 1000;
 
         public RecastPartitionMode PartitionType { get; set; } = RecastPartitionMode.WaterShed;
 
         // -------------------------------------------------------------------
         // Internal
         // -------------------------------------------------------------------
-        internal ManagedRecastSettings ToManaged()
+        internal byte[] GetData()
         {
-            var managedSettings = new ManagedRecastSettings
-                       {
+            var serialized = new ProtoRecastSettings { 
                            CellSize = this.CellSize,
                            CellHeight = this.CellHeight,
                            AgentMaxSlope = this.AgentMaxSlope,
@@ -59,12 +59,13 @@ namespace GDX.AI.Sharp.Recast.RecastSharp
 
                            MaxAgents = this.MaxAgents,
 
-                           PartitionType = (int)this.PartitionType
+                           PartitionType = (uint)this.PartitionType
                        };
 
-            managedSettings.SetWorldBounds(this.WorldBoundsMin.ToArray(), this.WorldBoundsMax.ToArray());
+            serialized.WorldBoundsMin.AddRange(this.WorldBoundsMin.ToArray());
+            serialized.WorldBoundsMax.AddRange(this.WorldBoundsMax.ToArray());
 
-            return managedSettings;
+            return serialized.ToByteArray();
         }
     }
 }

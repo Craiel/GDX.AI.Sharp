@@ -1,6 +1,8 @@
 namespace GDX.AI.Sharp.Recast.RecastSharp
 {
-    using RecastWrapper;
+    using AI.Recast.Protocol;
+    using Google.Protobuf;
+    using Microsoft.Xna.Framework;
 
     public class DetourCrowdAgentParameters
     {
@@ -16,6 +18,8 @@ namespace GDX.AI.Sharp.Recast.RecastSharp
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
+        public Vector3 InitialPosition { get; set; }
+
         public float Radius { get; set; }
 
         public float Height { get; set; }
@@ -39,21 +43,29 @@ namespace GDX.AI.Sharp.Recast.RecastSharp
         // -------------------------------------------------------------------
         // Internal
         // -------------------------------------------------------------------
-        internal ManagedDtCrowdAgentParams GetManaged()
+        internal byte[] GetData()
         {
-            return new ManagedDtCrowdAgentParams
+            var proto = new ProtoCrowdAgentParameters
             {
-                radius = this.Radius,
-                height = this.Height,
-                maxAcceleration = this.MaxAcceleration,
-                maxSpeed = this.MaxSpeed,
-                collisionQueryRange = this.CollisionQueryRange,
-                pathOptimizationRange = this.PathOptimizationRange,
-                separationWeight = this.SeparationWeight,
-                obstacleAvoidanceType = this.ObstacleAvoidanceType,
-                queryFilterType = this.QueryFilterType,
-                updateFlags = (byte)this.UpdateFlags
+                InitialPosition = new ProtoNavMeshVector
+                {
+                    X = this.InitialPosition.X,
+                    Y = this.InitialPosition.Y,
+                    Z = this.InitialPosition.Z
+                },
+                Radius = this.Radius,
+                Height = this.Height,
+                MaxAcceleration = this.MaxAcceleration,
+                MaxSpeed = this.MaxSpeed,
+                CollisionQueryRange = this.CollisionQueryRange,
+                PathOptimizationRange = this.PathOptimizationRange,
+                SeparationWeight = this.SeparationWeight,
+                ObstacleAvoidanceType = this.ObstacleAvoidanceType,
+                QueryFilterType = this.QueryFilterType,
+                UpdateFlags = (uint) this.UpdateFlags
             };
+
+            return proto.ToByteArray();
         }
     }
 }

@@ -156,20 +156,20 @@
     <ClInclude Include="..\Source\Protocol\NavMesh.pb.h">
       <Filter>Header Files\Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="ManagedRecastSettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ManagedRecastClientSoloMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ManagedRecastClientTiled.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\Protocol\Settings.pb.h">
+      <Filter>Header Files\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="RecastInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AssemblyInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\Recast\Source\RecastRegion.cpp">
       <Filter>Source Files\Recast\Native</Filter>
     </ClCompile>
@@ -283,6 +283,12 @@
     </ClCompile>
     <ClCompile Include="..\Source\Protocol\NavMesh.pb.cc">
       <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Protocol\Settings.pb.cc">
+      <Filter>Source Files\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="RecastInterface.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

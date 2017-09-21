@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 
 #include <DetourCrowd.h>
 
@@ -25,4 +25,4 @@ namespace RecastWrapper {
 		!ManagedDtCrowdAgentInfo() { }
 	};
 
-}
+}*/

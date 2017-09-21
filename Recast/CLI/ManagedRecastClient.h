@@ -1,10 +1,9 @@
-#pragma once
+/*#pragma once
 
 #include <msclr\marshal_cppstd.h>
 
 #include "RecastClientTiled.h"
 #include "RecastClientSoloMesh.h"
-#include "ManagedRecastSettings.h"
 #include "ManagedDtCrowdAgentInfo.h"
 #include "ManagedDtCrowdAgentParams.h"
 
@@ -258,5 +257,20 @@ namespace RecastWrapper
 		{
 			unmanaged->clearObstacles();
 		}
+
+		bool LoadSettings(array<byte>^ data)
+		{
+			GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+			pin_ptr<byte> data_array_start = &data[0];
+
+			GDX::AI::ProtoRecastSettings* proto = new GDX::AI::ProtoRecastSettings();
+			if (!proto->ParseFromArray(data_array_start, data->Length))
+			{
+				return false;
+			}
+
+			return unmanaged->configure(proto);
+		}
 	};
-}
+}*/

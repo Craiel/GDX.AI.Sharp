@@ -4,7 +4,7 @@ PROTOC=../../../../External/protoc/3.2.0/bin/protoc.exe
 SRC_DIR=.
 PROTO_DST_DIR=../Source/
 PROTO_DST_DIR_CSHARP=../RecastSharp/Protocol
-PROTO_FILES=("NavMesh.proto")
+PROTO_FILES=("NavMesh.proto Settings.proto")
 
 echo Compiler: $PROTOC
 $PROTOC --version

@@ -22,14 +22,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CLRSupport>true</CLRSupport>
+    <CLRSupport>false</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CLRSupport>true</CLRSupport>
+    <CLRSupport>false</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -46,26 +46,31 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)\Output\bin\$(Configuration)\$(ProjectName)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\Output\bin\$(Configuration)\$(ProjectName)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;NATIVEDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Source\Detour\Include;$(ProjectDir)..\Source\DetourCrowd\Include;$(ProjectDir)..\Source\DetourTileCache\Include;$(ProjectDir)..\Source\Recast\Include;$(ProjectDir)..\Source\Contrib\fastlz;$(ProjectDir)..\Source\Protocol;$(ProjectDir)..\Source\Contrib\google;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(ProjectDir)..\Lib\libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>msvcmrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;NATIVEDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Source\Detour\Include;$(ProjectDir)..\Source\DetourCrowd\Include;$(ProjectDir)..\Source\DetourTileCache\Include;$(ProjectDir)..\Source\Recast\Include;$(ProjectDir)..\Source\Contrib\fastlz;$(ProjectDir)..\Source\Protocol;$(ProjectDir)..\Source\Contrib\google;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>
@@ -100,6 +105,7 @@
     <ClInclude Include="..\Source\Detour\Include\DetourNode.h" />
     <ClInclude Include="..\Source\Detour\Include\DetourStatus.h" />
     <ClInclude Include="..\Source\Protocol\NavMesh.pb.h" />
+    <ClInclude Include="..\Source\Protocol\Settings.pb.h" />
     <ClInclude Include="..\Source\Recast\Include\Recast.h" />
     <ClInclude Include="..\Source\Recast\Include\RecastAlloc.h" />
     <ClInclude Include="..\Source\Recast\Include\RecastAssert.h" />
@@ -111,12 +117,12 @@
     <ClInclude Include="ManagedRecastClient.h" />
     <ClInclude Include="ManagedRecastClientSoloMesh.h" />
     <ClInclude Include="ManagedRecastClientTiled.h" />
-    <ClInclude Include="ManagedRecastSettings.h" />
     <ClInclude Include="MeshLoaderObj.h" />
     <ClInclude Include="PerfTimer.h" />
     <ClInclude Include="RecastClient.h" />
     <ClInclude Include="RecastClientSoloMesh.h" />
     <ClInclude Include="RecastClientTiled.h" />
+    <ClInclude Include="RecastInterface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\Contrib\fastlz\fastlz.cpp" />
@@ -136,6 +142,7 @@
     <ClCompile Include="..\Source\Detour\Source\DetourNavMeshQuery.cpp" />
     <ClCompile Include="..\Source\Detour\Source\DetourNode.cpp" />
     <ClCompile Include="..\Source\Protocol\NavMesh.pb.cc" />
+    <ClCompile Include="..\Source\Protocol\Settings.pb.cc" />
     <ClCompile Include="..\Source\Recast\Source\Recast.cpp" />
     <ClCompile Include="..\Source\Recast\Source\RecastAlloc.cpp" />
     <ClCompile Include="..\Source\Recast\Source\RecastArea.cpp" />
@@ -147,7 +154,6 @@
     <ClCompile Include="..\Source\Recast\Source\RecastMeshDetail.cpp" />
     <ClCompile Include="..\Source\Recast\Source\RecastRasterization.cpp" />
     <ClCompile Include="..\Source\Recast\Source\RecastRegion.cpp" />
-    <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="BuildLog.cpp" />
     <ClCompile Include="ChunkyTriMesh.cpp" />
     <ClCompile Include="InputGeom.cpp" />
@@ -158,6 +164,7 @@
     <ClCompile Include="RecastClient.cpp" />
     <ClCompile Include="RecastClientSoloMesh.cpp" />
     <ClCompile Include="RecastClientTiled.cpp" />
+    <ClCompile Include="RecastInterface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

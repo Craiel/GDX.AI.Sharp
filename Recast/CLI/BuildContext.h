@@ -3,8 +3,6 @@
 #include <Recast.h>
 #include "PerfTimer.h"
 
-using namespace System;
-
 namespace RecastWrapper {
 
 	class BuildContext : public rcContext

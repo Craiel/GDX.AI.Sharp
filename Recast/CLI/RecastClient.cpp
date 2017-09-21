@@ -374,3 +374,34 @@ dtStatus RecastWrapper::RecastClient::removeObstacle(dtObstacleRef ref)
 void RecastWrapper::RecastClient::clearObstacles()
 {
 }
+
+bool RecastWrapper::RecastClient::configure(GDX::AI::ProtoRecastSettings* proto)
+{	
+	for (int i = 0; i < 3; i++) {
+		m_worldBoundsMin[i] = proto->world_bounds_min(i);
+		m_worldBoundsMax[i] = proto->world_bounds_max(i);
+	}
+	
+	m_cellSize = proto->cell_size();
+	m_cellHeight = proto->cell_height();
+	m_agentMaxSlope = proto->agent_max_slope();
+	m_agentHeight = proto->agent_height();
+	m_agentMaxClimb = proto->agent_max_climb();
+	m_agentRadius = proto->agent_radius();
+	m_edgeMaxLen = proto->edge_max_len();
+	m_edgeMaxError = proto->edge_max_error();
+	m_regionMinSize = proto->region_min_size();
+	m_regionMergeSize = proto->region_merge_size();
+	m_detailSampleDist = proto->detail_sample_dist();
+	m_detailSampleMaxError = proto->detail_sample_max_error();
+
+	m_filterLowHangingObstacles = proto->filter_low_hanging_obstacles();
+	m_filterLedgeSpans = proto->filter_ledge_spans();
+	m_filterWalkableLowHeightSpans = proto->filter_walkable_low_height_spans();
+
+	m_maxAgents = proto->max_agents();
+
+	m_partitionType = (RecastWrapper::PartitionType)proto->partition_type();
+
+	return true;
+}

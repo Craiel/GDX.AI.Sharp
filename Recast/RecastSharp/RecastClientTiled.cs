@@ -1,57 +1,90 @@
 namespace GDX.AI.Sharp.Recast.RecastSharp
 {
-    using System.Collections.Generic;
-
+    using System;
+    using AI.Recast.Protocol;
     using NLog;
-
-    using RecastWrapper;
-
+    
     public class RecastClientTiled : RecastClient
     {
         private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
-
-        private readonly ManagedRecastClientTiled typedClient;
-
+        
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        public RecastClientTiled(RecastClientSettings settings)
+        public RecastClientTiled(uint area, uint layer)
+            : base(area, layer)
         {
-            this.typedClient = new ManagedRecastClientTiled(settings.ToManaged());
-            this.ManagedClient = this.typedClient;
+            _Initialize(area, layer, true);
         }
-
+         
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
         public bool GetDebugNavMesh(out byte[] data)
         {
-            return this.typedClient.GetDebugNavMesh(out data);
-        }
+            IntPtr ptr;
+            int size;
+            if (!_GetDebugNavMesh(this.Slot.Area, this.Slot.Layer, out ptr, out size))
+            {
+                data = null;
+                return false;
+            }
 
+            data = GetArrayFromPtr(ptr, size);
+            return true;
+        }
+         
         public bool Load(byte[] data)
         {
-            return this.typedClient.Load(data);
+            IntPtr ptr = GetArrayPtr(data);
+            return _Load(this.Slot.Area, this.Slot.Layer, ptr, data.Length);
         }
 
         public bool Save(out byte[] data)
         {
-            return this.typedClient.Save(out data);
+            IntPtr ptr;
+            int size;
+            if (!_Save(this.Slot.Area, this.Slot.Layer, out ptr, out size))
+            {
+                data = null;
+                return false;
+            }
+
+            data = GetArrayFromPtr(ptr, size);
+
+            return true;
         }
 
         public bool Generate(string path)
         {
-            bool result = this.typedClient.Generate(path);
+            IntPtr ptr = GetStringPtr(path);
+            bool result = _Build(this.Slot.Area, this.Slot.Layer, ptr, path.Length);
 
-            this.ManagedClient.LogBuildTimes();
+            _LogBuildTimes(this.Slot.Area, this.Slot.Layer);
 
-            IList<string> buildlogText = this.ManagedClient.GetLogText();
-            foreach (string line in buildlogText)
+            IntPtr logPtr;
+            int logSize;
+            if (!_GetLog(this.Slot.Area, this.Slot.Layer, out logPtr, out logSize))
             {
-                Logger.Info(line);
+                return result;
+            }
+
+            byte[] logData = GetArrayFromPtr(logPtr, logSize);
+            var log = ProtoRecastLog.Parser.ParseFrom(logData);
+            foreach (string message in log.Messages)
+            {
+                Logger.Info(message);
             }
 
             return result;
+        }
+
+        // -------------------------------------------------------------------
+        // Protected
+        // -------------------------------------------------------------------
+        protected override void Dispose(bool isDisposing)
+        {
+            _Destroy(this.Slot.Area, this.Slot.Layer);
         }
     }
 }

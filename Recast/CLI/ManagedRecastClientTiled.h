@@ -1,10 +1,9 @@
-#pragma once
+/*#pragma once
 
 #include <msclr\marshal_cppstd.h>
 
 #include "RecastClientTiled.h"
 #include "RecastClientSoloMesh.h"
-#include "ManagedRecastSettings.h"
 #include "ManagedDtCrowdAgentInfo.h"
 #include "ManagedDtCrowdAgentParams.h"
 #include "ManagedRecastClient.h"
@@ -21,11 +20,10 @@ namespace RecastWrapper
 		RecastClientTiled* unmanagedTyped;
 
 	public:
-		ManagedRecastClientTiled(ManagedRecastSettings^ settings)
+		ManagedRecastClientTiled()
 		{
 			unmanagedTyped = new RecastClientTiled();
 			unmanaged = unmanagedTyped;
-			settings->Apply(unmanaged);
 		}
 
 		~ManagedRecastClientTiled() { }
@@ -98,4 +96,4 @@ namespace RecastWrapper
 			return true;
 		}
 	};
-}
+}*/

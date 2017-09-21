@@ -7,6 +7,7 @@
 #include <DetourCrowd.h>
 #include <DetourTileCache.h>
 #include <DetourCommon.h>
+#include <Settings.pb.h>
 
 #include "BuildContext.h"
 #include "InputGeom.h"
@@ -93,12 +94,8 @@ namespace RecastWrapper {
 	public:
 		RecastClient();
 		~RecastClient();
-
-		void setWorldBounds(const float* min, const float* max)
-		{
-			rcVcopy(m_worldBoundsMin, min);
-			rcVcopy(m_worldBoundsMax, max);
-		}
+		
+		bool configure(GDX::AI::ProtoRecastSettings* proto);
 
 		BuildContext* getContext() { return m_ctx; }
 

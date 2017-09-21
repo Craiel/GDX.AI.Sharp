@@ -10,6 +10,7 @@
 #include <iostream>
 #include <iterator>
 #include <NavMesh.pb.h>
+#include <Settings.pb.h>
 
 #include "RecastClient.h"
 
