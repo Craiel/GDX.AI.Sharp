@@ -1,6 +1,1 @@
-Help/
-Debug/
-x64/
-.vs/
-
-*.csproj
+*.meta

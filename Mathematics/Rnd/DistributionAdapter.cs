@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Mathematics.Rnd
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Mathematics.Rnd
 {
     using System;
 
@@ -32,7 +32,7 @@ namespace GDX.AI.Sharp.Mathematics.Rnd
                 return result;
             }
 
-            throw new DistributionFormatException($"Not a double value: {value}");
+            throw new DistributionFormatException(string.Format("Not a double value: {0}", value));
         }
 
         public static float ParseFloat(string value)
@@ -43,7 +43,7 @@ namespace GDX.AI.Sharp.Mathematics.Rnd
                 return result;
             }
 
-            throw new DistributionFormatException($"Not a float value: {value}");
+            throw new DistributionFormatException(string.Format("Not a float value: {0}", value));
         }
 
         public static int ParseInteger(string value)
@@ -54,7 +54,7 @@ namespace GDX.AI.Sharp.Mathematics.Rnd
                 return result;
             }
 
-            throw new DistributionFormatException($"Not a integer value: {value}");
+            throw new DistributionFormatException(string.Format("Not a integer value: {0}", value));
         }
 
         public static long ParseLong(string value)
@@ -65,7 +65,7 @@ namespace GDX.AI.Sharp.Mathematics.Rnd
                 return result;
             }
 
-            throw new DistributionFormatException($"Not a long value: {value}");
+            throw new DistributionFormatException(string.Format("Not a long value: {0}", value));
         }
 
         public abstract T ToDistribution<T>(params string[] parameters) where T : IDistribution;

@@ -1,7 +1,6 @@
-namespace GDX.AI.Sharp.BTree
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
 {
     using System;
-
     using Contracts;
 
     using Enums;
@@ -18,7 +17,10 @@ namespace GDX.AI.Sharp.BTree
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public override int ChildCount => 0;
+        public override int ChildCount
+        {
+            get { return 0; }
+        }
 
         /// <summary>
         /// This method contains the update logic of this task. The implementation delegates the <see cref="Execute"/> method
@@ -48,7 +50,7 @@ namespace GDX.AI.Sharp.BTree
 
                 default:
                     {
-                        throw new IllegalStateException($"Invalid status '{status}' returned by the execute method");
+                        throw new IllegalStateException(string.Format("Invalid status '{0}' returned by the execute method", status));
                     }
             }
         }

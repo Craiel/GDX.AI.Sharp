@@ -1,11 +1,10 @@
-namespace GDX.AI.Sharp.Geometry
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Geometry
 {
     using System;
     using System.Collections.Generic;
-
-    using CarbonCore.Utils;
-
-    using Microsoft.Xna.Framework;
+    
+    using Essentials;
+    using UnityEngine;
 
     public class StaticMesh : Mesh
     {
@@ -27,7 +26,7 @@ namespace GDX.AI.Sharp.Geometry
                 throw new InvalidOperationException("Join attempted on Static Mesh with geometry data, call clear first before setting new data!");
             }
 
-            if (offset == Vector3.Zero)
+            if (offset == Vector3.zero)
             {
                 this.Vertices.AddRange(vertices);
             }

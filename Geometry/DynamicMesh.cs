@@ -1,12 +1,12 @@
-namespace GDX.AI.Sharp.Geometry
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Geometry
 {
     using System.Collections.Generic;
     using Mathematics;
-    using Microsoft.Xna.Framework;
 
     using NLog;
 
     using Spatial;
+    using UnityEngine;
 
     public class DynamicMesh : Mesh
     {
@@ -18,7 +18,7 @@ namespace GDX.AI.Sharp.Geometry
         // Constructor
         // -------------------------------------------------------------------
         public DynamicMesh(float initialSize = 1f)
-            : this(Vector3.Zero, initialSize)
+            : this(Vector3.zero, initialSize)
         {
         }
 
@@ -54,10 +54,10 @@ namespace GDX.AI.Sharp.Geometry
             for (var i = 0; i < vertices.Count; i++)
             {
                 Vector3 finalVertex = vertices[i] + offset;
-                if (finalVertex.Length() > MathUtils.MaxFloat)
+                if (finalVertex.magnitude > MathUtils.MaxFloat)
                 {
                     // Create a zero vertex, we will skip the triangles anyway
-                    indexMap[i] = MeshUtils.AddNewVertex(this.Vertices, new Vector3(0), this.mergeTree);
+                    indexMap[i] = MeshUtils.AddNewVertex(this.Vertices, Vector3.zero, this.mergeTree);
                     vertexInvalidMap[i] = false;
                     Logger.Warn("- Vertex out of Safe Range: " + finalVertex);
                     skipped++;

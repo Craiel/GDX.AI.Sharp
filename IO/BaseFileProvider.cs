@@ -1,9 +1,9 @@
-namespace GDX.AI.Sharp.IO
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
 {
     using System;
     using System.IO;
-
-    using CarbonCore.Utils.IO;
+    
+    using Essentials.IO;
 
     public abstract class BaseFileProvider : IDisposable
     {

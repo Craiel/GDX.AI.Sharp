@@ -1,5 +1,6 @@
-namespace GDX.AI.Sharp.BTree.Decorators
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Decorators
 {
+    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
     using Contracts;
 
     using Sharp.Utils;

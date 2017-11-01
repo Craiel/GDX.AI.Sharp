@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Enums
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Enums
 {
     public enum ReturnReceiptStatus
     {

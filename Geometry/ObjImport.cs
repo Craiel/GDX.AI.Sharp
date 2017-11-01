@@ -1,16 +1,13 @@
-namespace GDX.AI.Sharp.Geometry
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Geometry
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
-
-    using Microsoft.Xna.Framework;
-
+    
     using NLog;
+    using UnityEngine;
 
     public static class ObjImport
     {
@@ -57,7 +54,7 @@ namespace GDX.AI.Sharp.Geometry
             }
 
             target.Name = context.Name;
-            target.Join(context.TempVertices, context.Normals, context.NormalMapping, context.Triangles, Vector3.Zero);
+            target.Join(context.TempVertices, context.Normals, context.NormalMapping, context.Triangles, Vector3.zero);
         }
 
         // -------------------------------------------------------------------
@@ -144,7 +141,7 @@ namespace GDX.AI.Sharp.Geometry
 
                 default:
                     {
-                        throw new DataException("Invalid PolyFace Data");
+                        throw new InvalidOperationException("Invalid PolyFace Data");
                     }
             }
         }
@@ -189,7 +186,7 @@ namespace GDX.AI.Sharp.Geometry
                 {
                     if (n0 == null || n1 == null || n2 == null)
                     {
-                        throw new DataException("Partial normals are not allowed");
+                        throw new InvalidOperationException("Partial normals are not allowed");
                     }
                 }
 
@@ -278,19 +275,19 @@ namespace GDX.AI.Sharp.Geometry
 
         private static bool TryParseVector3(string x, string y, string z, out Vector3 v)
         {
-            v = Vector3.Zero;
+            v = Vector3.zero;
 
-            if (!float.TryParse(x, NumberStyles.Any, CultureInfo.InvariantCulture, out v.X))
+            if (!float.TryParse(x, NumberStyles.Any, CultureInfo.InvariantCulture, out v.x))
             {
                 return false;
             }
 
-            if (!float.TryParse(y, NumberStyles.Any, CultureInfo.InvariantCulture, out v.Y))
+            if (!float.TryParse(y, NumberStyles.Any, CultureInfo.InvariantCulture, out v.y))
             {
                 return false;
             }
 
-            if (!float.TryParse(z, NumberStyles.Any, CultureInfo.InvariantCulture, out v.Z))
+            if (!float.TryParse(z, NumberStyles.Any, CultureInfo.InvariantCulture, out v.z))
             {
                 return false;
             }
@@ -313,12 +310,12 @@ namespace GDX.AI.Sharp.Geometry
 
             public string Name { get; set; }
 
-            public IList<Triangle3Indexed> Triangles { get; }
-            public IList<Vector3> Normals { get; }
-            public IDictionary<uint, uint[]> NormalMapping { get; }
+            public IList<Triangle3Indexed> Triangles { get; private set; }
+            public IList<Vector3> Normals { get; private set; }
+            public IDictionary<uint, uint[]> NormalMapping { get; private set; }
 
-            public IList<Vector3> TempVertices { get; }
-            public IList<Vector3> TempNormals { get; }
+            public IList<Vector3> TempVertices { get; private set; }
+            public IList<Vector3> TempNormals { get; private set; }
 
             public int CurrentLineNumber { get; set; }
             public string CurrentLine { get; set; }

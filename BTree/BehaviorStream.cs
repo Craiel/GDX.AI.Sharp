@@ -1,9 +1,8 @@
-namespace GDX.AI.Sharp.BTree
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
 {
     using System;
     using System.Collections.Generic;
-
-    using Contracts;
+    using Assets.Scripts.Craiel.GDX.AI.Sharp.Contracts;
 
     using Enums;
 

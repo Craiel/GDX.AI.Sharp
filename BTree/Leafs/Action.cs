@@ -1,5 +1,6 @@
-namespace GDX.AI.Sharp.BTree.Leafs
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Leafs
 {
+    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
     using Contracts;
 
     using Enums;

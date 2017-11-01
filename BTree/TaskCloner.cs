@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.BTree
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
 {
     using Contracts;
 

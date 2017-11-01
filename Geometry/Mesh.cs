@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Geometry
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Geometry
 {
     using System;
     using System.Collections;
@@ -6,11 +6,10 @@ namespace GDX.AI.Sharp.Geometry
     using System.Diagnostics.CodeAnalysis;
 
     using Mathematics;
-
-    using Microsoft.Xna.Framework;
-
-    using NLog;
     
+    using NLog;
+    using UnityEngine;
+
     public class Mesh : IEnumerable<Triangle3Indexed>
     {
         private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
@@ -31,15 +30,15 @@ namespace GDX.AI.Sharp.Geometry
         // -------------------------------------------------------------------
         public string Name { get; set; }
 
-        public IList<Vector3> Vertices { get; }
+        public IList<Vector3> Vertices { get; private set; }
 
-        public IList<Triangle3Indexed> Triangles { get; }
+        public IList<Triangle3Indexed> Triangles { get; private set; }
 
-        public IList<Vector3> Normals { get; }
+        public IList<Vector3> Normals { get; private set; }
 
-        public IDictionary<uint, uint[]> NormalMapping { get; }
+        public IDictionary<uint, uint[]> NormalMapping { get; private set; }
 
-        public BoundingBox Bounds { get; private set; }
+        public Bounds Bounds { get; private set; }
 
         public IEnumerator<Triangle3Indexed> GetEnumerator()
         {
@@ -52,7 +51,7 @@ namespace GDX.AI.Sharp.Geometry
             this.Vertices.Clear();
             this.Triangles.Clear();
             this.Normals.Clear();
-            this.Bounds = new BoundingBox();
+            this.Bounds = new Bounds();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -66,9 +65,9 @@ namespace GDX.AI.Sharp.Geometry
             int index = 0;
             for (var i = 0; i < this.Vertices.Count; i++)
             {
-                result[index++] = this.Vertices[i].X;
-                result[index++] = this.Vertices[i].Y;
-                result[index++] = this.Vertices[i].Z;
+                result[index++] = this.Vertices[i].x;
+                result[index++] = this.Vertices[i].y;
+                result[index++] = this.Vertices[i].z;
             }
 
             return result;
@@ -105,7 +104,7 @@ namespace GDX.AI.Sharp.Geometry
 
         public void Join(Mesh other)
         {
-            this.Join(other.Vertices, other.Normals, other.NormalMapping, other.Triangles, Vector3.Zero);
+            this.Join(other.Vertices, other.Normals, other.NormalMapping, other.Triangles, Vector3.zero);
         }
 
         public void Join(IList<Vector3> vertices, IList<Triangle3Indexed> triangles, Vector3 offset)
@@ -192,7 +191,9 @@ namespace GDX.AI.Sharp.Geometry
         // -------------------------------------------------------------------
         protected void RecalculateBounds(float padding)
         {
-            var newBounds = new BoundingBox(new Vector3(float.MaxValue), new Vector3(float.MinValue));
+            var newBounds = new Bounds();
+            newBounds.SetMinMax(VectorExtensions.Fill(float.MaxValue), VectorExtensions.Fill(float.MinValue));
+
             foreach (Triangle3Indexed triangle in this.Triangles)
             {
                 var va = this.Vertices[triangle.A];
@@ -213,24 +214,26 @@ namespace GDX.AI.Sharp.Geometry
         // Private
         // -------------------------------------------------------------------
         [SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1501:StatementMustNotBeOnSingleLine", Justification = "Reviewed. Suppression is OK here.")]
-        private static void ApplyVertexToBounds(ref Vector3 vertex, ref BoundingBox target)
+        private static void ApplyVertexToBounds(ref Vector3 vertex, ref Bounds target)
         {
-            if (vertex.X < target.Min.X) { target.Min.X = vertex.X; }
-            if (vertex.Y < target.Min.Y) { target.Min.Y = vertex.Y; }
-            if (vertex.Z < target.Min.Z) { target.Min.Z = vertex.Z; }
-            if (vertex.X > target.Max.X) { target.Max.X = vertex.X; }
-            if (vertex.Y > target.Max.Y) { target.Max.Y = vertex.Y; }
-            if (vertex.Z > target.Max.Z) { target.Max.Z = vertex.Z; }
+            Vector3 min = target.min;
+            Vector3 max = target.max;
+
+            if (vertex.x < min.x) { min.x = vertex.x; }
+            if (vertex.y < min.y) { min.y = vertex.y; }
+            if (vertex.z < min.z) { min.z = vertex.z; }
+            if (vertex.x > max.x) { max.x = vertex.x; }
+            if (vertex.y > max.y) { max.y = vertex.y; }
+            if (vertex.z > max.z) { max.z = vertex.z; }
+
+            target.SetMinMax(min, max);
         }
 
-        private static void ApplyPaddingToBounds(float padding, ref BoundingBox target)
+        private static void ApplyPaddingToBounds(float padding, ref Bounds target)
         {
-            target.Min.X -= padding;
-            target.Min.Y -= padding;
-            target.Min.Z -= padding;
-            target.Max.X += padding;
-            target.Max.Y += padding;
-            target.Max.Z += padding;
+            Vector3 paddingVector = VectorExtensions.Fill(padding);
+            target.min += paddingVector;
+            target.max += paddingVector;
         }
     }
 }

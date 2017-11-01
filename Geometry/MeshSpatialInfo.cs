@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Geometry
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Geometry
 {
     internal class MeshSpatialInfo
     {

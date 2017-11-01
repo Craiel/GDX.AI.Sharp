@@ -3,7 +3,7 @@
 <#@ assembly name="EnvDTE" #>
 <#@ import namespace="EnvDTE" #>
 <#@ import namespace="System.Collections.Generic" #>
-namespace GDX.AI.Sharp.Enums
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Enums
 {
     using System;
     using System.Collections.Generic;

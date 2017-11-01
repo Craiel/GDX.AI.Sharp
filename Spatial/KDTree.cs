@@ -1,7 +1,6 @@
-namespace GDX.AI.Sharp.Spatial
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Spatial
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -30,22 +29,22 @@ namespace GDX.AI.Sharp.Spatial
         /// <summary>
         /// The number of points in the KDTree
         /// </summary>
-        public int Count { get; }
+        public int Count { get; set; }
 
         /// <summary>
         /// The numbers of dimensions that the tree has.
         /// </summary>
-        public int Dimensions { get; }
+        public int Dimensions { get; set; }
 
         /// <summary>
         /// The array in which the binary tree is stored. Enumerating this array is a level-order traversal of the tree.
         /// </summary>
-        public TDimension[][] InternalPointArray { get; }
+        public TDimension[][] InternalPointArray { get; set; }
 
         /// <summary>
         /// The array in which the node objects are stored. There is a one-to-one correspondence with this array and the <see cref="InternalPointArray"/>.
         /// </summary>
-        public TNode[] InternalNodeArray { get; }
+        public TNode[] InternalNodeArray { get; set; }
 
         /// <summary>
         /// The metric function used to calculate distance between points.
@@ -55,17 +54,20 @@ namespace GDX.AI.Sharp.Spatial
         /// <summary>
         /// Gets a <see cref="KDTreeNavigator{TPoint,TNode}"/> that allows for manual tree navigation,
         /// </summary>
-        public KDTreeNavigator<TDimension[], TNode> Navigator => new KDTreeNavigator<TDimension[], TNode>(this.InternalPointArray, this.InternalNodeArray);
+        public KDTreeNavigator<TDimension[], TNode> Navigator
+        {
+            get { return new KDTreeNavigator<TDimension[], TNode>(this.InternalPointArray, this.InternalNodeArray); }
+        }
 
         /// <summary>
         /// The maximum value along any dimension.
         /// </summary>
-        private TDimension MaxValue { get; }
+        private TDimension MaxValue { get; set; }
 
         /// <summary>
         /// The minimum value along any dimension.
         /// </summary>
-        private TDimension MinValue { get; }
+        private TDimension MinValue { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KDTree{TDimension,TNode}"/> class.

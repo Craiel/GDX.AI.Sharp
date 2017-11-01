@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Exceptions
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Exceptions
 {
     using System;
 

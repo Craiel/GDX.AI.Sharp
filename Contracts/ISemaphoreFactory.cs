@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Contracts
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Contracts
 {
     /// <summary>
     /// Abstract factory for creating concrete instances of classes implementing <see cref="INonBlockingSemaphore"/>

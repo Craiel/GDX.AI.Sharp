@@ -1,11 +1,8 @@
-namespace GDX.AI.Sharp.BTree
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
 {
     using System;
-
     using Contracts;
-
-    using Enums;
-
+    
     using Exceptions;
 
     /// <summary>
@@ -38,7 +35,10 @@ namespace GDX.AI.Sharp.BTree
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public override int ChildCount => this.Child == TaskId.Invalid ? 0 : 1;
+        public override int ChildCount
+        {
+            get { return this.Child == TaskId.Invalid ? 0 : 1; }
+        }
 
         public override TaskId GetChild(int index)
         {

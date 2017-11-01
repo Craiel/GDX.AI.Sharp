@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Mathematics.Rnd
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Mathematics.Rnd
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -24,7 +24,7 @@ namespace GDX.AI.Sharp.Mathematics.Rnd
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public float Value { get; }
+        public float Value { get; private set; }
 
         public override float NextFloat()
         {

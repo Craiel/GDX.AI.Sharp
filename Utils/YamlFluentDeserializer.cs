@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Utils
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Utils
 {
     using System;
     using System.Collections.Generic;

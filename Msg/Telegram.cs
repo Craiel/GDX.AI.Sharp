@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Msg
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Msg
 {
     using System;
     using System.Diagnostics.CodeAnalysis;

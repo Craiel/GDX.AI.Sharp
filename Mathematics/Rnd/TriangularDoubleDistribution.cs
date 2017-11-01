@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Mathematics.Rnd
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Mathematics.Rnd
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -33,11 +33,11 @@ namespace GDX.AI.Sharp.Mathematics.Rnd
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public double Low { get; }
+        public double Low { get; private set; }
 
-        public double High { get; }
+        public double High { get; private set; }
 
-        public double Mode { get; }
+        public double Mode { get; private set; }
 
         public override double NextDouble()
         {

@@ -1,9 +1,10 @@
-namespace GDX.AI.Sharp.Mathematics
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Mathematics
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
-    using Microsoft.Xna.Framework;
+    using UnityEngine;
 
     /// <summary>
     /// Math utilities for GDX-AI
@@ -15,6 +16,9 @@ namespace GDX.AI.Sharp.Mathematics
         public const float MaxFloat = (1 << 24) - 1;
         public const double MaxDouble = 9007199254740991;
         public const double MinDouble = 1 - MaxDouble;
+
+        public static readonly double PiOver2 = Math.PI / 2;
+        public static readonly double TwoPi = Math.PI * 2;
 
         public static float Epsilon;
 
@@ -68,7 +72,7 @@ namespace GDX.AI.Sharp.Mathematics
         /// <para>Returns the next pseudorandom, Gaussian ("normally") distributed double value with mean 0.0 and standard deviation 1.0 from this random number generator's sequence.</para>
         /// <para>The general contract of <see cref="NextGaussian"/> is that one double value, chosen from(approximately) the usual
         /// normal distribution with mean 0.0 and standard deviation 1.0, is pseudorandomly generated and returned.</para>
-        /// <para>The method <see cref="NextGaussian"/> is implemented by class <see cref="Random"/> as if by a threadsafe version of the following:
+        /// <para>The method <see cref="NextGaussian"/> is implemented by class <see cref="System.Random"/> as if by a threadsafe version of the following:
         /// <code>
         /// public double nextGaussian()
         /// {
@@ -200,7 +204,7 @@ namespace GDX.AI.Sharp.Mathematics
 
         public static Vector3 WithMaxPrecision(this Vector3 source, int precision)
         {
-            return new Vector3((float)Math.Round(source.X, precision), (float)Math.Round(source.Y, precision), (float)Math.Round(source.Z, precision));
+            return new Vector3((float)Math.Round(source.x, precision), (float)Math.Round(source.y, precision), (float)Math.Round(source.z, precision));
         }
 
         public static float Max(params float[] values)
@@ -215,6 +219,111 @@ namespace GDX.AI.Sharp.Mathematics
             }
 
             return result;
+        }
+
+        public static float DegreesToRadians(float degree)
+        {
+            return (float)(degree * (Math.PI / 180.0f));
+        }
+
+        public static float RadiansToDegrees(float radian)
+        {
+            return (float)(radian * (180.0f / Math.PI));
+        }
+
+        public static int Clamp(this int value, int min, int max)
+        {
+            return (value < min) ? min : (value > max) ? max : value;
+        }
+
+        public static float Clamp(this float value, float min, float max)
+        {
+            return (value < min) ? min : (value > max) ? max : value;
+        }
+
+        public static double Clamp(this double value, double min, double max)
+        {
+            return (value < min) ? min : (value > max) ? max : value;
+        }
+
+        public static float Floor(this float value)
+        {
+            return (float)Math.Floor(value);
+        }
+
+        public static int FloorToInt(this float value)
+        {
+            return (int)Math.Floor(value);
+        }
+
+        public static int FloorToInt(this double value)
+        {
+            return (int)Math.Floor(value);
+        }
+
+        public static long FloorToLong(this double value)
+        {
+            return (long)Math.Floor(value);
+        }
+
+        public static double Floor(this double value)
+        {
+            return Math.Floor(value);
+        }
+
+        public static IList<int> ComputePrimes(int max)
+        {
+            var primes = new bool[max + 1];
+            var sqrt = (int)Math.Sqrt(max);
+            for (int x = 1; x < sqrt; x++)
+            {
+                var squareX = x * x;
+                for (int y = 1; y <= sqrt; y++)
+                {
+                    var squareY = y * y;
+                    var n = (4 * squareX) + squareY;
+                    if (n <= max && (n % 12 == 1 || n % 12 == 5))
+                    {
+                        primes[n] ^= true;
+                    }
+
+                    n = (3 * squareX) + squareY;
+                    if (n <= max && n % 12 == 7)
+                    {
+                        primes[n] ^= true;
+                    }
+
+                    n = (3 * squareX) - squareY;
+                    if (x > y && n <= max && n % 12 == 11)
+                    {
+                        primes[n] ^= true;
+                    }
+                }
+            }
+
+            var primeList = new List<int> { 2, 3 };
+            for (int i = 5; i <= sqrt; i++)
+            {
+                if (primes[i])
+                {
+                    primeList.Add(i);
+                    int square = i * i;
+                    for (int k = square; k < max; k += square)
+                    {
+                        primes[k] = false;
+                    }
+                }
+            }
+
+            for (int i = sqrt + 1; i <= max; i++)
+            {
+                if (primes[i])
+                {
+                    primeList.Add(i);
+                }
+            }
+
+            return primeList;
         }
     }
 }

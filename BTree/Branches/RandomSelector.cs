@@ -1,7 +1,7 @@
-namespace GDX.AI.Sharp.BTree.Branches
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Branches
 {
     using System.Collections.Generic;
-
+    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
     using Contracts;
 
     /// <summary>

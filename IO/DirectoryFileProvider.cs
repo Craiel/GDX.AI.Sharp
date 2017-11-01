@@ -1,9 +1,9 @@
-namespace GDX.AI.Sharp.IO
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
 {
     using System.Collections.Generic;
     using System.IO;
-
-    using CarbonCore.Utils.IO;
+    
+    using Essentials.IO;
 
     public class DirectoryFileProvider : BaseFileProvider
     {
@@ -21,7 +21,7 @@ namespace GDX.AI.Sharp.IO
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public CarbonDirectory Root { get; }
+        public CarbonDirectory Root { get; private set; }
 
         public override Stream BeginWrite(CarbonFile file)
         {

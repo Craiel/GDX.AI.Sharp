@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Contracts
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Contracts
 {
     using Msg;
 

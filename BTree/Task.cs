@@ -1,14 +1,10 @@
-namespace GDX.AI.Sharp.BTree
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-
     using Contracts;
-
     using Enums;
-
     using Exceptions;
-
     using Sharp.Utils;
 
     /// <summary>
@@ -150,7 +146,7 @@ namespace GDX.AI.Sharp.BTree
 
                 default:
                     {
-                        throw new IllegalStateException($"Illegal guard status: {guard.Status}. Guards should succeed or fail in one step");
+                        throw new IllegalStateException(string.Format("Illegal guard status: {0}. Guards should succeed or fail in one step", guard.Status));
                     }
             }
         }

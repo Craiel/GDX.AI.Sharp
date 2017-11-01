@@ -1,6 +1,6 @@
-namespace GDX.AI.Sharp.Spatial
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Spatial
 {
-    using Microsoft.Xna.Framework;
+    using UnityEngine;
 
     public struct OctreeResult<T>
         where T : class

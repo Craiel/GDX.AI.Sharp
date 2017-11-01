@@ -1,11 +1,11 @@
-namespace GDX.AI.Sharp.Spatial
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Spatial
 {
     using System;
     using System.Collections.Generic;
     using Mathematics;
-    using Microsoft.Xna.Framework;
 
     using NLog;
+    using UnityEngine;
 
     internal static class OctreeConstants
     {
@@ -48,11 +48,11 @@ namespace GDX.AI.Sharp.Spatial
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public float InitialSize { get; }
+        public float InitialSize { get; private set; }
 
-        public float MinNodeSize { get; }
+        public float MinNodeSize { get; private set; }
 
-        public Vector3 InitialPosition { get; }
+        public Vector3 InitialPosition { get; private set; }
         
         public int Count { get; private set; }
 
@@ -62,14 +62,21 @@ namespace GDX.AI.Sharp.Spatial
 
         public bool AutoMerge
         {
-            get => this.root.AutoMerge;
-            set => this.root.AutoMerge = value;
+            get
+            {
+                return this.root.AutoMerge;
+            }
+
+            set
+            {
+                this.root.AutoMerge = value;
+            }
         }
 
         public bool Add(T obj, Vector3 objPos)
         {
 #if DEBUG
-            if (Math.Abs(objPos.Length()) > MathUtils.MaxFloat)
+            if (Math.Abs(objPos.magnitude) > MathUtils.MaxFloat)
             {
                 OctreeStatic.Logger.Error("Add Operation failed, coordinates are outside of safe range");
                 return false;
@@ -78,8 +85,8 @@ namespace GDX.AI.Sharp.Spatial
 
             Vector3 positionVector = objPos.WithMaxPrecision(OctreeConstants.OctreeFloatPrecision);
 
-            if (positionVector.X < this.root.Bounds.Min.X || positionVector.Y < this.root.Bounds.Min.Y ||
-                positionVector.Z < this.root.Bounds.Min.Z)
+            if (positionVector.x < this.root.Bounds.min.x || positionVector.y < this.root.Bounds.min.y ||
+                positionVector.z < this.root.Bounds.min.z)
             {
                 OctreeStatic.Logger.Error("Object position outside of octree lower bounds!");
                 return false;
@@ -168,11 +175,6 @@ namespace GDX.AI.Sharp.Spatial
         public void Merge()
         {
             this.root.ForceMerge();
-        }
-
-        public void Clear()
-        {
-            this.root = new OctreeNode<T>(this, this.InitialSize, this.MinNodeSize, this.InitialPosition);
         }
     }
 }

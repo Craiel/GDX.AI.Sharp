@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Utils
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Utils
 {
     using Contracts;
 
@@ -20,7 +20,7 @@ namespace GDX.AI.Sharp.Utils
         // -------------------------------------------------------------------
         public static readonly LocalFactory Factory = new LocalFactory();
 
-        public int MaxResources { get; }
+        public int MaxResources { get; private set; }
 
         public string Name { get; private set; }
 

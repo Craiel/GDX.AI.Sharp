@@ -1,8 +1,7 @@
-namespace GDX.AI.Sharp.BTree
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
 {
     using System.Collections.Generic;
     using System.Linq;
-
     using Contracts;
 
     /// <summary>
@@ -50,7 +49,10 @@ namespace GDX.AI.Sharp.BTree
         /// </summary>
         public IList<TaskId> Children { get; protected set; }
 
-        public override int ChildCount => this.Children.Count;
+        public override int ChildCount
+        {
+            get { return this.Children.Count; }
+        }
 
         public override TaskId GetChild(int index)
         {

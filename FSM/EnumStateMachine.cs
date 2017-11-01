@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.FSM
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.FSM
 {
     using System;
     using System.Globalization;

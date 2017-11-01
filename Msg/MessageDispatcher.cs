@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Msg
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Msg
 {
     using System;
     using System.Collections.Generic;
@@ -8,7 +8,7 @@ namespace GDX.AI.Sharp.Msg
     using Enums;
 
     using NLog;
-
+    using Pool;
     using Utils;
 
     /// <summary>

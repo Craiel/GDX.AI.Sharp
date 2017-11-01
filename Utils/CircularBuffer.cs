@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Utils
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Utils
 {
     using System;
 
@@ -29,9 +29,21 @@ namespace GDX.AI.Sharp.Utils
         // -------------------------------------------------------------------
         public bool Resizable { get; set; }
 
-        public bool IsEmpty => this.Size == 0;
+        public bool IsEmpty
+        {
+            get
+            {
+                return this.Size == 0;
+            }
+        }
 
-        public bool IsFull => this.Size == this.items.Length;
+        public bool IsFull
+        {
+            get
+            {
+                return this.Size == this.items.Length;
+            }
+        }
 
         public int Size { get; private set; }
 

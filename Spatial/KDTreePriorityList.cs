@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Spatial
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Spatial
 {
     using System;
     using System.Collections;
@@ -28,44 +28,65 @@ namespace GDX.AI.Sharp.Spatial
         /// <summary>
         /// Gets the element with the largest priority.
         /// </summary>
-        public TElement MaxElement => this.elementList[this.elementList.Count - 1];
+        public TElement MaxElement
+        {
+            get { return this.elementList[this.elementList.Count - 1]; }
+        }
 
         /// <summary>
         /// Gets the largest priority.
         /// </summary>
-        public TPriority MaxPriority => this.priorityList[this.priorityList.Count - 1];
+        public TPriority MaxPriority
+        {
+            get { return this.priorityList[this.priorityList.Count - 1]; }
+        }
 
         /// <summary>
         /// Gets the element with the lowest priority.
         /// </summary>
-        public TElement MinElement => this.elementList[0];
+        public TElement MinElement
+        {
+            get { return this.elementList[0]; }
+        }
 
         /// <summary>
         /// Gets the smallest priority.
         /// </summary>
-        public TPriority MinPriority => this.priorityList[0];
+        public TPriority MinPriority
+        {
+            get { return this.priorityList[0]; }
+        }
 
         /// <summary>
         /// Gets the maximum allows capacity for the <see cref="KDTreePriorityList{TElement,TPriority}"/>
         /// </summary>
-        public int Capacity { get; }
+        public int Capacity { get; private set; }
 
         /// <summary>
         /// Returns true if the list is at maximum capacity.
         /// </summary>
-        public bool IsFull => this.Count == this.Capacity;
+        public bool IsFull
+        {
+            get { return this.Count == this.Capacity; }
+        }
 
         /// <summary>
         /// Returns the count of items currently in the list.
         /// </summary>
-        public int Count => this.priorityList.Count;
+        public int Count
+        {
+            get { return this.priorityList.Count; }
+        }
 
         /// <summary>
         /// Indexer for the internal element array.
         /// </summary>
         /// <param name="index">The index in the array.</param>
         /// <returns>The element at the specified index.</returns>
-        public TElement this[int index] => this.elementList[index];
+        public TElement this[int index]
+        {
+            get { return this.elementList[index]; }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KDTreePriorityList{TElement,TPriority}"/> class.

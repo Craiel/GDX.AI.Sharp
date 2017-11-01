@@ -1,13 +1,13 @@
-namespace GDX.AI.Sharp.Geometry
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Geometry
 {
     using System;
     using System.Collections.Generic;
     using Mathematics;
-    using Microsoft.Xna.Framework;
 
     using NLog;
 
     using Spatial;
+    using UnityEngine;
 
     public static class MeshUtils
     {
@@ -18,22 +18,22 @@ namespace GDX.AI.Sharp.Geometry
         // -------------------------------------------------------------------
         public static void BuildMinCoordinate(ref Vector3 target, Vector3 coordinate)
         {
-            if (coordinate.X < target.X) { target.X = coordinate.X; }
-            if (coordinate.Y < target.Y) { target.Y = coordinate.Y; }
-            if (coordinate.Z < target.Z) { target.Z = coordinate.Z; }
+            if (coordinate.x < target.x) { target.x = coordinate.x; }
+            if (coordinate.y < target.y) { target.y = coordinate.y; }
+            if (coordinate.z < target.z) { target.z = coordinate.z; }
         }
 
         public static void BuildMaxCoordinate(ref Vector3 target, Vector3 coordinate)
         {
-            if (coordinate.X > target.X) { target.X = coordinate.X; }
-            if (coordinate.Y > target.Y) { target.Y = coordinate.Y; }
-            if (coordinate.Z > target.Z) { target.Z = coordinate.Z; }
+            if (coordinate.x > target.x) { target.x = coordinate.x; }
+            if (coordinate.y > target.y) { target.y = coordinate.y; }
+            if (coordinate.z > target.z) { target.z = coordinate.z; }
         }
 
         public static void CleanOrphanVertices(IList<Vector3> vertices, IList<Triangle3Indexed> triangles, out IList<Vector3> cleanVertices, out IList<Triangle3Indexed> cleanTriangles)
         {
-            Vector3 minCoordinate = new Vector3(float.MaxValue);
-            Vector3 maxCoordinate = new Vector3(float.MinValue);
+            Vector3 minCoordinate = VectorExtensions.Fill(float.MaxValue);
+            Vector3 maxCoordinate = VectorExtensions.Fill(float.MinValue);
 
             // First we build non-indexed triangles so we can re-index them after the cleanup
             IList<Triangle3> triangleList = new List<Triangle3>();
@@ -101,7 +101,7 @@ namespace GDX.AI.Sharp.Geometry
         // -------------------------------------------------------------------
         internal static bool IsVertexValid(Vector3 vertex)
         {
-            return Math.Abs(vertex.Length()) < MathUtils.MaxFloat;
+            return Math.Abs(vertex.magnitude) < MathUtils.MaxFloat;
         }
 
         internal static uint AddNewVertex(IList<Vector3> target, Vector3 vertex, Octree<MeshSpatialInfo> mergeTree)

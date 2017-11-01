@@ -1,10 +1,11 @@
-namespace GDX.AI.Sharp.Spatial
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Spatial
 {
     using System;
     using System.Collections.Generic;
+    using Geometry;
     using Mathematics;
-    using Microsoft.Xna.Framework;
-    
+    using UnityEngine;
+
     public class OctreeNode<T>
         where T : class
     {
@@ -33,10 +34,13 @@ namespace GDX.AI.Sharp.Spatial
                 throw new InvalidOperationException("Octree Node Exceeded safe float range!");
             }
 
-            this.Bounds = new BoundingBox(min.WithMaxPrecision(OctreeConstants.OctreeFloatPrecision),
-                (min + new Vector3(size)).WithMaxPrecision(OctreeConstants.OctreeFloatPrecision));
+            var bounds = new Bounds();
+            bounds.SetMinMax(min.WithMaxPrecision(OctreeConstants.OctreeFloatPrecision),
+                (min + VectorExtensions.Fill(size)).WithMaxPrecision(OctreeConstants.OctreeFloatPrecision));
 
-            this.Center = (this.Bounds.Min + (this.Bounds.Max - this.Bounds.Min) / 2).WithMaxPrecision(OctreeConstants.OctreeFloatPrecision);
+            this.Bounds = bounds;
+
+            this.Center = (this.Bounds.min + (this.Bounds.max - this.Bounds.min) / 2).WithMaxPrecision(OctreeConstants.OctreeFloatPrecision);
             
             this.objects = new T[objectLimit];
             this.objectPositions = new Vector3[objectLimit];
@@ -51,11 +55,11 @@ namespace GDX.AI.Sharp.Spatial
 
         public float Size { get; private set; }
 
-        public float MinSize { get; }
+        public float MinSize { get; private set; }
 
-        public BoundingBox Bounds { get; }
+        public Bounds Bounds { get; private set; }
 
-        public BoundingBox[] ChildBounds { get; private set; }
+        public Bounds[] ChildBounds { get; private set; }
 
         public bool AutoMerge { get; set; }
 
@@ -63,12 +67,12 @@ namespace GDX.AI.Sharp.Spatial
 
         public static int GetChildIndex(Vector3 center, Vector3 position)
         {
-            return (position.X <= center.X ? 0 : 1) + (position.Y >= center.Y ? 0 : 4) + (position.Z <= center.Z ? 0 : 2);
+            return (position.x <= center.x ? 0 : 1) + (position.y >= center.y ? 0 : 4) + (position.z <= center.z ? 0 : 2);
         }
         
         public bool Add(T obj, Vector3 position)
         {
-            if (this.Bounds.Contains(position) == ContainmentType.Disjoint)
+            if (!this.Bounds.Contains(position))
             {
                 return false;
             }
@@ -159,7 +163,7 @@ namespace GDX.AI.Sharp.Spatial
                 if (this.objects[i].Equals(obj))
                 {
                     this.objects[i] = default(T);
-                    this.objectPositions[i] = Vector3.Zero;
+                    this.objectPositions[i] = Vector3.zero;
                     this.nextFree = i;
                     this.Count--;
                     return true;
@@ -187,7 +191,7 @@ namespace GDX.AI.Sharp.Spatial
         {
             result = default(OctreeResult<T>);
 
-            if (this.Bounds.Contains(position) == ContainmentType.Disjoint)
+            if (!this.Bounds.Contains(position))
             {
                 return false;
             }
@@ -225,10 +229,11 @@ namespace GDX.AI.Sharp.Spatial
         public void GetNearby(ref Ray ray, ref float maxDistance, ref IList<OctreeResult<T>> result)
         {
             // Does the ray hit this node at all?
-            Vector3 area = new Vector3(maxDistance * 2);
-            BoundingBox expanded = new BoundingBox(this.Bounds.Min - area, this.Bounds.Max + area);
-            float? value = expanded.Intersects(ray);
-            if (value == null)
+            Vector3 area = VectorExtensions.Fill(maxDistance * 2);
+            Bounds expanded = new Bounds();
+            expanded.SetMinMax(this.Bounds.min - area, this.Bounds.max + area);
+            
+            if (!expanded.IntersectRay(ray))
             {
                 return;
             }
@@ -349,7 +354,7 @@ namespace GDX.AI.Sharp.Spatial
         // -------------------------------------------------------------------
         private static float RayDistance(Ray ray, Vector3 point)
         {
-            return Vector3.Cross(ray.Direction, point - ray.Position).Length();
+            return Vector3.Cross(ray.direction, point - ray.origin).magnitude;
         }
         
         private void UpdateChildBounds()
@@ -357,21 +362,21 @@ namespace GDX.AI.Sharp.Spatial
             float quarter = this.Size / 4f;
             float childActualLength = this.Size / 2;
             Vector3 childActualSize = new Vector3(childActualLength, childActualLength, childActualLength);
-            this.ChildBounds = new BoundingBox[8];
-            this.ChildBounds[0] = new BoundingBox(this.Center + new Vector3(-quarter, quarter, -quarter), childActualSize);
-            this.ChildBounds[1] = new BoundingBox(this.Center + new Vector3(quarter, quarter, -quarter), childActualSize);
-            this.ChildBounds[2] = new BoundingBox(this.Center + new Vector3(-quarter, quarter, quarter), childActualSize);
-            this.ChildBounds[3] = new BoundingBox(this.Center + new Vector3(quarter, quarter, quarter), childActualSize);
-            this.ChildBounds[4] = new BoundingBox(this.Center + new Vector3(-quarter, -quarter, -quarter), childActualSize);
-            this.ChildBounds[5] = new BoundingBox(this.Center + new Vector3(quarter, -quarter, -quarter), childActualSize);
-            this.ChildBounds[6] = new BoundingBox(this.Center + new Vector3(-quarter, -quarter, quarter), childActualSize);
-            this.ChildBounds[7] = new BoundingBox(this.Center + new Vector3(quarter, -quarter, quarter), childActualSize);
+            this.ChildBounds = new Bounds[8];
+            this.ChildBounds[0] = BoundsExtensions.FromMinMax(this.Center + new Vector3(-quarter, quarter, -quarter), childActualSize);
+            this.ChildBounds[1] = BoundsExtensions.FromMinMax(this.Center + new Vector3(quarter, quarter, -quarter), childActualSize);
+            this.ChildBounds[2] = BoundsExtensions.FromMinMax(this.Center + new Vector3(-quarter, quarter, quarter), childActualSize);
+            this.ChildBounds[3] = BoundsExtensions.FromMinMax(this.Center + new Vector3(quarter, quarter, quarter), childActualSize);
+            this.ChildBounds[4] = BoundsExtensions.FromMinMax(this.Center + new Vector3(-quarter, -quarter, -quarter), childActualSize);
+            this.ChildBounds[5] = BoundsExtensions.FromMinMax(this.Center + new Vector3(quarter, -quarter, -quarter), childActualSize);
+            this.ChildBounds[6] = BoundsExtensions.FromMinMax(this.Center + new Vector3(-quarter, -quarter, quarter), childActualSize);
+            this.ChildBounds[7] = BoundsExtensions.FromMinMax(this.Center + new Vector3(quarter, -quarter, quarter), childActualSize);
         }
 
         private void DeleteObject(int index)
         {
             this.objects[index] = default(T);
-            this.objectPositions[index] = Vector3.Zero;
+            this.objectPositions[index] = Vector3.zero;
         }
 
         private void FindNextFreeSlot()
@@ -390,14 +395,14 @@ namespace GDX.AI.Sharp.Spatial
         {
             float half = this.Size / 2f;
             this.children = new OctreeNode<T>[8];
-            this.children[0] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, half, 0)) { AutoMerge = this.AutoMerge };
-            this.children[1] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, half, 0)) { AutoMerge = this.AutoMerge };
-            this.children[2] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, half, half)) { AutoMerge = this.AutoMerge };
-            this.children[3] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, half, half)) { AutoMerge = this.AutoMerge };
-            this.children[4] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, 0, 0)) { AutoMerge = this.AutoMerge };
-            this.children[5] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, 0, 0)) { AutoMerge = this.AutoMerge };
-            this.children[6] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(0, 0, half)) { AutoMerge = this.AutoMerge };
-            this.children[7] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.Min + new Vector3(half, 0, half)) { AutoMerge = this.AutoMerge };
+            this.children[0] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.min + new Vector3(0, half, 0)) { AutoMerge = this.AutoMerge };
+            this.children[1] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.min + new Vector3(half, half, 0)) { AutoMerge = this.AutoMerge };
+            this.children[2] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.min + new Vector3(0, half, half)) { AutoMerge = this.AutoMerge };
+            this.children[3] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.min + new Vector3(half, half, half)) { AutoMerge = this.AutoMerge };
+            this.children[4] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.min + new Vector3(0, 0, 0)) { AutoMerge = this.AutoMerge };
+            this.children[5] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.min + new Vector3(half, 0, 0)) { AutoMerge = this.AutoMerge };
+            this.children[6] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.min + new Vector3(0, 0, half)) { AutoMerge = this.AutoMerge };
+            this.children[7] = new OctreeNode<T>(this.parent, half, this.MinSize, this.Bounds.min + new Vector3(half, 0, half)) { AutoMerge = this.AutoMerge };
         }
 
         private bool ShouldMerge()

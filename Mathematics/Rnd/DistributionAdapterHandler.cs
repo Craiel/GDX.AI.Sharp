@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Mathematics.Rnd
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Mathematics.Rnd
 {
     using System;
     using System.Collections.Generic;
@@ -56,13 +56,14 @@ namespace GDX.AI.Sharp.Mathematics.Rnd
             IDictionary<string, DistributionAdapter> typeList;
             if (!this.typeMap.TryGetValue(type, out typeList))
             {
-                throw new DistributionFormatException($"No adapter set for type {type}");
+                throw new DistributionFormatException(string.Format("No adapter set for type {0}", type));
             }
 
             DistributionAdapter adapter;
             if (!typeList.TryGetValue(parameters[0], out adapter))
             {
-                throw new DistributionFormatException($"No adapter set for type {type} and category {parameters[0]}");
+                throw new DistributionFormatException(string.Format("No adapter set for type {0} and category {1}",
+                    type, parameters[0]));
             }
 
             return adapter.ToDistribution<T>(parameters.Skip(1).ToArray());
@@ -73,7 +74,8 @@ namespace GDX.AI.Sharp.Mathematics.Rnd
             DistributionAdapter adapter;
             if (!this.map.TryGetValue(distribution.GetType(), out adapter))
             {
-                throw new DistributionFormatException($"No adapter set for type {distribution.GetType()}");
+                throw new DistributionFormatException(
+                    string.Format("No adapter set for type {0}", distribution.GetType()));
             }
 
             string[] parameters = adapter.ToParameters(distribution);

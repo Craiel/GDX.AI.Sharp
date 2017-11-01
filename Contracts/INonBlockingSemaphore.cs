@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Contracts
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Contracts
 {
     /// <summary>
     /// A counting semaphore that does not block the thread when the requested resource is not available.

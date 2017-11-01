@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Geometry
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Geometry
 {
     using System;
     using System.Runtime.InteropServices;
@@ -116,7 +116,7 @@ namespace GDX.AI.Sharp.Geometry
         /// <returns>A string containing the triangle's data.</returns>
         public override string ToString()
         {
-            return $"({this.A}, {this.B}, {this.C})";
+            return string.Format("({0}, {1}, {2})", this.A, this.B, this.C);
         }
     }
 }

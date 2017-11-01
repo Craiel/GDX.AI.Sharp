@@ -1,4 +1,4 @@
-namespace GDX.AI.Sharp.Spatial
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Spatial
 {
     using System;
 
@@ -41,39 +41,64 @@ namespace GDX.AI.Sharp.Spatial
         /// <summary>
         /// The index in the pointArray that the current node resides in.
         /// </summary>
-        public int Index { get; }
+        public int Index { get; private set; }
 
         /// <summary>
         /// The left child of the current node.
         /// </summary>
         public KDTreeNavigator<TPoint, TNode> Left
-            =>
-                KDTreeNavigation.LeftChildIndex(this.Index) < this.pointArray.Length - 1
-                    ? new KDTreeNavigator<TPoint, TNode>(this.pointArray, this.nodeArray, KDTreeNavigation.LeftChildIndex(this.Index))
+        {
+            get
+            {
+                return KDTreeNavigation.LeftChildIndex(this.Index) < this.pointArray.Length - 1
+                    ? new KDTreeNavigator<TPoint, TNode>(this.pointArray, this.nodeArray,
+                        KDTreeNavigation.LeftChildIndex(this.Index))
                     : null;
+            }
+        }
 
         /// <summary>
         /// The right child of the current node.
         /// </summary>
         public KDTreeNavigator<TPoint, TNode> Right
-               =>
-                   KDTreeNavigation.RightChildIndex(this.Index) < this.pointArray.Length - 1
-                       ? new KDTreeNavigator<TPoint, TNode>(this.pointArray, this.nodeArray, KDTreeNavigation.RightChildIndex(this.Index))
-                       : null;
+        {
+            get
+            {
+                return KDTreeNavigation.RightChildIndex(this.Index) < this.pointArray.Length - 1
+                    ? new KDTreeNavigator<TPoint, TNode>(this.pointArray, this.nodeArray,
+                        KDTreeNavigation.RightChildIndex(this.Index))
+                    : null;
+            }
+        }
 
         /// <summary>
         /// The parent of the current node.
         /// </summary>
-        public KDTreeNavigator<TPoint, TNode> Parent => this.Index == 0 ? null : new KDTreeNavigator<TPoint, TNode>(this.pointArray, this.nodeArray, KDTreeNavigation.ParentIndex(this.Index));
+        public KDTreeNavigator<TPoint, TNode> Parent
+        {
+            get
+            {
+                return this.Index == 0
+                    ? null
+                    : new KDTreeNavigator<TPoint, TNode>(this.pointArray, this.nodeArray,
+                        KDTreeNavigation.ParentIndex(this.Index));
+            }
+        }
 
         /// <summary>
         /// The current <typeparamref name="TPoint"/>.
         /// </summary>
-        public TPoint Point => this.pointArray[this.Index];
+        public TPoint Point
+        {
+            get { return this.pointArray[this.Index]; }
+        }
 
         /// <summary>
         /// The current <typeparamref name="TNode"/>
         /// </summary>
-        public TNode Node => this.nodeArray[this.Index];
+        public TNode Node
+        {
+            get { return this.nodeArray[this.Index]; }
+        }
     }
 }

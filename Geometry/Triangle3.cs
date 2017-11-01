@@ -1,10 +1,10 @@
-namespace GDX.AI.Sharp.Geometry
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Geometry
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
-
-    using Microsoft.Xna.Framework;
+    
+    using UnityEngine;
 
     /// <summary>
     /// A 3d triangle.
@@ -40,18 +40,13 @@ namespace GDX.AI.Sharp.Geometry
             this.B = b;
             this.C = c;
         }
-        
+
         /// <summary>
         /// Gets the directed line segment from <see cref="A"/> to <see cref="B"/>.
         /// </summary>
         public Vector3 AB
         {
-            get
-            {
-                Vector3 result;
-                Vector3.Subtract(ref this.B, ref this.A, out result);
-                return result;
-            }
+            get { return this.B - this.A; }
         }
 
         /// <summary>
@@ -59,12 +54,7 @@ namespace GDX.AI.Sharp.Geometry
         /// </summary>
         public Vector3 AC
         {
-            get
-            {
-                Vector3 result;
-                Vector3.Subtract(ref this.C, ref this.A, out result);
-                return result;
-            }
+            get { return this.C - this.A; }
         }
 
         /// <summary>
@@ -72,12 +62,7 @@ namespace GDX.AI.Sharp.Geometry
         /// </summary>
         public Vector3 BA
         {
-            get
-            {
-                Vector3 result;
-                Vector3.Subtract(ref this.A, ref this.B, out result);
-                return result;
-            }
+            get { return this.A - this.B; }
         }
 
         /// <summary>
@@ -85,12 +70,7 @@ namespace GDX.AI.Sharp.Geometry
         /// </summary>
         public Vector3 BC
         {
-            get
-            {
-                Vector3 result;
-                Vector3.Subtract(ref this.C, ref this.B, out result);
-                return result;
-            }
+            get { return this.C - this.B; }
         }
 
         /// <summary>
@@ -98,12 +78,7 @@ namespace GDX.AI.Sharp.Geometry
         /// </summary>
         public Vector3 CA
         {
-            get
-            {
-                Vector3 result;
-                Vector3.Subtract(ref this.A, ref this.C, out result);
-                return result;
-            }
+            get { return this.A - this.C; }
         }
 
         /// <summary>
@@ -111,23 +86,24 @@ namespace GDX.AI.Sharp.Geometry
         /// </summary>
         public Vector3 CB
         {
-            get
-            {
-                Vector3 result;
-                Vector3.Subtract(ref this.B, ref this.C, out result);
-                return result;
-            }
+            get { return this.B - this.C; }
         }
 
         /// <summary>
         /// Gets the area of the triangle.
         /// </summary>
-        public float Area => Vector3.Cross(this.AB, this.AC).Length() * 0.5f;
+        public float Area
+        {
+            get { return Vector3.Cross(this.AB, this.AC).magnitude * 0.5f; }
+        }
 
         /// <summary>
         /// Gets the perimeter of the triangle.
         /// </summary>
-        public float Perimeter => this.AB.Length() + this.AC.Length() + this.BC.Length();
+        public float Perimeter
+        {
+            get { return this.AB.magnitude + this.AC.magnitude + this.BC.magnitude; }
+        }
 
         /// <summary>
         /// Gets the centroid of the triangle.
@@ -144,7 +120,10 @@ namespace GDX.AI.Sharp.Geometry
         /// <summary>
         /// Gets the <see cref="Triangle3"/>'s surface normal. Assumes clockwise ordering of A, B, and C.
         /// </summary>
-        public Vector3 Normal => Vector3.Normalize(Vector3.Cross(this.AB, this.AC));
+        public Vector3 Normal
+        {
+            get { return Vector3.Normalize(Vector3.Cross(this.AB, this.AC)); }
+        }
 
         /// <summary>
         /// Compares two <see cref="Triangle3"/>'s for equality.
@@ -173,9 +152,9 @@ namespace GDX.AI.Sharp.Geometry
         /// </summary>
         /// <param name="tri">A triangle.</param>
         /// <returns>The triangle's bounding box.</returns>
-        public static BoundingBox GetBoundingBox(Triangle3 tri)
+        public static Bounds GetBoundingBox(Triangle3 tri)
         {
-            BoundingBox bounds;
+            Bounds bounds;
             GetBoundingBox(ref tri, out bounds);
             return bounds;
         }
@@ -185,7 +164,7 @@ namespace GDX.AI.Sharp.Geometry
         /// </summary>
         /// <param name="tri">A triangle.</param>
         /// <param name="bounds">The triangle's bounding box.</param>
-        public static void GetBoundingBox(ref Triangle3 tri, out BoundingBox bounds)
+        public static void GetBoundingBox(ref Triangle3 tri, out Bounds bounds)
         {
             GetBoundingBox(ref tri.A, ref tri.B, ref tri.C, out bounds);
         }
@@ -198,26 +177,27 @@ namespace GDX.AI.Sharp.Geometry
         /// <param name="c">The third vertex.</param>
         /// <param name="bounds">The bounding box between the points.</param>
         [SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1501:StatementMustNotBeOnSingleLine", Justification = "Reviewed. Suppression is OK here.")]
-        public static void GetBoundingBox(ref Vector3 a, ref Vector3 b, ref Vector3 c, out BoundingBox bounds)
+        public static void GetBoundingBox(ref Vector3 a, ref Vector3 b, ref Vector3 c, out Bounds bounds)
         {
-            Vector3 min = a, max = a;
+            Vector3 min = a;
+            Vector3 max = a;
 
-            if (b.X < min.X) { min.X = b.X;}
-            if (b.Y < min.Y) { min.Y = b.Y;}
-            if (b.Z < min.Z) { min.Z = b.Z;}
-            if (c.X < min.X) { min.X = c.X;}
-            if (c.Y < min.Y) { min.Y = c.Y;}
-            if (c.Z < min.Z) { min.Z = c.Z;}
+            if (b.x < min.x) { min.x = b.x;}
+            if (b.y < min.y) { min.y = b.y;}
+            if (b.z < min.z) { min.z = b.z;}
+            if (c.x < min.x) { min.x = c.x;}
+            if (c.y < min.y) { min.y = c.y;}
+            if (c.z < min.z) { min.z = c.z;}
 
-            if (b.X > max.X) { max.X = b.X;}
-            if (b.Y > max.Y) { max.Y = b.Y;}
-            if (b.Z > max.Z) { max.Z = b.Z;}
-            if (c.X > max.X) { max.X = c.X;}
-            if (c.Y > max.Y) { max.Y = c.Y;}
-            if (c.Z > max.Z) { max.Z = c.Z;}
+            if (b.x > max.x) { max.x = b.x;}
+            if (b.y > max.y) { max.y = b.y;}
+            if (b.z > max.z) { max.z = b.z;}
+            if (c.x > max.x) { max.x = c.x;}
+            if (c.y > max.y) { max.y = c.y;}
+            if (c.z > max.z) { max.z = c.z;}
 
-            bounds.Min = min;
-            bounds.Max = max;
+            bounds = new Bounds();
+            bounds.SetMinMax(min, max);
         }
 
         /// <summary>
@@ -229,10 +209,10 @@ namespace GDX.AI.Sharp.Geometry
         /// <param name="area">The calculated area.</param>
         public static void Area2D(ref Vector3 a, ref Vector3 b, ref Vector3 c, out float area)
         {
-            float abx = b.X - a.X;
-            float abz = b.Z - a.Z;
-            float acx = c.X - a.X;
-            float acz = c.Z - a.Z;
+            float abx = b.x - a.x;
+            float abz = b.z - a.z;
+            float acx = c.x - a.x;
+            float acz = c.z - a.z;
             area = acx * abz - abx * acz;
         }
 
@@ -301,7 +281,7 @@ namespace GDX.AI.Sharp.Geometry
         /// <returns>A string containing the triangle's data.</returns>
         public override string ToString()
         {
-            return $"({this.A}, {this.B}, {this.C})";
+            return string.Format("({0}, {1}, {2})", this.A, this.B, this.C);
         }
     }
 }

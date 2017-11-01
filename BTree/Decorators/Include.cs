@@ -1,7 +1,7 @@
-namespace GDX.AI.Sharp.BTree.Decorators
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Decorators
 {
     using System;
-
+    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
     using Contracts;
 
     using Exceptions;
@@ -59,7 +59,7 @@ namespace GDX.AI.Sharp.BTree.Decorators
         {
             if (!this.Lazy)
             {
-                throw new NotSupportedException($"A non-lazy {this.GetType().Name} isn't meant to be run!");
+                throw new NotSupportedException(string.Format("A non-lazy {0} isn't meant to be run!", this.GetType().Name));
             }
 
             if (this.Child == TaskId.Invalid)
@@ -97,7 +97,7 @@ namespace GDX.AI.Sharp.BTree.Decorators
         {
             if (!this.Lazy)
             {
-                throw new TaskCloneException($"A non-lazy {this.GetType().Name} should never be copied");
+                throw new TaskCloneException(string.Format("A non-lazy {0} should never be copied", this.GetType().Name));
             }
 
             Include<T> include = (Include<T>)clone;

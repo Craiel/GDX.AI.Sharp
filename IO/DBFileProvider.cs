@@ -1,18 +1,15 @@
-namespace GDX.AI.Sharp.IO
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
 {
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-
-    using CarbonCore.Utils.IO;
-
+    
+    using Essentials.IO;
     using LiteDB;
     using NLog;
 
     public class DBFileProvider : BaseFileProvider
     {
-        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
-
         private readonly LiteDatabase database;
 
         private readonly IList<LiteFileStream> openStreams;
