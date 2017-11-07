@@ -2,6 +2,7 @@
 {
     using System;
     using Contracts;
+    using Essentials.Resource;
     using UnityEngine;
 
     public class GameObjectPool<T> : TrackedPool<T>
@@ -15,12 +16,32 @@
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public void Initialize(GameObject poolPrefab, Func<T, bool> updateCallback, Transform poolRoot = null)
+        private void Initialize(Func<T, bool> updateCallback, Transform poolRoot)
         {
             this.root = poolRoot;
+            this.activeUpdateCallback = updateCallback;
+        }
+        
+        public void Initialize(ResourceKey poolPrefabKey, Func<T, bool> updateCallback, Transform poolRoot = null)
+        {
+            this.Initialize(updateCallback, poolRoot);
+
+            using (var resource = ResourceProvider.Instance.AcquireOrLoadResource<GameObject>(poolPrefabKey))
+            {
+                if (resource == null || resource.Data == null)
+                {
+                    throw new InvalidOperationException("Resource could not be loaded: " + poolPrefabKey);
+                }
+
+                this.prefab = resource.Data;
+            }
+        }
+        
+        public void Initialize(GameObject poolPrefab, Func<T, bool> updateCallback, Transform poolRoot = null)
+        {
+            this.Initialize(updateCallback, poolRoot);
 
             this.prefab = poolPrefab;
-            this.activeUpdateCallback = updateCallback;
         }
 
         // -------------------------------------------------------------------
