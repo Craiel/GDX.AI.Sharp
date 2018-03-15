@@ -1,3 +1,6 @@
+using INonBlockingSemaphore = Craiel.UnityEssentials.Contracts.INonBlockingSemaphore;
+using NonBlockingSemaphoreRepository = Craiel.UnityEssentials.NonBlockingSemaphoreRepository;
+
 namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Decorators
 {
     using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;

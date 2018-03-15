@@ -1,3 +1,5 @@
+using EssentialMathUtils = Craiel.UnityEssentials.Utils.EssentialMathUtils;
+
 namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Mathematics.Rnd
 {
     using System;
@@ -41,13 +43,13 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Mathematics.Rnd
 
         public override int NextInt()
         {
-            if (Math.Abs(-this.Low - this.High) < MathUtils.DoubleEpsilon && Math.Abs(this.Mode) < MathUtils.DoubleEpsilon)
+            if (Math.Abs(-this.Low - this.High) < EssentialMathUtils.DoubleEpsilon && Math.Abs(this.Mode) < EssentialMathUtils.DoubleEpsilon)
             {
                 // Faster
-                return (int)Math.Round(MathUtils.RandomTriangular(this.High));
+                return (int)Math.Round(EssentialMathUtils.RandomTriangular(this.High));
             }
 
-            return (int)Math.Round(MathUtils.RandomTriangular(this.Low, this.High, this.Mode));
+            return (int)Math.Round(EssentialMathUtils.RandomTriangular(this.Low, this.High, this.Mode));
         }
 
         public override T Clone<T>()

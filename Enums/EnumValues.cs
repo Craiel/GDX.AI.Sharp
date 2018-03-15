@@ -1,4 +1,6 @@
-﻿namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Enums
+﻿using TelegramReturnReceiptStatus = Craiel.UnityEssentials.Enums.TelegramReturnReceiptStatus;
+
+namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Enums
 {
     using System;
     using System.Collections.Generic;
@@ -11,7 +13,7 @@
         // -------------------------------------------------------------------
         public static readonly IList<BTTaskStatus> BTTaskStatusValues = Enum.GetValues(typeof(BTTaskStatus)).Cast<BTTaskStatus>().ToList();
 
-        public static readonly IList<ReturnReceiptStatus> ReturnReceiptStatusValues = Enum.GetValues(typeof(ReturnReceiptStatus)).Cast<ReturnReceiptStatus>().ToList();
+        public static readonly IList<TelegramReturnReceiptStatus> ReturnReceiptStatusValues = Enum.GetValues(typeof(TelegramReturnReceiptStatus)).Cast<TelegramReturnReceiptStatus>().ToList();
 
         public static readonly IList<YamlContainerType> YamlContainerTypeValues = Enum.GetValues(typeof(YamlContainerType)).Cast<YamlContainerType>().ToList();
 

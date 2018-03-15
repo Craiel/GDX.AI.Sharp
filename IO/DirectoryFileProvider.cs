@@ -1,9 +1,11 @@
+using ManagedDirectory = Craiel.UnityEssentials.IO.ManagedDirectory;
+using ManagedFile = Craiel.UnityEssentials.IO.ManagedFile;
+using ManagedFileResult = Craiel.UnityEssentials.IO.ManagedFileResult;
+
 namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
 {
     using System.Collections.Generic;
     using System.IO;
-    
-    using Essentials.IO;
 
     public class DirectoryFileProvider : BaseFileProvider
     {
@@ -12,7 +14,7 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
         // -------------------------------------------------------------------
         // Constructor
         // -------------------------------------------------------------------
-        public DirectoryFileProvider(CarbonDirectory root)
+        public DirectoryFileProvider(ManagedDirectory root)
         {
             this.Root = root;
             this.openStreams = new List<FileStream>();
@@ -21,11 +23,11 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
         // -------------------------------------------------------------------
         // Public
         // -------------------------------------------------------------------
-        public CarbonDirectory Root { get; private set; }
+        public ManagedDirectory Root { get; private set; }
 
-        public override Stream BeginWrite(CarbonFile file)
+        public override Stream BeginWrite(ManagedFile file)
         {
-            CarbonFile fullFile = this.Root.ToFile(file);
+            ManagedFile fullFile = this.Root.ToFile(file);
             fullFile.GetDirectory().Create();
 
             var stream = fullFile.OpenCreate();
@@ -33,9 +35,9 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
             return stream;
         }
 
-        public override Stream BeginRead(CarbonFile file)
+        public override Stream BeginRead(ManagedFile file)
         {
-            CarbonFile fullFile = this.Root.ToFile(file);
+            ManagedFile fullFile = this.Root.ToFile(file);
             if (fullFile.Exists)
             {
                 var stream = fullFile.OpenRead();
@@ -46,10 +48,10 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
             return null;
         }
 
-        public override CarbonFile[] Find(string pattern)
+        public override ManagedFile[] Find(string pattern)
         {
-            CarbonFileResult[] results = this.Root.GetFiles(pattern, SearchOption.AllDirectories);
-            CarbonFile[] result = new CarbonFile[results.Length];
+            ManagedFileResult[] results = this.Root.GetFiles(pattern, SearchOption.AllDirectories);
+            ManagedFile[] result = new ManagedFile[results.Length];
             for (var i = 0; i < results.Length; i++)
             {
                 result[i] = results[i].Relative;

@@ -1,3 +1,5 @@
+using EssentialMathUtils = Craiel.UnityEssentials.Utils.EssentialMathUtils;
+
 namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Mathematics.Rnd
 {
     using System;
@@ -30,7 +32,7 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Mathematics.Rnd
 
         public override double NextDouble()
         {
-            return this.Mean + MathUtils.NextGaussian() * this.StandardDeviation;
+            return this.Mean + EssentialMathUtils.NextGaussian() * this.StandardDeviation;
         }
 
         public override T Clone<T>()

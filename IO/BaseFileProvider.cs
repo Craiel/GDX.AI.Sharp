@@ -1,9 +1,9 @@
+using ManagedFile = Craiel.UnityEssentials.IO.ManagedFile;
+
 namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
 {
     using System;
     using System.IO;
-    
-    using Essentials.IO;
 
     public abstract class BaseFileProvider : IDisposable
     {
@@ -16,10 +16,10 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
             GC.SuppressFinalize(this);
         }
 
-        public abstract Stream BeginWrite(CarbonFile file);
-        public abstract Stream BeginRead(CarbonFile file);
+        public abstract Stream BeginWrite(ManagedFile file);
+        public abstract Stream BeginRead(ManagedFile file);
 
-        public virtual void Write(CarbonFile file, byte[] data)
+        public virtual void Write(ManagedFile file, byte[] data)
         {
             using (var stream = this.BeginWrite(file))
             {
@@ -28,7 +28,7 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
             }
         }
 
-        public virtual void Read(CarbonFile file, out byte[] data)
+        public virtual void Read(ManagedFile file, out byte[] data)
         {
             using (var stream = this.BeginRead(file))
             {
@@ -43,7 +43,7 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
             }
         }
 
-        public abstract CarbonFile[] Find(string pattern);
+        public abstract ManagedFile[] Find(string pattern);
         
         // -------------------------------------------------------------------
         // Protected
