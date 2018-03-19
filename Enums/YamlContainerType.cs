@@ -1,8 +1,0 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Enums
-{
-    public enum YamlContainerType
-    {
-        Dictionary,
-        List
-    }
-}

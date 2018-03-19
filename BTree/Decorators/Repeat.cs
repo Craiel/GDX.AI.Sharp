@@ -1,10 +1,11 @@
+using ConstantIntegerDistribution = Craiel.UnityEssentials.Mathematics.Rnd.ConstantIntegerDistribution;
+using IntegerDistribution = Craiel.UnityEssentials.Mathematics.Rnd.IntegerDistribution;
+
 namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Decorators
 {
     using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
     using Contracts;
 
-    using Mathematics.Rnd;
-    
     /// <summary>
     /// A <see cref="Repeat{T}"/> decorator will repeat the wrapped task a certain number of times, possibly infinite. 
     /// This task always succeeds when reaches the specified number of repetitions

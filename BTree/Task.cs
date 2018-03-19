@@ -1,3 +1,9 @@
+using IllegalStateException = Craiel.UnityEssentials.Exceptions.IllegalStateException;
+using IYamlSerializable = Craiel.UnityEssentials.Contracts.IYamlSerializable;
+using YamlContainerType = Craiel.UnityEssentials.Enums.YamlContainerType;
+using YamlFluentDeserializer = Craiel.UnityEssentials.Utils.YamlFluentDeserializer;
+using YamlFluentSerializer = Craiel.UnityEssentials.Utils.YamlFluentSerializer;
+
 namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
 {
     using System;
@@ -5,7 +11,6 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
     using Contracts;
     using Enums;
     using Exceptions;
-    using Sharp.Utils;
 
     /// <summary>
     /// This is the abstract base class of all behavior tree tasks. The Task of a behavior tree has a status, one control and a list of children.

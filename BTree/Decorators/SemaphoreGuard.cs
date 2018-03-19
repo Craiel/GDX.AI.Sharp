@@ -6,8 +6,6 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Decorators
     using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
     using Contracts;
 
-    using Sharp.Utils;
-
     /// <summary>
     /// A <see cref="SemaphoreGuard{T}"/> decorator allows you to specify how many characters should be allowed to concurrently execute its
     /// child which represents a limited resource used in different behavior trees(note that this does not necessarily involve

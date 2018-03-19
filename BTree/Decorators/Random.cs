@@ -1,12 +1,13 @@
+using ConstantFloatDistribution = Craiel.UnityEssentials.Mathematics.Rnd.ConstantFloatDistribution;
+using FloatDistribution = Craiel.UnityEssentials.Mathematics.Rnd.FloatDistribution;
+
 namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Decorators
 {
     using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
     using Contracts;
 
     using Leafs;
-    
-    using Mathematics.Rnd;
-    
+
     /// <summary>
     /// The <see cref="Random{T}"/> decorator succeeds with the specified probability, regardless of whether the wrapped task fails or succeeds.
     /// Also, the wrapped task is optional, meaning that this decorator can act like a leaf task.

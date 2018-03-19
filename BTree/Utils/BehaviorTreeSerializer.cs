@@ -1,3 +1,7 @@
+using YamlContainerType = Craiel.UnityEssentials.Enums.YamlContainerType;
+using YamlFluentDeserializer = Craiel.UnityEssentials.Utils.YamlFluentDeserializer;
+using YamlFluentSerializer = Craiel.UnityEssentials.Utils.YamlFluentSerializer;
+
 namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Utils
 {
     using System;
@@ -9,8 +13,6 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Utils
 
     using Exceptions;
 
-    using Sharp.Utils;
-    
     /// <summary>
     /// Serializer for <see cref="BehaviorStream{T}"/>
     /// </summary>

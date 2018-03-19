@@ -1,3 +1,5 @@
+using IllegalStateException = Craiel.UnityEssentials.Exceptions.IllegalStateException;
+
 namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Leafs
 {
     using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
