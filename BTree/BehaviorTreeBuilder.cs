@@ -1,18 +1,12 @@
-using IntegerDistribution = Craiel.UnityEssentials.Mathematics.Rnd.IntegerDistribution;
-
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
+namespace Craiel.GDX.AI.Sharp.BTree
 {
     using System.Collections.Generic;
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
     using Branches;
-
     using Contracts;
-
     using Decorators;
-
     using Exceptions;
-
     using Leafs;
+    using UnityEssentials.Mathematics.Rnd;
 
     /// <summary>
     /// Helper class to build a behavior tree using the fluent API

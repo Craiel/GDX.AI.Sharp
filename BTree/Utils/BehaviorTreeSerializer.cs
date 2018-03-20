@@ -1,20 +1,16 @@
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
+using SerializationException = Craiel.GDX.AI.Sharp.Exceptions.SerializationException;
 using YamlContainerType = Craiel.UnityEssentials.Enums.YamlContainerType;
 using YamlFluentDeserializer = Craiel.UnityEssentials.Utils.YamlFluentDeserializer;
 using YamlFluentSerializer = Craiel.UnityEssentials.Utils.YamlFluentSerializer;
 
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Utils
+namespace Craiel.GDX.AI.Sharp.BTree.Utils
 {
     using System;
     using System.Collections.Generic;
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-    using Contracts;
-
-    using Enums;
-
-    using Exceptions;
 
     /// <summary>
-    /// Serializer for <see cref="BehaviorStream{T}"/>
+    /// Serializer for <see cref="Craiel.GDX.AI.Sharp.BTree.BehaviorStream{T}"/>
     /// </summary>
     /// <typeparam name="T">the type of <see cref="IBlackboard"/> the tree is using</typeparam>
     public class BehaviorTreeSerializer<T>
@@ -70,7 +66,7 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Utils
         }
 
         /// <summary>
-        /// Deserialize the given data into a <see cref="BehaviorStream{T}"/>.
+        /// Deserialize the given data into a <see cref="Craiel.GDX.AI.Sharp.BTree.BehaviorStream{T}"/>.
         /// </summary>
         /// <param name="blackboard">the <see cref="IBlackboard"/> the deserialized tree will use</param>
         /// <param name="data">the data to load from</param>

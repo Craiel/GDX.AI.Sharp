@@ -1,8 +1,9 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
+
+namespace Craiel.GDX.AI.Sharp.BTree
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Contracts;
 
     /// <summary>
     /// A branch task defines a behavior tree branch, contains logic of starting or running sub-branches and leaves

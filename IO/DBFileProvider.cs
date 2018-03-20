@@ -1,12 +1,11 @@
 using ManagedFile = Craiel.UnityEssentials.IO.ManagedFile;
 
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
+namespace Craiel.GDX.AI.Sharp.IO
 {
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using LiteDB;
-    using NLog;
 
     public class DBFileProvider : BaseFileProvider
     {

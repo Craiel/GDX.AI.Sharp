@@ -2,7 +2,7 @@ using ManagedDirectory = Craiel.UnityEssentials.IO.ManagedDirectory;
 using ManagedFile = Craiel.UnityEssentials.IO.ManagedFile;
 using ManagedFileResult = Craiel.UnityEssentials.IO.ManagedFileResult;
 
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
+namespace Craiel.GDX.AI.Sharp.IO
 {
     using System.Collections.Generic;
     using System.IO;

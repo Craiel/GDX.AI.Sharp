@@ -1,8 +1,8 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Branches
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
+
+namespace Craiel.GDX.AI.Sharp.BTree.Branches
 {
     using System.Collections.Generic;
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-    using Contracts;
 
     /// <summary>
     /// A <see cref="RandomSequence{T}"/> is a selector task's variant that runs its children in a random order

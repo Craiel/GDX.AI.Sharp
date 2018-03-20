@@ -1,8 +1,7 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Decorators
-{
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-    using Contracts;
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
 
+namespace Craiel.GDX.AI.Sharp.BTree.Decorators
+{
     /// <summary>
     /// Executes the child only when a certain delay time has passed and gets reset on execution
     /// </summary>

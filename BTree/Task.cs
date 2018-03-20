@@ -1,16 +1,14 @@
-using IllegalStateException = Craiel.UnityEssentials.Exceptions.IllegalStateException;
-using IYamlSerializable = Craiel.UnityEssentials.Contracts.IYamlSerializable;
-using YamlContainerType = Craiel.UnityEssentials.Enums.YamlContainerType;
-using YamlFluentDeserializer = Craiel.UnityEssentials.Utils.YamlFluentDeserializer;
-using YamlFluentSerializer = Craiel.UnityEssentials.Utils.YamlFluentSerializer;
-
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
+namespace Craiel.GDX.AI.Sharp.BTree
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using Contracts;
     using Enums;
     using Exceptions;
+    using UnityEssentials.Contracts;
+    using UnityEssentials.Enums;
+    using UnityEssentials.Exceptions;
+    using UnityEssentials.Utils;
 
     /// <summary>
     /// This is the abstract base class of all behavior tree tasks. The Task of a behavior tree has a status, one control and a list of children.
@@ -305,7 +303,7 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
         }
 
         /// <summary>
-        /// Clones this task to a new one. If you don't specify a clone strategy through <see cref="TaskCloner"/> the new task is instantiated via reflection and <see cref="CopyTo"/> is invoked
+        /// Clones this task to a new one. If you don't specify a clone strategy through <see cref="Craiel.GDX.AI.Sharp.BTree.TaskCloner"/> the new task is instantiated via reflection and <see cref="CopyTo"/> is invoked
         /// </summary>
         /// <returns>the cloned task</returns>
         /// <exception cref="TaskCloneException">if the task cannot be successfully cloned</exception>

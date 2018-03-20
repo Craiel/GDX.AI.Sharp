@@ -3,7 +3,7 @@
 <#@ assembly name="EnvDTE" #>
 <#@ import namespace="EnvDTE" #>
 <#@ import namespace="System.Collections.Generic" #>
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Enums
+namespace Craiel.GDX.AI.Sharp.Enums
 {
     using System;
     using System.Collections.Generic;
@@ -16,12 +16,7 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Enums
         // -------------------------------------------------------------------
 <#
 IList<string> excludes = new List<string>() { "EnumValues" };
-var provider = (IServiceProvider)this.Host;
-var dteObject = (DTE)provider.GetService(typeof(DTE));
 
-var CurrentProject = dteObject.Solution.FindProjectItem(Host.TemplateFile).ContainingProject;
-
-var ProjectPath = System.IO.Path.GetDirectoryName(CurrentProject.FullName) + System.IO.Path.DirectorySeparatorChar;
 string[] files = System.IO.Directory.GetFiles(System.IO.Path.GetDirectoryName(Host.TemplateFile), "*.cs");
 foreach(string file in files)
 {

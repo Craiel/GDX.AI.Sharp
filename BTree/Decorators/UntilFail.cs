@@ -1,8 +1,7 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Decorators
-{
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-    using Contracts;
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
 
+namespace Craiel.GDX.AI.Sharp.BTree.Decorators
+{
     /// <summary>
     /// The <see cref="UntilFail{T}"/> decorator will repeat the wrapped task until that task fails, which makes the decorator succeed.
     /// <para></para>

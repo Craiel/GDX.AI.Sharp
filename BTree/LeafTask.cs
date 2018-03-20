@@ -1,13 +1,10 @@
+using BTTaskStatus = Craiel.GDX.AI.Sharp.Enums.BTTaskStatus;
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
 using IllegalStateException = Craiel.UnityEssentials.Exceptions.IllegalStateException;
 
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
+namespace Craiel.GDX.AI.Sharp.BTree
 {
     using System;
-    using Contracts;
-
-    using Enums;
-
-    using Exceptions;
 
     /// <summary>
     /// A <see cref="LeafTask{T}"/> is a terminal task of a behavior tree, contains action or condition logic, can not have any child

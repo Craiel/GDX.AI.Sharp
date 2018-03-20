@@ -1,11 +1,10 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Branches
+using BTTaskStatus = Craiel.GDX.AI.Sharp.Enums.BTTaskStatus;
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
+
+namespace Craiel.GDX.AI.Sharp.BTree.Branches
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-    using Contracts;
-
-    using Enums;
 
     /// <summary>
     /// A {@code Parallel} is a special branch task that starts or resumes all children every single time.

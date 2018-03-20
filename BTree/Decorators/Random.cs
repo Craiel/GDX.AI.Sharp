@@ -1,19 +1,15 @@
 using ConstantFloatDistribution = Craiel.UnityEssentials.Mathematics.Rnd.ConstantFloatDistribution;
 using FloatDistribution = Craiel.UnityEssentials.Mathematics.Rnd.FloatDistribution;
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
 
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Decorators
+namespace Craiel.GDX.AI.Sharp.BTree.Decorators
 {
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-    using Contracts;
-
-    using Leafs;
-
     /// <summary>
     /// The <see cref="Random{T}"/> decorator succeeds with the specified probability, regardless of whether the wrapped task fails or succeeds.
     /// Also, the wrapped task is optional, meaning that this decorator can act like a leaf task.
     /// <para></para>
-    /// Notice that if success probability is 1 this task is equivalent to the decorator <see cref="AlwaysSucceed{T}"/> and the leaf <see cref="Success{T}"/>.
-    /// Similarly if success probability is 0 this task is equivalent to the decorator <see cref="AlwaysFail{T}"/> and the leaf <see cref="Failure{T}"/>.
+    /// Notice that if success probability is 1 this task is equivalent to the decorator <see cref="Craiel.GDX.AI.Sharp.BTree.Decorators.AlwaysSucceed{T}"/> and the leaf <see cref="Craiel.GDX.AI.Sharp.BTree.Leafs.Success{T}"/>.
+    /// Similarly if success probability is 0 this task is equivalent to the decorator <see cref="Craiel.GDX.AI.Sharp.BTree.Decorators.AlwaysFail{T}"/> and the leaf <see cref="Craiel.GDX.AI.Sharp.BTree.Leafs.Failure{T}"/>.
     /// </summary>
     /// <typeparam name="T">type of the blackboard object that tasks use to read or modify game state</typeparam>
     public class Random<T> : Decorator<T>

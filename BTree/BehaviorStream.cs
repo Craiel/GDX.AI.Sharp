@@ -1,15 +1,11 @@
-using IllegalStateException = Craiel.UnityEssentials.Exceptions.IllegalStateException;
-
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
+namespace Craiel.GDX.AI.Sharp.BTree
 {
     using System;
     using System.Collections.Generic;
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.Contracts;
-
+    using Contracts;
     using Enums;
+    using UnityEssentials.Exceptions;
 
-    using Exceptions;
-    
     /// <summary>
     /// Creates a new BehaviorStream object that is used to execute and maintain the tree at runtime
     /// </summary>
@@ -93,7 +89,7 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
         }
 
         /// <summary>
-        /// Adds a new listener which will receive events defined in <see cref="IListener{T}"/>
+        /// Adds a new listener which will receive events defined in <see cref="Craiel.GDX.AI.Sharp.Contracts.IListener{T}"/>
         /// </summary>
         /// <param name="listener">the listener to add</param>
         public void AddListener(IListener<T> listener)
@@ -151,7 +147,7 @@ namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
         /// Returns the task for the given task id
         /// </summary>
         /// <param name="taskId">the task id</param>
-        /// <returns>the <see cref="Task{T}"/> of the given id</returns>
+        /// <returns>the <see cref="Craiel.GDX.AI.Sharp.BTree.Task{T}"/> of the given id</returns>
         public Task<T> Get(TaskId taskId)
         {
             return this.stream[taskId.Value];

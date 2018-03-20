@@ -1,10 +1,9 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Decorators
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
+using TaskCloneException = Craiel.GDX.AI.Sharp.Exceptions.TaskCloneException;
+
+namespace Craiel.GDX.AI.Sharp.BTree.Decorators
 {
     using System;
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-    using Contracts;
-
-    using Exceptions;
 
     /// <summary>
     /// An <see cref="Include{T}"/> decorator grafts a subtree.

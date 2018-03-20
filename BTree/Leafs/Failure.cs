@@ -1,11 +1,8 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Leafs
+using BTTaskStatus = Craiel.GDX.AI.Sharp.Enums.BTTaskStatus;
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
+
+namespace Craiel.GDX.AI.Sharp.BTree.Leafs
 {
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-
-    using Contracts;
-
-    using Enums;
-
     /// <summary>
     /// <see cref="Failure{T}"/> is a leaf that immediately fails
     /// </summary>

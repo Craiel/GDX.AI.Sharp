@@ -1,7 +1,6 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.Exceptions
+namespace Craiel.GDX.AI.Sharp.Exceptions
 {
     using System;
-
     using BTree;
 
     /// <summary>

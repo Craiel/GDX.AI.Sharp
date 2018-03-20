@@ -1,14 +1,10 @@
-using IllegalStateException = Craiel.UnityEssentials.Exceptions.IllegalStateException;
-
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
+namespace Craiel.GDX.AI.Sharp.BTree
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
     using Contracts;
+    using UnityEssentials.Exceptions;
 
-    using Exceptions;
-    
     /// <summary>
     /// A <see cref="SingleRunningBranchTask{T}"/> task is a branch task that supports only one running child at a time
     /// </summary>

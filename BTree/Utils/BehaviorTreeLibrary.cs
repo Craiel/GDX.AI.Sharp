@@ -1,8 +1,8 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Utils
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
+
+namespace Craiel.GDX.AI.Sharp.BTree.Utils
 {
     using System.Collections.Generic;
-
-    using Contracts;
 
     public class BehaviorTreeLibrary
     {

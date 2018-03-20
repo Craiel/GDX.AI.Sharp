@@ -1,6 +1,6 @@
 using ManagedFile = Craiel.UnityEssentials.IO.ManagedFile;
 
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.IO
+namespace Craiel.GDX.AI.Sharp.IO
 {
     using System;
     using System.IO;

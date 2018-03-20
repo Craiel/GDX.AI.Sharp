@@ -1,14 +1,9 @@
+using BTTaskStatus = Craiel.GDX.AI.Sharp.Enums.BTTaskStatus;
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
 using IllegalStateException = Craiel.UnityEssentials.Exceptions.IllegalStateException;
 
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Leafs
+namespace Craiel.GDX.AI.Sharp.BTree.Leafs
 {
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-    using Contracts;
-
-    using Enums;
-
-    using Exceptions;
-    
     public delegate bool ActionDelegate();
 
     /// <summary>

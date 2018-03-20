@@ -1,11 +1,9 @@
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
 using INonBlockingSemaphore = Craiel.UnityEssentials.Contracts.INonBlockingSemaphore;
 using NonBlockingSemaphoreRepository = Craiel.UnityEssentials.NonBlockingSemaphoreRepository;
 
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Decorators
+namespace Craiel.GDX.AI.Sharp.BTree.Decorators
 {
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-    using Contracts;
-
     /// <summary>
     /// A <see cref="SemaphoreGuard{T}"/> decorator allows you to specify how many characters should be allowed to concurrently execute its
     /// child which represents a limited resource used in different behavior trees(note that this does not necessarily involve

@@ -1,8 +1,7 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Decorators
-{
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-    using Contracts;
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
 
+namespace Craiel.GDX.AI.Sharp.BTree.Decorators
+{
     /// <summary>
     /// An <see cref="AlwaysFail{T}"/> decorator will fail no matter the wrapped task fails or succeeds
     /// </summary>

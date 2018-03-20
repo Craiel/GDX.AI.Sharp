@@ -1,14 +1,10 @@
+using BTTaskStatus = Craiel.GDX.AI.Sharp.Enums.BTTaskStatus;
 using ConstantFloatDistribution = Craiel.UnityEssentials.Mathematics.Rnd.ConstantFloatDistribution;
 using FloatDistribution = Craiel.UnityEssentials.Mathematics.Rnd.FloatDistribution;
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
 
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Leafs
+namespace Craiel.GDX.AI.Sharp.BTree.Leafs
 {
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-
-    using Contracts;
-
-    using Enums;
-
     /// <summary>
     /// <see cref="Wait{T}"/> is a leaf that keeps running for the specified amount of time then succeeds
     /// </summary>

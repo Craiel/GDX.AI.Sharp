@@ -1,11 +1,8 @@
-using IllegalStateException = Craiel.UnityEssentials.Exceptions.IllegalStateException;
-
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree
+namespace Craiel.GDX.AI.Sharp.BTree
 {
     using System;
     using Contracts;
-    
-    using Exceptions;
+    using UnityEssentials.Exceptions;
 
     /// <summary>
     /// A <see cref="Decorator{T}"/> is a wrapper that provides custom behavior for its child. The child can be of any kind (branch task, leaf task, or another decorator)

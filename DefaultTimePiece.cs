@@ -1,4 +1,4 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp
+namespace Craiel.GDX.AI.Sharp
 {
     using Contracts;
 

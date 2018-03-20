@@ -1,9 +1,9 @@
-namespace Assets.Scripts.Craiel.GDX.AI.Sharp.BTree.Branches
+using IBlackboard = Craiel.GDX.AI.Sharp.Contracts.IBlackboard;
+
+namespace Craiel.GDX.AI.Sharp.BTree.Branches
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Assets.Scripts.Craiel.GDX.AI.Sharp.BTree;
-    using Contracts;
 
     /// <summary>
     /// A <see cref="DynamicGuardSelector{T}"/> is a branch task that executes the first child whose guard is evaluated to <code>false</code>. 
