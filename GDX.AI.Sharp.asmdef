@@ -1,8 +1,0 @@
-{
-    "name": "GDX.AI.Sharp",
-    "references": [
-        "Craiel.UnityEssentials"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": []
-}
